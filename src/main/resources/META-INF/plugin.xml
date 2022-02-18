@@ -1,0 +1,36 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <id>org.mvnsearch.plugins.justPlugin</id>
+    <name>Just</name>
+    <vendor email="libing.chen@gmail.com">linux_china</vendor>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType name="justfile"
+                  implementationClass="org.mvnsearch.plugins.just.lang.psi.JustFileType"
+                  fieldName="INSTANCE" fileNamesCaseInsensitive="false"
+                  language="Just" fileNames="justfile;Justfile"/>
+        <codeInsight.lineMarkerProvider language="Just" implementationClass="org.mvnsearch.plugins.just.lang.run.JustRunLineMarkerContributor"/>
+        <lang.parserDefinition language="Just"
+                               implementationClass="org.mvnsearch.plugins.just.lang.parser.JustParserDefinition"/>
+        <annotator language="Just" implementationClass="org.mvnsearch.plugins.just.lang.insight.JustfileAnnotator"/>
+        <lang.commenter language="Just" implementationClass="org.mvnsearch.plugins.just.lang.comment.JustfileCommenter"/>
+        <completion.contributor language="Just" implementationClass="org.mvnsearch.plugins.just.lang.completion.JustCodeCompletionContributor"/>
+        <completion.contributor language="Just" implementationClass="org.mvnsearch.plugins.just.lang.completion.JustSetCompletionContributor"/>
+        <completion.contributor language="Just" implementationClass="org.mvnsearch.plugins.just.lang.completion.JustRecipeDependencyCompletionContributor"/>
+        <languageInjectionContributor language="Just" implementationClass="org.mvnsearch.plugins.just.lang.injector.JustCodeBlockLanguageInjector"/>
+        <!--suppress PluginXmlValidity -->
+        <lang.directNavigationProvider implementation="org.mvnsearch.plugins.just.lang.navigation.RecipeRefNavigation"/>
+    </extensions>
+
+    <actions>
+        <action class="org.mvnsearch.plugins.just.ide.action.NewJustfileAction"
+                id="NewJustfileAction"
+                text="Justfile"
+                icon="/icons/just-16x16.svg">
+            <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewFromTemplate"/>
+        </action>
+    </actions>
+
+</idea-plugin>
