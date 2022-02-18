@@ -1,0 +1,83 @@
+{
+  parserClass="org.mvnsearch.plugins.just.lang.parser.JustParser"
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+  
+  psiClassPrefix="Just"
+  psiImplClassSuffix="Impl"
+  psiPackage="org.mvnsearch.plugins.just.lang.psi"
+  psiImplPackage="org.mvnsearch.plugins.just.lang.psi.impl"
+
+  elementTypeHolderClass="org.mvnsearch.plugins.just.lang.psi.JustTypes"
+  elementTypeClass="org.mvnsearch.plugins.just.lang.psi.JustElementType"
+  tokenTypeClass="org.mvnsearch.plugins.just.lang.psi.JustTokenType"
+
+  psiImplUtilClass="org.mvnsearch.plugins.just.lang.psi.impl.JustPsiImplUtil"
+
+  tokens=[
+      NEW_LINE='regexp:\n'
+      WHITE_SPACE='regexp:\s+'
+      OPEN_PAREN='regexp:\('
+      CLOSE_PAREN='regexp:\)'
+      OPEN_BRACE='regexp:[{]'
+      CLOSE_BRACE='regexp:[}]'
+      COMMA='regexp:,'
+      EQUAL='regexp:='
+      BOOL_LITERAL='regexp:(true)|(false)'
+      NUMBER_LITERAL='regexp:\d+'
+      COMMA='regexp:,'
+      COMMA='regexp:,'
+      ASSIGN='regexp:(:=)'
+      SEPERATOR='regexp:(:)'
+      BACKTICK="regexp:`[^`]*`"
+      INDENTED_BACKTICK="regexp:(```)[^`]*(```)"
+      RAW_STRING="regexp:'[^']*'"
+      INDENTED_RAW_STRING="regexp:(''')[^(')]*(''')"
+      STRING='regexp:"[^"]*"'
+      INDENTED_STRING='regexp:"(""")[^(")]*(""")'
+      PAREN_STRING='regexp:\([^(]*\)'
+      LITERAL="regexp:[^\n \t]*"
+      SETTING='regexp:[a-zA-Z_][a-zA-Z0-9_\-]*'
+      ID='regexp:[a-zA-Z_][a-zA-Z0-9_\-]*'
+      ID_LITERAL='regexp:[a-zA-Z_][a-zA-Z0-9_\-]*'
+      VARIABLE='regexp:([a-zA-Z_][a-zA-Z0-9_-]*)'
+      RECIPE_NAME='regexp:[a-zA-Z_][a-zA-Z0-9_\-]*'
+      DEPENDENCY_NAME='regexp:[a-zA-Z_][a-zA-Z0-9_\-]*'
+      RECIPE_PARAM_NAME='regexp:[$*+]?[a-zA-Z_][a-zA-Z0-9_\-]*'
+      RECIPE_PARAMS='regexp:([^:\n]*)'
+      DEPENDENCY_WITH_PARAMS='regexp:[a-zA-Z_][a-zA-Z0-9_\-]*\([^(\n]*\)'
+      DEPENDENCY_PARAMS='regexp:[^(\n)]*'
+      SHEBANG='regexp:#!.*'
+      COMMENT='regexp:#.*'
+      CODE='regexp:(\n[ \t]+[^\n]*)*'
+
+      KEYWORD_ALIAS='regexp:(alias)'
+      KEYWORD_EXPORT='regexp:(export)'
+      KEYWORD_SET='regexp:(set)'
+      KEYWORD_IF='regexp:(if)'
+      KEYWORD_ELSE='regexp:(else)'
+    ]
+}
+
+
+justfile ::= any*
+
+private stmt ::= (SHEBANG_STATEMENT|COMMENT|ALIAS_STATEMENT|EXPORT_STATEMENT|SET_STATEMENT|VARIABLE_STATEMENT|RECIPE_STATEMENT|NEW_LINE)
+private recover ::= !(any)
+private any ::= !<<eof>> stmt {pin=1 recoverWhile=recover}
+
+SHEBANG_STATEMENT ::= SHEBANG
+TEXT_ITEM ::= (STRING|RAW_STRING|BACKTICK|LITERAL|ID_LITERAL)
+ANY_TEXT_ITEM ::= (INDENTED_RAW_STRING|INDENTED_STRING|INDENTED_BACKTICK|STRING|RAW_STRING|BACKTICK|PAREN_STRING|LITERAL|ID_LITERAL)
+EXPORT_STATEMENT ::= KEYWORD_EXPORT ID ASSIGN TEXT_ITEM
+ALIAS_STATEMENT ::= KEYWORD_ALIAS RECIPE_NAME ASSIGN RECIPE_NAME
+SET_STATEMENT ::= KEYWORD_SET SETTING ASSIGN? (BOOL_LITERAL|LITERAL)*
+VARIABLE_STATEMENT ::= VARIABLE ASSIGN VARIABLE_VALUE+
+VARIABLE_VALUE ::= (KEYWORD_IF|KEYWORD_ELSE|OPEN_BRACE|CLOSE_BRACE | NEW_LINE) | ANY_TEXT_ITEM
+RECIPE_STATEMENT ::= RECIPE_NAME PARAMS? SEPERATOR DEPENDENCIES_WITH_CODE?
+PARAMS ::= RECIPE_PARAM*
+RECIPE_PARAM ::= RECIPE_PARAM_NAME EQUAL? RECIPE_PARAM_VALUE?
+RECIPE_PARAM_VALUE ::= (STRING|RAW_STRING|BACKTICK|PAREN_STRING|ID_LITERAL)
+DEPENDENCIES_WITH_CODE ::= (DEPENDENCY)* CODE_BLOCK?
+DEPENDENCY ::= OPEN_PAREN? DEPENDENCY_NAME DEPENDENCY_PARAM* CLOSE_PAREN?
+DEPENDENCY_PARAM ::= (STRING | RAW_STRING | BACKTICK | COMMA)
+CODE_BLOCK ::= CODE
