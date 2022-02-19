@@ -24,24 +24,26 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
     fun parseMetadata(loadDotenv: Boolean): JustfileMetadata {
         val justfileMetadata = JustfileMetadata()
         text.lines().forEach { line ->
-            if (line.startsWith("export ") && line.contains(":=")) { //export
-                val variable = line.substring(7, line.indexOf(":=")).trim()
-                justfileMetadata.envVariables.add(variable)
-            } else if (line.startsWith("set ")) { //set
-                if (line.contains("dotenv-load")) {
-                    justfileMetadata.dotenvLoad = line.contains("dotenv-load") && !line.contains("false")
-                } else if (line.contains("export")) {
-                    justfileMetadata.variablesExported = !line.contains("false")
-                }
-            } else if (line.startsWith("alias ") && line.contains(":=")) {
-                val aliasRecipeName = line.substring(6, line.indexOf(":=")).trim()
-                justfileMetadata.recipes.add(parseRecipeName(aliasRecipeName))
-            } else if (!(line.startsWith(" ") || line.startsWith("\t")) && line.contains(":")) { //recipe or variable
-                if (line.contains(":=")) { // variable
-                    val variable = line.substring(0, line.indexOf(":=")).trim()
-                    justfileMetadata.variables.add(variable)
-                } else { // recipe
-                    justfileMetadata.recipes.add(parseRecipeName(line))
+            if (!line.startsWith("#")) {  //skip comments
+                if (line.startsWith("export ") && line.contains(":=")) { //export
+                    val variable = line.substring(7, line.indexOf(":=")).trim()
+                    justfileMetadata.envVariables.add(variable)
+                } else if (line.startsWith("set ")) { //set
+                    if (line.contains("dotenv-load")) {
+                        justfileMetadata.dotenvLoad = line.contains("dotenv-load") && !line.contains("false")
+                    } else if (line.contains("export")) {
+                        justfileMetadata.variablesExported = !line.contains("false")
+                    }
+                } else if (line.startsWith("alias ") && line.contains(":=")) {
+                    val aliasRecipeName = line.substring(6, line.indexOf(":=")).trim()
+                    justfileMetadata.recipes.add(aliasRecipeName)
+                } else if (!(line.startsWith(" ") || line.startsWith("\t")) && line.contains(":")) { //recipe or variable
+                    if (line.contains(":=")) { // variable
+                        val variable = line.substring(0, line.indexOf(":=")).trim()
+                        justfileMetadata.variables.add(variable)
+                    } else { // recipe
+                        justfileMetadata.recipes.add(parseRecipeName(line))
+                    }
                 }
             }
         }
