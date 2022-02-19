@@ -35,13 +35,16 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
                 psiElement,
                 psiElement.textRange,
                 icon,
-                { _: PsiElement? ->
+                {
                     "Run just recipe: $recipeName"
                 },
                 { e, elt ->
                     runJustRecipeByRunAnything(psiElement.project, psiElement, recipeName)
                 },
-                GutterIconRenderer.Alignment.CENTER
+                GutterIconRenderer.Alignment.CENTER,
+                {
+                    recipeName
+                }
             )
         }
         return null
