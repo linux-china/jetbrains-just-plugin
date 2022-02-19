@@ -1,4 +1,4 @@
-package org.mvnsearch.plugins.just.lang.injector
+package org.jetbrains.plugins.template
 
 import com.intellij.lang.Language
 import com.intellij.lang.injection.general.Injection
