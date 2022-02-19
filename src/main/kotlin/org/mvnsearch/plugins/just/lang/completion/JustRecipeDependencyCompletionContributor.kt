@@ -15,7 +15,7 @@ class JustRecipeDependencyCompletionContributor : CompletionContributor() {
     init {
         extend(
             CompletionType.BASIC,
-            psiElement(PsiElement::class.java).withParent(psiElement(JustTypes.DEPENDENCIES_WITH_CODE)).withElementType(JustTypes.RECIPE_NAME).withLanguage(JustLanguage),
+            psiElement(PsiElement::class.java).withParent(psiElement(JustTypes.DEPENDENCY)).withElementType(JustTypes.DEPENDENCY_NAME).withLanguage(JustLanguage),
             object : CompletionProvider<CompletionParameters>() {
                 override fun addCompletions(
                     parameters: CompletionParameters,
@@ -36,7 +36,17 @@ class JustRecipeDependencyCompletionContributor : CompletionContributor() {
                         val justfile = element.containingFile as JustFile
                         val justfileMetadata = justfile.parseMetadata(false)
                         justfileMetadata.recipes.filter { !excludedNames.contains(it) }.forEach {
-                            result.addElement(LookupElementBuilder.create(it))
+                            val buildItem = if (prefixText.endsWith("(")) {
+                                LookupElementBuilder.create("$it \"\")").withPresentableText(it)
+                                    .withInsertHandler { context, item ->
+                                        run {
+                                            context.editor.caretModel.moveToOffset(caret.offset - 2)
+                                        }
+                                    }
+                            } else {
+                                LookupElementBuilder.create(it)
+                            }
+                            result.addElement(buildItem)
                         }
                     }
                 }
