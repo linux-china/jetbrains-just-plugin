@@ -85,7 +85,7 @@ class JustfileAnnotator : Annotator {
             if (endOffset > offset) {
                 val range = TextRange(rangeOffset + offset, rangeOffset + endOffset + 2)
                 holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(range).textAttributes(DefaultLanguageHighlighterColors.STATIC_FIELD).create()
-                offset = text.indexOf('"', offset + 1)
+                offset = text.indexOf("{{", endOffset + 2)
             } else {
                 offset = -1
             }
