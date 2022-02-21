@@ -1,5 +1,6 @@
 package org.mvnsearch.plugins.just
 
+val INDENT_CHARS = listOf(' ', '\t', '\n')
 val PARAM_PREFIX_LIST = listOf('$', '+', '*', '@')
 
 fun parseRecipeName(line: String): String {
