@@ -11,6 +11,6 @@ build-plugin: clean generate
 
 # clean
 clean:
-  rm -rf target/distributions
-  rm -rf target/resources
-  rm -rf target/classes
+  rm -rf build/distributions
+  rm -rf build/resources
+  rm -rf build/classes
