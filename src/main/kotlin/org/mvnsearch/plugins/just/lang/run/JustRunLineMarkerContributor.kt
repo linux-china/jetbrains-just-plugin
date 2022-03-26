@@ -17,16 +17,15 @@ import com.intellij.openapi.actionSystem.impl.SimpleDataContext
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
-import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.elementType
 import com.intellij.util.execution.ParametersListUtil
+import org.mvnsearch.plugins.just.Just
 import org.mvnsearch.plugins.just.ide.icons.JustIcons.JUST_FILE
 import org.mvnsearch.plugins.just.lang.psi.JustTypes
 import org.mvnsearch.plugins.just.parseRecipeName
-import java.io.File
 import javax.swing.Icon
 
 @Suppress("DialogTitleCapitalization")
@@ -68,22 +67,10 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
         runCommand(
             project,
             psiElement.containingFile.virtualFile.parent,
-            "${getJustCmdAbsolutionPath()} $taskName",
+            "${Just.getJustCmdAbsolutionPath()} $taskName",
             DefaultRunExecutor.getRunExecutorInstance(),
             SimpleDataContext.getProjectContext(project)
         )
-    }
-
-    private fun getJustCmdAbsolutionPath(): String {
-        return if (SystemInfo.isWindows) {
-            return "just"
-        } else {
-            if (File("/usr/local/bin/just").exists()) {
-                "/usr/local/bin/just"
-            } else {
-                "just"
-            }
-        }
     }
 
     private fun runCommand(project: Project, workDirectory: VirtualFile, commandString: String, executor: Executor, dataContext: DataContext) {
