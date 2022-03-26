@@ -21,6 +21,15 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
             }
     }
 
+
+    fun findAllRecipes(): List<String> {
+        return this.children
+            .filterIsInstance<JustRecipeStatement>()
+            .map {
+                it.recipeName.text
+            }.toList()
+    }
+
     fun parseMetadata(loadDotenv: Boolean): JustfileMetadata {
         val justfileMetadata = JustfileMetadata()
         text.lines().forEach { line ->
