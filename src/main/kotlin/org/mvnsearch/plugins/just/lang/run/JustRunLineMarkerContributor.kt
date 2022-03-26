@@ -10,7 +10,6 @@ import com.intellij.execution.lineMarker.RunLineMarkerProvider
 import com.intellij.execution.runners.ExecutionEnvironmentBuilder
 import com.intellij.icons.AllIcons
 import com.intellij.ide.IdeBundle
-import com.intellij.ide.actions.runAnything.RunAnythingCache
 import com.intellij.ide.actions.runAnything.commands.RunAnythingCommandCustomizer
 import com.intellij.ide.actions.runAnything.execution.RunAnythingRunProfile
 import com.intellij.openapi.actionSystem.DataContext
@@ -89,9 +88,6 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
 
     private fun runCommand(project: Project, workDirectory: VirtualFile, commandString: String, executor: Executor, dataContext: DataContext) {
         var commandDataContext = dataContext
-        val commands: MutableCollection<String> = RunAnythingCache.getInstance(project).state.commands
-        commands.remove(commandString)
-        commands.add(commandString)
         commandDataContext = RunAnythingCommandCustomizer.customizeContext(commandDataContext)
         val initialCommandLine = GeneralCommandLine(ParametersListUtil.parse(commandString, false, true))
             .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
