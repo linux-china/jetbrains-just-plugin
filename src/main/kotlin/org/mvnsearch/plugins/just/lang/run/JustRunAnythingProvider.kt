@@ -74,9 +74,13 @@ class JustRunAnythingProvider : RunAnythingCommandLineProvider() {
 
     override fun suggestCompletionVariants(dataContext: DataContext, commandLine: CommandLine): Sequence<String> {
         val project = dataContext.getData(CommonDataKeys.PROJECT)
-        val justfile = project?.guessProjectDir()?.findChild("justfile")
+        val projectDir = project?.guessProjectDir()
+        var justfile = projectDir?.findChild("justfile")
+        if (justfile == null) {
+            justfile = projectDir?.findChild("Justfile")
+        }
         if (justfile != null) {
-            val psiFile = PsiManager.getInstance(project).findFile(justfile) as JustFile
+            val psiFile = PsiManager.getInstance(project!!).findFile(justfile) as JustFile
             return psiFile.findAllRecipes().asSequence()
 
         }
