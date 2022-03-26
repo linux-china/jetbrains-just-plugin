@@ -39,7 +39,7 @@ class JustRunAnythingProvider : RunAnythingCommandLineProvider() {
     }
 
     override fun getHelpCommandPlaceholder(): String {
-        return "just <taskName...> <--option-name...>"
+        return "just <taskName...>"
     }
 
     override fun getHelpCommand(): String {
