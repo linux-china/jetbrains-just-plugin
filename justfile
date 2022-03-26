@@ -6,5 +6,11 @@ generate:
   ./gradlew generateLexer generateParser
 
 # Build just plugin
-build-plugin: generate
+build-plugin: clean generate
   ./gradlew patchPluginXml buildPlugin
+
+# clean
+clean:
+  rm -rf target/distributions
+  rm -rf target/resources
+  rm -rf target/classes
