@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+## [0.2.1] - 2022-03-27
+
+### Added
+
+-  `&&` support for "Running Recipes at the End of a Recipe" syntax 
+
 ## [0.2.0] - 2022-03-26
 
 ### Added
