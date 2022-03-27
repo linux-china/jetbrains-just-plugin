@@ -53,6 +53,7 @@ DEPENDENCY_PARAMS=[^\(\n\)]*
 LITERAL=([^\n \t]*)
 SHEBANG=("#!")[^\n]*
 COMMENT=("#")[^\n]*
+DOUBLE_AND=("&&")
 VARIABLE=([a-zA-Z_][a-zA-Z0-9_-]*)
 VARIABLE_DECLARE=([a-zA-Z_][a-zA-Z0-9_-]*)(\s*)(":=")
 RECIPE_PARAMS=([^:\n]*)
@@ -162,7 +163,8 @@ KEYWORD_ELSE=(else)
 
 <DEPENDENCIES> {
   {WHITE_SPACE}+           {  yybegin(DEPENDENCIES); return TokenType.WHITE_SPACE; }
-  {DEPENDENCY_NAME}            {  yybegin(DEPENDENCIES); return DEPENDENCY_NAME; }
+  {DOUBLE_AND}             {  yybegin(DEPENDENCIES); return DOUBLE_AND; }
+  {DEPENDENCY_NAME}        {  yybegin(DEPENDENCIES); return DEPENDENCY_NAME; }
   {OPEN_PAREN}             {  yybegin(DEPENDENCY_WITH_PARAMS); return OPEN_PAREN; }
   {CODE}                   {  yybegin(YYINITIAL); return CODE; }
   {NEW_LINE}               {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
