@@ -41,6 +41,9 @@ class NewJustfileAction : AnAction() {
                 
                 dependencies:
                   ./gradlew -q dependencies --configuration compileClasspath > ./dependencies.txt
+                
+                wrapper:
+                  ./gradlew wrapper --gradle-version=7.4.2
                 """.trimIndent()
         val JUSTFILE = """
                 #!/usr/bin/env just --justfile
