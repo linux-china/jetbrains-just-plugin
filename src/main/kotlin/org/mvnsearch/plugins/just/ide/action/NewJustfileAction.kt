@@ -49,6 +49,21 @@ class NewJustfileAction : AnAction() {
                 wrapper:
                   ./gradlew wrapper --gradle-version=7.4.2
                 """.trimIndent()
+        val JUSTFILE_CARGO = """
+                #!/usr/bin/env just --justfile
+                
+                release:
+                  cargo build --release    
+                
+                lint:
+                  cargo clippy
+                
+                bin:
+                  cargo run --bin bin -- arg1
+                
+                example:
+                  cargo run --example exname -- arg1
+                """.trimIndent()
         val JUSTFILE = """
                 #!/usr/bin/env just --justfile
                     
@@ -64,6 +79,8 @@ class NewJustfileAction : AnAction() {
             JUSTFILE_MAVEN
         } else if (projectDir.findChild("gradlew") != null) {
             JUSTFILE_GRADLE
+        } else if (projectDir.findChild("Cargo.toml") != null) {
+            JUSTFILE_CARGO
         } else {
             JUSTFILE
         }
