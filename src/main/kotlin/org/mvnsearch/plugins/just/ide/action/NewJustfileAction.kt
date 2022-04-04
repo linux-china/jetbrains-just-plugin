@@ -35,10 +35,12 @@ class NewJustfileAction : AnAction() {
         """.trimIndent()
         val JUSTFILE_GRADLE = """
                 #!/usr/bin/env just --justfile
-                        
-                # gradle build without tests
+                
                 build:
                   ./gradlew -x test build    
+                
+                dependencies:
+                  ./gradlew -q dependencies --configuration compileClasspath > ./dependencies.txt
                 """.trimIndent()
         val JUSTFILE = """
                 #!/usr/bin/env just --justfile
