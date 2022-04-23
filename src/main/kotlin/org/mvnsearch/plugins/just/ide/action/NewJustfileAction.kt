@@ -66,7 +66,7 @@ class NewJustfileAction : AnAction() {
                 """.trimIndent()
         val JUSTFILE = """
                 #!/usr/bin/env just --justfile
-                    
+                
                 hello:
                   echo "hello world"
                 """.trimIndent()
