@@ -64,6 +64,13 @@ class NewJustfileAction : AnAction() {
                 example:
                   cargo run --example exname -- arg1
                 """.trimIndent()
+        val JUSTFILE_CMAKE = """
+                #!/usr/bin/env just --justfile
+                
+                release:
+                  cmake -S . -B build -D CMAKE_BUILD_TYPE=Release
+                  cmake --build build
+                """.trimIndent()
         val JUSTFILE = """
                 #!/usr/bin/env just --justfile
                 
@@ -81,6 +88,8 @@ class NewJustfileAction : AnAction() {
             JUSTFILE_GRADLE
         } else if (projectDir.findChild("Cargo.toml") != null) {
             JUSTFILE_CARGO
+        } else if (projectDir.findChild("CMakeLists.txt") != null) {
+            JUSTFILE_CMAKE
         } else {
             JUSTFILE
         }
