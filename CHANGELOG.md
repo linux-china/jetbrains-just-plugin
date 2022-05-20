@@ -4,11 +4,15 @@
 
 ## [Unreleased]
 
+## [0.2.2] - 2022-05-20
+
+- Compatible with JetBrains IDEs 2022.*
+
 ## [0.2.1] - 2022-03-27
 
 ### Added
 
--  `&&` support for "Running Recipes at the End of a Recipe" syntax 
+- `&&` support for "Running Recipes at the End of a Recipe" syntax
 
 ## [0.2.0] - 2022-03-26
 
