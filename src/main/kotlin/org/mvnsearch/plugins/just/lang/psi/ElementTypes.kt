@@ -17,5 +17,5 @@ object JustFileType : LanguageFileType(JustLanguage) {
     override fun getDescription(): String = "Just file"
     override fun getDefaultExtension(): String = "justfile"
 
-    override fun getIcon(): Icon = AllIcons.Nodes.RunnableMark
+    override fun getIcon(): Icon = AllIcons.RunConfigurations.TestState.Run_run
 }
