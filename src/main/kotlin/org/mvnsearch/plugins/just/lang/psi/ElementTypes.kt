@@ -1,8 +1,8 @@
 package org.mvnsearch.plugins.just.lang.psi
 
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.fileTypes.LanguageFileType
 import com.intellij.psi.tree.IElementType
-import org.mvnsearch.plugins.just.ide.icons.JustIcons
 import org.mvnsearch.plugins.just.lang.JustLanguage
 import javax.swing.Icon
 
@@ -17,5 +17,5 @@ object JustFileType : LanguageFileType(JustLanguage) {
     override fun getDescription(): String = "Just file"
     override fun getDefaultExtension(): String = "justfile"
 
-    override fun getIcon(): Icon = JustIcons.JUST_FILE
+    override fun getIcon(): Icon = AllIcons.Nodes.RunnableMark
 }
