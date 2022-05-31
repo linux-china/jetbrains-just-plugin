@@ -90,10 +90,10 @@ KEYWORD_ELSE=(else)
 <EXPORT_VALUE> {
    {WHITE_SPACE}+     {  yybegin(EXPORT_VALUE); return TokenType.WHITE_SPACE; }
    {ASSIGN}           {  yybegin(EXPORT_VALUE); return ASSIGN; }
-   {STRING}           {  yybegin(YYINITIAL); return STRING; }
-   {RAW_STRING}       {  yybegin(YYINITIAL); return RAW_STRING; }
-   {BACKTICK}         {  yybegin(YYINITIAL); return BACKTICK; }
-   {LITERAL}          {  yybegin(YYINITIAL); return LITERAL; }
+   {STRING}           {  yybegin(EXPORT_VALUE); return STRING; }
+   {RAW_STRING}       {  yybegin(EXPORT_VALUE); return RAW_STRING; }
+   {BACKTICK}         {  yybegin(EXPORT_VALUE); return BACKTICK; }
+   {LITERAL}          {  yybegin(EXPORT_VALUE); return LITERAL; }
    {NEW_LINE}         {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
 }
 
