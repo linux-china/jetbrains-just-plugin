@@ -71,6 +71,13 @@ class NewJustfileAction : AnAction() {
                   cmake -S . -B build -D CMAKE_BUILD_TYPE=Release
                   cmake --build build
                 """.trimIndent()
+        val JUSTFILE_GOLANG = """
+                #!/usr/bin/env just --justfile
+                
+                update:
+                  go get -u
+                  go mod tidy -v
+                """.trimIndent()
         val JUSTFILE = """
                 #!/usr/bin/env just --justfile
                 
@@ -90,6 +97,8 @@ class NewJustfileAction : AnAction() {
             JUSTFILE_CARGO
         } else if (projectDir.findChild("CMakeLists.txt") != null) {
             JUSTFILE_CMAKE
+        } else if (projectDir.findChild("go.mod") != null) {
+            JUSTFILE_GOLANG
         } else {
             JUSTFILE
         }
