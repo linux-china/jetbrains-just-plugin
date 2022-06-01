@@ -28,7 +28,8 @@ class JustSetCompletionContributor : CompletionContributor() {
                         result.addElement(LookupElementBuilder.create("export"))
                         result.addElement(LookupElementBuilder.create("positional-arguments"))
                         result.addElement(LookupElementBuilder.create("shell := [\"bash\", \"-c\"]").withPresentableText("shell"))
-                        result.addElement(LookupElementBuilder.create("windows-powershell"))
+                        result.addElement(LookupElementBuilder.create("windows-shell := [\"pwsh.exe\", \"-NoLogo\",\"-Command\"]").withPresentableText("shell"))
+                        result.addElement(LookupElementBuilder.create("windows-powershell := true"))
                     }
                 }
             }
