@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+## [0.2.3] - 2022-05-31
+
+- Adjust justfile icon in file explorer to 12x12
+- Bug fix syntax error for export statement
+
 ## [0.2.2] - 2022-05-20
 
 - Compatible with JetBrains IDEs 2022.*
