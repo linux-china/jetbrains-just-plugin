@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+- Fix empty line in recipe's code block
+
 ## [0.2.4] - 2022-06-16
 
 - Shell language injection
