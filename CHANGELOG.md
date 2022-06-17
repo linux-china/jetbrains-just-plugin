@@ -4,7 +4,9 @@
 
 ## [Unreleased]
 
-- Fix empty line in recipe's code block
+## [0.2.5] - 2022-06-17
+
+- Fix blank line in recipe's code block
 
 ## [0.2.4] - 2022-06-16
 
