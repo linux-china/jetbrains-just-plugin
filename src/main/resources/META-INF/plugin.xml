@@ -19,7 +19,7 @@
         <completion.contributor language="Just" implementationClass="org.mvnsearch.plugins.just.lang.completion.JustCodeCompletionContributor"/>
         <completion.contributor language="Just" implementationClass="org.mvnsearch.plugins.just.lang.completion.JustSetCompletionContributor"/>
         <completion.contributor language="Just" implementationClass="org.mvnsearch.plugins.just.lang.completion.JustRecipeDependencyCompletionContributor"/>
-        <!-- <multiHostInjector implementation="org.mvnsearch.plugins.just.lang.injector.JustCodeBlockLanguageInjector"/>-->
+        <multiHostInjector implementation="org.mvnsearch.plugins.just.lang.injector.JustCodeBlockLanguageInjector"/>
         <!--suppress PluginXmlValidity -->
         <lang.directNavigationProvider implementation="org.mvnsearch.plugins.just.lang.navigation.RecipeRefNavigation"/>
         <runAnything.executionProvider implementation="org.mvnsearch.plugins.just.lang.run.JustRunAnythingProvider"/>
