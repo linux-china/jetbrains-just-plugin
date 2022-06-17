@@ -28,10 +28,17 @@ class JustCodeBlockLanguageInjector : MultiHostInjector, DumbAware {
         if (!text.contains("#!/usr/bin/env") || text.contains("#!/usr/bin/env sh")) {
             val offset = text.indexOfFirst { !INDENT_CHARS.contains(it) && !PARAM_PREFIX_LIST.contains(it) }
             if (offset > 0) {
-                val injectionTextRange = TextRange(offset, context.textLength)
-                registrar.startInjecting(shellLanguage!!)
-                registrar.addPlace(null, null, context as PsiLanguageInjectionHost, injectionTextRange)
-                registrar.doneInjecting()
+                var trailLength = text.toCharArray().reversedArray().indexOfFirst { !INDENT_CHARS.contains(it) }
+                if (trailLength < 0) {
+                    trailLength = 0
+                }
+                val endOffset = context.textLength - trailLength
+                if (endOffset > offset) {
+                    val injectionTextRange = TextRange(offset, context.textLength - trailLength)
+                    registrar.startInjecting(shellLanguage!!)
+                    registrar.addPlace(null, null, context as PsiLanguageInjectionHost, injectionTextRange)
+                    registrar.doneInjecting()
+                }
             }
         }
     }
