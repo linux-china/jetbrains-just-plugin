@@ -63,7 +63,7 @@ RECIPE_SIMPLE_PARARM2=[$*+]?[a-zA-Z_][a-zA-Z0-9_\-]*=[a-zA-Z0-9_\-]*
 RECIPE_PAIR_PARARM1=[$*+]?[a-zA-Z_][a-zA-Z0-9_\-]*='[^':]*'
 RECIPE_PAIR_PARARM2=[$*+]?[a-zA-Z_][a-zA-Z0-9_\-]*=`[^`:]*`
 RECIPE_PAIR_PARARM3=[$*+]?[a-zA-Z_][a-zA-Z0-9_\-]*=\([^:\(]*\)
-CODE=(\n[ \t]+[^\n]*)*
+CODE=((\n[ \t]+[^\n]*)|(\n[ \t]*))*
 
 KEYWORD_ALIAS=(alias)
 KEYWORD_EXPORT=(export)
