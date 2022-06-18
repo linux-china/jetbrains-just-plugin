@@ -16,6 +16,7 @@
                                implementationClass="org.mvnsearch.plugins.just.lang.parser.JustParserDefinition"/>
         <annotator language="Just" implementationClass="org.mvnsearch.plugins.just.lang.insight.JustfileAnnotator"/>
         <lang.commenter language="Just" implementationClass="org.mvnsearch.plugins.just.lang.comment.JustfileCommenter"/>
+        <lang.foldingBuilder language="Just" implementationClass="org.mvnsearch.plugins.just.JustfileFoldingBuilder"/>
         <completion.contributor language="Just" implementationClass="org.mvnsearch.plugins.just.lang.completion.JustCodeCompletionContributor"/>
         <completion.contributor language="Just" implementationClass="org.mvnsearch.plugins.just.lang.completion.JustSetCompletionContributor"/>
         <completion.contributor language="Just" implementationClass="org.mvnsearch.plugins.just.lang.completion.JustRecipeDependencyCompletionContributor"/>
