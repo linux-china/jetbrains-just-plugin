@@ -1,4 +1,4 @@
-package org.mvnsearch.plugins.just
+package org.mvnsearch.plugins.just.lang
 
 import com.intellij.lang.ASTNode
 import com.intellij.lang.folding.FoldingBuilderEx
