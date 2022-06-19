@@ -4,13 +4,10 @@
 
 ## [Unreleased]
 
-## [0.2.6] - 2022-06-19
-
-- Justfile structure view
-
 ## [0.2.5] - 2022-06-17
 
 - Folding support for recipe and variable
+- Justfile structure view
 - Fix blank line in recipe's code block
 
 ## [0.2.4] - 2022-06-16
