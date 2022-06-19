@@ -12,6 +12,8 @@ Plugin features:
 * New justfile by project type, such as Maven/Gradle
 * Code completion: settings names, recipe dependencies, variables with dotenv support
 * Navigation for dependency name
+* Language injection for shell
+* Justfile structure view
 
 How to use?
 
