@@ -8,7 +8,6 @@ import com.intellij.execution.configurations.PtyCommandLine
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.lineMarker.RunLineMarkerProvider
 import com.intellij.execution.runners.ExecutionEnvironmentBuilder
-import com.intellij.icons.AllIcons
 import com.intellij.ide.IdeBundle
 import com.intellij.ide.actions.runAnything.commands.RunAnythingCommandCustomizer
 import com.intellij.ide.actions.runAnything.execution.RunAnythingRunProfile
@@ -23,6 +22,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.elementType
 import com.intellij.util.execution.ParametersListUtil
 import org.mvnsearch.plugins.just.Just
+import org.mvnsearch.plugins.just.ide.icons.JustIcons
 import org.mvnsearch.plugins.just.ide.icons.JustIcons.JUST_FILE
 import org.mvnsearch.plugins.just.lang.psi.JustTypes
 import org.mvnsearch.plugins.just.parseRecipeName
@@ -35,7 +35,7 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
     }
 
     override fun getIcon(): Icon {
-        return AllIcons.RunConfigurations.TestState.Run
+        return JustIcons.RUN_ICON
     }
 
     override fun getLineMarkerInfo(psiElement: PsiElement): LineMarkerInfo<*>? {
