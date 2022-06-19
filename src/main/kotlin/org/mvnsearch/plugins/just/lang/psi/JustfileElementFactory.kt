@@ -14,4 +14,8 @@ object JustfileElementFactory {
         return recipeStatement.dependenciesWithCode?.codeBlock!!
     }
 
+    fun createRecipe(project: Project, recipeName: String): JustRecipeStatement {
+        return createFile(project, "${recipeName}:\n").firstChild as JustRecipeStatement
+    }
+
 }
