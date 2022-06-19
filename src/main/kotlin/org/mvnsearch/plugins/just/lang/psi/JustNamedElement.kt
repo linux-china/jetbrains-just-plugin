@@ -9,9 +9,7 @@ import com.intellij.psi.PsiNameIdentifierOwner
 import org.mvnsearch.plugins.just.lang.psi.JustfileElementFactory.createRecipe
 import javax.swing.Icon
 
-interface JustNamedElement : PsiNameIdentifierOwner
-
-interface JustRecipeElement : JustNamedElement {
+interface JustNamedElement : PsiNameIdentifierOwner {
     fun getKey(): String?
 
     fun getValue(): String?
@@ -32,17 +30,22 @@ abstract class JustNamedElementImpl(node: ASTNode) : ASTWrapperPsiElement(node),
         return this._name
     }
 
-    override fun getNameIdentifier(): PsiElement? {
-        return this
-    }
-
     override fun setName(name: String): PsiElement? {
         this._name = name
         return this
     }
+
+    override fun getNameIdentifier(): PsiElement? {
+        return this
+    }
+
+    override fun getPresentation(): ItemPresentation? {
+        return null
+    }
+
 }
 
-abstract class JustRecipeElementImpl(node: ASTNode) : JustNamedElementImpl(node), JustRecipeElement {
+abstract class JustRecipeElementImpl(node: ASTNode) : JustNamedElementImpl(node) {
     override fun getKey(): String? {
         val keyNode: ASTNode? = this.node.findChildByType(JustTypes.RECIPE_NAME)
         return keyNode?.text?.replace("\\\\ ".toRegex(), " ")
@@ -61,7 +64,7 @@ abstract class JustRecipeElementImpl(node: ASTNode) : JustNamedElementImpl(node)
         val keyNode: ASTNode? = this.node.findChildByType(JustTypes.RECIPE_NAME)
         if (keyNode != null) {
             val createdRecipe = createRecipe(this.project, name)
-            val newKeyNode = createdRecipe.firstChild.node
+            val newKeyNode = createdRecipe.recipeName.node
             this.node.replaceChild(keyNode, newKeyNode)
         }
         return this
