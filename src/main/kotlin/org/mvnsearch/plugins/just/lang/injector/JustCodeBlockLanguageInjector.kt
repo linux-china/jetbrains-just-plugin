@@ -24,8 +24,8 @@ class JustCodeBlockLanguageInjector : MultiHostInjector, DumbAware {
 
 
     override fun getLanguagesToInject(registrar: MultiHostRegistrar, context: PsiElement) {
-        val text = context.text
-        if (!text.contains("#!/usr/bin/env") || isShellCode(text.trim())) {
+        val text = context.text.trim()
+        if (!text.startsWith("#!/usr/bin/env") || isShellCode(text)) {
             val offset = text.indexOfFirst { !INDENT_CHARS.contains(it) && !PARAM_PREFIX_LIST.contains(it) }
             if (offset > 0) {
                 var trailLength = text.toCharArray().reversedArray().indexOfFirst { !INDENT_CHARS.contains(it) }
