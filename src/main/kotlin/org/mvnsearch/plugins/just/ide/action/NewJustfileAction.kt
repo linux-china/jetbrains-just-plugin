@@ -78,6 +78,13 @@ class NewJustfileAction : AnAction() {
                   go get -u
                   go mod tidy -v
                 """.trimIndent()
+        val JUSTFILE_NODEJS = """
+                #!/usr/bin/env just --justfile
+                export PATH := "./node_modules/.bin:" + env_var('PATH')
+                
+                build:
+                  npm run build
+                """.trimIndent()
         val JUSTFILE = """
                 #!/usr/bin/env just --justfile
                 
@@ -99,6 +106,8 @@ class NewJustfileAction : AnAction() {
             JUSTFILE_CMAKE
         } else if (projectDir.findChild("go.mod") != null) {
             JUSTFILE_GOLANG
+        } else if (projectDir.findChild("package.json") != null) {
+            JUSTFILE_NODEJS
         } else {
             JUSTFILE
         }
