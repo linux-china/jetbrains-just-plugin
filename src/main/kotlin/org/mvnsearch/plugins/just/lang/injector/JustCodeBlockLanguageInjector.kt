@@ -25,7 +25,7 @@ class JustCodeBlockLanguageInjector : MultiHostInjector, DumbAware {
 
     override fun getLanguagesToInject(registrar: MultiHostRegistrar, context: PsiElement) {
         val text = context.text
-        if (!text.contains("#!/usr/bin/env") || text.contains("#!/usr/bin/env sh")) {
+        if (!text.contains("#!/usr/bin/env") || isShellCode(text.trim())) {
             val offset = text.indexOfFirst { !INDENT_CHARS.contains(it) && !PARAM_PREFIX_LIST.contains(it) }
             if (offset > 0) {
                 var trailLength = text.toCharArray().reversedArray().indexOfFirst { !INDENT_CHARS.contains(it) }
@@ -45,6 +45,14 @@ class JustCodeBlockLanguageInjector : MultiHostInjector, DumbAware {
 
     override fun elementsToInjectIn(): MutableList<out Class<out PsiElement>> {
         return mutableListOf(JustCodeBlock::class.java)
+    }
+
+    fun isShellCode(code: String): Boolean {
+        return code.startsWith("#!/usr/bin/env sh")
+                || code.startsWith("#!/usr/bin/env bash")
+                || code.startsWith("#!/usr/bin/env zsh")
+                || code.startsWith("#!/usr/bin/env fish")
+                || code.startsWith("#!/usr/bin/env nu")
     }
 
 }
