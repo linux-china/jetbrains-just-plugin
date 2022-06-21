@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+## [0.2.6] - 2022-06-21
+
+- Shell language injection: sh, bash, zsh and nu
+- Justfile template for Node.js app
+
 ## [0.2.5] - 2022-06-17
 
 - Folding support for recipe and variable
