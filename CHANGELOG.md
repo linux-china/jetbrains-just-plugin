@@ -6,19 +6,27 @@
 
 ## [0.2.8] - 2022-10-30
 
+### Changed
+
 - NPE bug fix when shell language not found
 - Code completion for `set fallback := false`
 
 ## [0.2.7] - 2022-09-25
 
+### Changed
+
 - Compatible with JetBrains IDE 2022.3
 
 ## [0.2.6] - 2022-06-21
+
+### Changed
 
 - Shell language injection: sh, bash, zsh and nu
 - Justfile template for Node.js app
 
 ## [0.2.5] - 2022-06-17
+
+### Changed
 
 - Folding support for recipe and variable
 - Justfile structure view
@@ -26,15 +34,21 @@
 
 ## [0.2.4] - 2022-06-16
 
+### Changed
+
 - Shell language injection
 - windows-shell completion
 
 ## [0.2.3] - 2022-05-31
 
+### Changed
+
 - Adjust justfile icon in file explorer to 12x12
 - Bug fix syntax error for export statement
 
 ## [0.2.2] - 2022-05-20
+
+### Changed
 
 - Compatible with JetBrains IDEs 2022.*
 
