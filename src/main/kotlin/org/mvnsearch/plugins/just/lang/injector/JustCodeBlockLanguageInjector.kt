@@ -13,7 +13,7 @@ import org.mvnsearch.plugins.just.lang.psi.JustCodeBlock
 
 
 class JustCodeBlockLanguageInjector : MultiHostInjector, DumbAware {
-    var shellLanguage: Language? = null
+    private var shellLanguage: Language? = null
 
     init {
         shellLanguage = Language.findLanguageByID("Shell Script");
@@ -24,20 +24,22 @@ class JustCodeBlockLanguageInjector : MultiHostInjector, DumbAware {
 
 
     override fun getLanguagesToInject(registrar: MultiHostRegistrar, context: PsiElement) {
-        val text = context.text
-        if (isShellCode(text.trim())) {
-            val offset = text.indexOfFirst { !INDENT_CHARS.contains(it) && !PARAM_PREFIX_LIST.contains(it) }
-            if (offset > 0) {
-                var trailLength = text.toCharArray().reversedArray().indexOfFirst { !INDENT_CHARS.contains(it) }
-                if (trailLength < 0) {
-                    trailLength = 0
-                }
-                val endOffset = context.textLength - trailLength
-                if (endOffset > offset) {
-                    val injectionTextRange = TextRange(offset, context.textLength - trailLength)
-                    registrar.startInjecting(shellLanguage!!)
-                    registrar.addPlace(null, null, context as PsiLanguageInjectionHost, injectionTextRange)
-                    registrar.doneInjecting()
+        if (shellLanguage != null) {
+            val text = context.text
+            if (isShellCode(text.trim())) {
+                val offset = text.indexOfFirst { !INDENT_CHARS.contains(it) && !PARAM_PREFIX_LIST.contains(it) }
+                if (offset > 0) {
+                    var trailLength = text.toCharArray().reversedArray().indexOfFirst { !INDENT_CHARS.contains(it) }
+                    if (trailLength < 0) {
+                        trailLength = 0
+                    }
+                    val endOffset = context.textLength - trailLength
+                    if (endOffset > offset) {
+                        val injectionTextRange = TextRange(offset, context.textLength - trailLength)
+                        registrar.startInjecting(shellLanguage!!)
+                        registrar.addPlace(null, null, context as PsiLanguageInjectionHost, injectionTextRange)
+                        registrar.doneInjecting()
+                    }
                 }
             }
         }
@@ -47,7 +49,7 @@ class JustCodeBlockLanguageInjector : MultiHostInjector, DumbAware {
         return mutableListOf(JustCodeBlock::class.java)
     }
 
-    fun isShellCode(code: String): Boolean {
+    private fun isShellCode(code: String): Boolean {
         if (!code.startsWith("#!/usr/bin/env")) {
             return true
         }
