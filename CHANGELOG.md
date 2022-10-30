@@ -4,6 +4,15 @@
 
 ## [Unreleased]
 
+## [0.2.8] - 2022-10-30
+
+- NPE bug fix when shell language not found
+- Code completion for `set fallback := false`
+
+## [0.2.7] - 2022-09-25
+
+- Compatible with JetBrains IDE 2022.3
+
 ## [0.2.6] - 2022-06-21
 
 - Shell language injection: sh, bash, zsh and nu
