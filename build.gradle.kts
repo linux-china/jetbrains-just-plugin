@@ -1,3 +1,4 @@
+import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -119,9 +120,12 @@ tasks {
 
         // Get the latest available change notes from the changelog file
         changeNotes.set(provider {
-            changelog.run {
-                getOrNull(properties("pluginVersion")) ?: getLatest()
-            }.toHTML()
+            with(changelog) {
+                renderItem(
+                    getOrNull(properties("pluginVersion")) ?: getLatest(),
+                    Changelog.OutputType.HTML,
+                )
+            }
         })
     }
 
