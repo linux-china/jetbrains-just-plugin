@@ -39,6 +39,7 @@
       LITERAL="regexp:[^\n \t]*"
       SETTING='regexp:[a-zA-Z_][a-zA-Z0-9_\-]*'
       ID='regexp:[a-zA-Z_][a-zA-Z0-9_\-]*'
+      ATTRIBUTE='regexp:\[[a-zA-Z0-9_\-]*]'
       ID_LITERAL='regexp:[a-zA-Z_][a-zA-Z0-9_\-]*'
       VARIABLE='regexp:([a-zA-Z_][a-zA-Z0-9_-]*)'
       RECIPE_NAME='regexp:[a-zA-Z_][a-zA-Z0-9_\-]*'
@@ -62,7 +63,7 @@
 
 justfile ::= any*
 
-private stmt ::= (SHEBANG_STATEMENT|COMMENT|ALIAS_STATEMENT|EXPORT_STATEMENT|SET_STATEMENT|VARIABLE_STATEMENT|RECIPE_STATEMENT|NEW_LINE)
+private stmt ::= (SHEBANG_STATEMENT|COMMENT|ALIAS_STATEMENT|EXPORT_STATEMENT|SET_STATEMENT|ATTRIBUTE|VARIABLE_STATEMENT|RECIPE_STATEMENT|NEW_LINE)
 private recover ::= !(any)
 private any ::= !<<eof>> stmt {pin=1 recoverWhile=recover}
 

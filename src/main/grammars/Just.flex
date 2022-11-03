@@ -44,6 +44,7 @@ STRING=(\"[^\"]*\")
 INDENTED_STRING=("\"\"\"")[^("\"\"\"")]*("\"\"\"")
 PAREN_STRING=\([^\(]*\)
 ID=[a-zA-Z_][a-zA-Z0-9_\-]*
+ATTRIBUTE=(\[[a-zA-Z0-9_\-]*\])
 ID_LITERAL=[a-zA-Z_][a-zA-Z0-9_\-]*
 SETTING=[a-zA-Z_][a-zA-Z0-9_\-]*
 RECIPE_NAME=[a-zA-Z_][a-zA-Z0-9_\-]*
@@ -195,6 +196,7 @@ KEYWORD_ELSE=(else)
   {KEYWORD_ALIAS}                      { yybegin(ALIAS); return JustTypes.KEYWORD_ALIAS; }
   {KEYWORD_EXPORT}                     { yybegin(EXPORT); return JustTypes.KEYWORD_EXPORT; }
   {KEYWORD_SET}                        { yybegin(SET); return JustTypes.KEYWORD_SET; }
+  {ATTRIBUTE}                          { yybegin(YYINITIAL); return JustTypes.ATTRIBUTE; }
 
   // Flex: Lookahead predicate
   {VARIABLE} / (\s*)(":=")             { yybegin(VARIABLE); return JustTypes.VARIABLE; }
