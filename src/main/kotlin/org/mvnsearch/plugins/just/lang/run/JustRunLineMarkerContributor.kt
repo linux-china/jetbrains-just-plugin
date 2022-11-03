@@ -2,7 +2,6 @@ package org.mvnsearch.plugins.just.lang.run
 
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.execution.ExecutionException
-import com.intellij.execution.Executor
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.configurations.PtyCommandLine
 import com.intellij.execution.executors.DefaultRunExecutor
@@ -64,34 +63,33 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
 
 
     private fun runJustRecipeByRunAnything(project: Project, psiElement: PsiElement, taskName: String) {
-        runCommand(
+        runJustCommand(
             project,
             psiElement.containingFile.virtualFile.parent,
             "${Just.getJustCmdAbsolutionPath()} $taskName",
-            DefaultRunExecutor.getRunExecutorInstance(),
             SimpleDataContext.getProjectContext(project)
         )
     }
 
-    private fun runCommand(project: Project, workDirectory: VirtualFile, commandString: String, executor: Executor, dataContext: DataContext) {
-        var commandDataContext = dataContext
-        commandDataContext = RunAnythingCommandCustomizer.customizeContext(commandDataContext)
-        val initialCommandLine = GeneralCommandLine(ParametersListUtil.parse(commandString, false, true))
-            .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
-            .withWorkDirectory(workDirectory.path)
-        val commandLine = RunAnythingCommandCustomizer.customizeCommandLine(commandDataContext, workDirectory, initialCommandLine)
-        try {
-            val generalCommandLine = if (Registry.`is`("run.anything.use.pty", false)) PtyCommandLine(commandLine) else commandLine
-            val runAnythingRunProfile = RunJustProfile(generalCommandLine, commandString)
-            ExecutionEnvironmentBuilder.create(project, executor, runAnythingRunProfile)
-                .dataContext(commandDataContext)
-                .buildAndExecute()
-        } catch (e: ExecutionException) {
-            Messages.showInfoMessage(project, e.message, IdeBundle.message("run.anything.console.error.title"))
-        }
+
+}
+
+fun runJustCommand(project: Project, workDirectory: VirtualFile, commandString: String, dataContext: DataContext) {
+    var commandDataContext = dataContext
+    commandDataContext = RunAnythingCommandCustomizer.customizeContext(commandDataContext)
+    val initialCommandLine = GeneralCommandLine(ParametersListUtil.parse(commandString, false, true))
+        .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
+        .withWorkDirectory(workDirectory.path)
+    val commandLine = RunAnythingCommandCustomizer.customizeCommandLine(commandDataContext, workDirectory, initialCommandLine)
+    try {
+        val generalCommandLine = if (Registry.`is`("run.anything.use.pty", false)) PtyCommandLine(commandLine) else commandLine
+        val runAnythingRunProfile = RunJustProfile(generalCommandLine, commandString)
+        ExecutionEnvironmentBuilder.create(project, DefaultRunExecutor.getRunExecutorInstance(), runAnythingRunProfile)
+            .dataContext(commandDataContext)
+            .buildAndExecute()
+    } catch (e: ExecutionException) {
+        Messages.showInfoMessage(project, e.message, IdeBundle.message("run.anything.console.error.title"))
     }
-
-
 }
 
 class RunJustProfile(commandLine: GeneralCommandLine, originalCommand: String) : RunAnythingRunProfile(commandLine, originalCommand) {
