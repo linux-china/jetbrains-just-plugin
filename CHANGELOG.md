@@ -4,12 +4,15 @@
 
 ## [Unreleased]
 
+## [0.3.1] - 2022-11-03
+
+- Popup menu for executing Just recipes: `Run Menu -> Run Just Recipe on Root Module` or `ctrl shift alt J` #7
+
 ## [0.3.0] - 2022-11-03
 
 ### Added
 
 - OS Recipe Attributes support
-- Popup menu for executing Just recipes: `Run Menu -> Run Just Recipe on Root Module` or `ctrl shift alt J` #7
 
 ## [0.2.8] - 2022-10-30
 
