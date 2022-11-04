@@ -1,6 +1,8 @@
 JetBrains Just plugin
 ========================
 
+**Deprecated**: from WebStorm 2022.3 Beta, Vitest is supported by default. Please refer https://blog.jetbrains.com/webstorm/2022/11/webstorm-2022-3-beta/#Vitest_support
+
 <!-- Plugin description -->
 **JetBrains Just Command Runner Plugin** is a plugin to integrate [just commander](https://github.com/casey/just) in JetBrains IDEs.
 
