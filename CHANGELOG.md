@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+## [0.3.2] - 2022-11-06
+
+- Use command line `just -l` for recipe list on popup menu
+
 ## [0.3.1] - 2022-11-03
 
 - Popup menu for executing Just recipes: `Run Menu -> Run Just Recipe on Root Module` or `ctrl shift alt J` #7
