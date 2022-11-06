@@ -4,11 +4,11 @@ import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
-import com.intellij.psi.PsiManager
 import org.mvnsearch.plugins.just.Just
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
-import org.mvnsearch.plugins.just.lang.psi.JustFile
 import org.mvnsearch.plugins.just.lang.run.runJustCommand
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 
 @SuppressWarnings("ComponentNotRegistered")
@@ -28,16 +28,30 @@ open class JustRecipesActionGroup(private val justfileName: String) : ActionGrou
 
     open fun getActions(dataContext: DataContext?, project: Project): Array<AnAction> {
         val result = mutableListOf<AnAction>()
-        val justVirtualFile = project.guessProjectDir()!!.findChild(justfileName)!!
-        val justfile = PsiManager.getInstance(project).findFile(justVirtualFile) as JustFile
-        justfile.findAllRecipes().forEach {
-            result.add(RunJustRecipeAction(it))
+        val projectDir = project.guessProjectDir()!!
+        val builder = ProcessBuilder()
+        builder.command("just", "--color=never", "-l")
+        builder.directory(projectDir.toNioPath().toFile())
+        val process = builder.start()
+        val reader = BufferedReader(InputStreamReader(process.inputStream))
+        reader.lines().forEach {
+            val recipeInfo = it.trim()
+            if (recipeInfo.isNotEmpty() && !recipeInfo.startsWith("Available recipes:")) {
+                val parts = recipeInfo.split('#', limit = 2)
+                val recipeName = parts[0].trim()
+                if (parts.size >= 2) {
+                    val text = "$recipeName # ${parts[1].trim()}"
+                    result.add(RunJustRecipeAction(recipeName, text))
+                } else {
+                    result.add(RunJustRecipeAction(recipeName, recipeName))
+                }
+            }
         }
         return result.toTypedArray()
     }
 }
 
-class RunJustRecipeAction(private val recipeName: String) : AnAction(recipeName) {
+class RunJustRecipeAction(private val recipeName: String, private val text: String) : AnAction(text) {
 
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project!!
