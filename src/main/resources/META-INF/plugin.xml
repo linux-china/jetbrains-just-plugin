@@ -36,7 +36,7 @@
             <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewFromTemplate"/>
         </action>
         <action id="Just.QuickRunRecipes" class="org.mvnsearch.plugins.just.ide.action.QuickRunJustRecipesAction"
-                text="Run Just Recipe on Root Module"
+                text="Available Just Recipes"
                 description="Run Just recipes on root module" icon="/icons/just-16x16.svg">
             <add-to-group group-id="RunMenu" anchor="first"/>
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift alt J"/>
