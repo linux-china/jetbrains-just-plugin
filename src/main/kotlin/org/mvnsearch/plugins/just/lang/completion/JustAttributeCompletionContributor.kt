@@ -26,6 +26,9 @@ class JustAttributeCompletionContributor : CompletionContributor() {
                         result.addElement(LookupElementBuilder.create("macos"))
                         result.addElement(LookupElementBuilder.create("unix"))
                         result.addElement(LookupElementBuilder.create("windows"))
+                        result.addElement(LookupElementBuilder.create("private"))
+                        result.addElement(LookupElementBuilder.create("no-cd"))
+                        result.addElement(LookupElementBuilder.create("no-exit-message"))
                     }
                 }
             }
