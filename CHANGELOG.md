@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+## [0.3.3] - 2022-11-26
+
+- Add attributes: `[private]`, `[no-cd]`, `[no-exit-message]`
+- Code completion for `set fallback := true`
+
 ## [0.3.2] - 2022-11-06
 
 - Use command line `just -l` for recipe list on popup menu
