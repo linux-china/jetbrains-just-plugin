@@ -25,7 +25,7 @@ class JustSetCompletionContributor : CompletionContributor() {
                     if (element.elementType == JustTypes.SETTING) {
                         result.addElement(LookupElementBuilder.create("allow-duplicate-recipes"))
                         result.addElement(LookupElementBuilder.create("dotenv-load := true").withPresentableText("dotenv-load"))
-                        result.addElement(LookupElementBuilder.create("fallback := false"))
+                        result.addElement(LookupElementBuilder.create("fallback := true"))
                         result.addElement(LookupElementBuilder.create("export"))
                         result.addElement(LookupElementBuilder.create("positional-arguments"))
                         result.addElement(LookupElementBuilder.create("shell := [\"bash\", \"-c\"]").withPresentableText("shell"))
