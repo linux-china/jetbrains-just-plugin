@@ -11,6 +11,8 @@
   elementTypeClass="org.mvnsearch.plugins.just.lang.psi.JustElementType"
   tokenTypeClass="org.mvnsearch.plugins.just.lang.psi.JustTokenType"
 
+  psiImplUtilClass="org.mvnsearch.plugins.just.lang.psi.impl.JustPsiImplUtil"
+
   tokens=[
       NEW_LINE='regexp:\n'
       WHITE_SPACE='regexp:\s+'
