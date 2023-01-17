@@ -12,7 +12,7 @@ import org.mvnsearch.plugins.just.PARAM_PREFIX_LIST
 import org.mvnsearch.plugins.just.lang.psi.JustCodeBlock
 
 
-class JustCodeBlockLanguageInjector : MultiHostInjector, DumbAware {
+class JustCodeBlockLanguageInjector : MultiHostInjector {
     private var shellLanguage: Language? = null
 
     init {
