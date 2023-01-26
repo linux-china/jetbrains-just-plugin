@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+## [0.3.4] - 2023-01-26
+
+- Compatible with JetBrains IDE 2023.1
+
 ## [0.3.3] - 2022-11-26
 
 - Add attributes: `[private]`, `[no-cd]`, `[no-exit-message]`
