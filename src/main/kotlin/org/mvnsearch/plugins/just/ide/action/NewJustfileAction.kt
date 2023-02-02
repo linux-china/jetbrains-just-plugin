@@ -47,7 +47,7 @@ class NewJustfileAction : AnAction() {
                   ./gradlew dependencyUpdates > updates.txt
                 
                 wrapper:
-                  ./gradlew wrapper --gradle-version=7.4.2
+                  ./gradlew wrapper --gradle-version=7.6
                 """.trimIndent()
         val JUSTFILE_CARGO = """
                 #!/usr/bin/env just --justfile
