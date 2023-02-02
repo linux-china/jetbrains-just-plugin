@@ -118,18 +118,23 @@ class NewJustfileAction : AnAction() {
             } else {
                 psiElement as PsiDirectory
             }
-            val destDir = psiDirectory.virtualFile
-            ApplicationManager.getApplication().runWriteAction {
-                val justfile = destDir.createChildData(psiElement, "justfile")
-                justfile.getOutputStream(psiElement).use {
-                    it.write(content.toByteArray())
-                    it.flush()
+            val justFile = psiDirectory.findFile("justfile")
+            if (justFile == null) {
+                val destDir = psiDirectory.virtualFile
+                ApplicationManager.getApplication().runWriteAction {
+                    val newJustfile = destDir.createChildData(psiElement, "justfile")
+                    newJustfile.getOutputStream(psiElement).use {
+                        it.write(content.toByteArray())
+                        it.flush()
+                    }
+                    File(newJustfile.path).setExecutable(true)
+                    if ((SystemInfo.isLinux || SystemInfo.isMac)) {
+                        File(newJustfile.path).setExecutable(true)
+                    }
+                    FileEditorManager.getInstance(project).openFile(newJustfile, true)
                 }
-                File(justfile.path).setExecutable(true)
-                if ((SystemInfo.isLinux || SystemInfo.isMac)) {
-                    File(justfile.path).setExecutable(true)
-                }
-                FileEditorManager.getInstance(project).openFile(justfile, true)
+            } else {
+                FileEditorManager.getInstance(project).openFile(justFile.virtualFile, true)
             }
         }
     }
