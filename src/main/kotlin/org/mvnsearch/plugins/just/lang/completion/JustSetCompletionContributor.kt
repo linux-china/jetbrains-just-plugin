@@ -31,6 +31,7 @@ class JustSetCompletionContributor : CompletionContributor() {
                         result.addElement(LookupElementBuilder.create("shell := [\"bash\", \"-c\"]").withPresentableText("shell"))
                         result.addElement(LookupElementBuilder.create("windows-shell := [\"pwsh.exe\", \"-NoLogo\",\"-Command\"]").withPresentableText("shell"))
                         result.addElement(LookupElementBuilder.create("windows-powershell := true"))
+                        result.addElement(LookupElementBuilder.create("ignore-comments := true"))
                     }
                 }
             }
