@@ -25,3 +25,5 @@ clean:
   rm -rf build/distributions
   rm -rf build/resources
   rm -rf build/classes
+  rm -rf build/instrumented
+  rm -rf build/tmp
