@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+## [0.3.5] - 2023-04-25
+
+- Fix match pattern for Strings
+
 ## [0.3.4] - 2023-01-26
 
 - Compatible with JetBrains IDE 2023.1
