@@ -8,15 +8,15 @@ plugins {
     // Java support
     id("java")
     // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "1.6.10"
+    id("org.jetbrains.kotlin.jvm") version "1.9.10"
     // Gradle IntelliJ Plugin
-    id("org.jetbrains.intellij") version "1.13.3"
+    id("org.jetbrains.intellij") version "1.16.0"
     // Gradle Changelog Plugin
-    id("org.jetbrains.changelog") version "2.0.0"
+    id("org.jetbrains.changelog") version "2.2.0"
     // Gradle Qodana Plugin
-    id("org.jetbrains.qodana") version "0.1.13"
+    id("org.jetbrains.qodana") version "2023.2.1"
     
-    id("org.jetbrains.grammarkit") version "2021.2.2"
+    id("org.jetbrains.grammarkit") version "2022.3.2"
 }
 
 group = properties("pluginGroup")
@@ -46,9 +46,7 @@ changelog {
 // Configure Gradle Qodana Plugin - read more: https://github.com/JetBrains/gradle-qodana-plugin
 qodana {
     cachePath.set(projectDir.resolve(".qodana").canonicalPath)
-    reportPath.set(projectDir.resolve("build/reports/inspections").canonicalPath)
-    saveReport.set(true)
-    showReport.set(System.getenv("QODANA_SHOW_REPORT")?.toBoolean() ?: false)
+    resultsPath.set(projectDir.resolve("build/reports/inspections").canonicalPath)
 }
 
 sourceSets["main"].java.srcDirs("src/main/gen")
@@ -57,7 +55,7 @@ sourceSets["main"].java.srcDirs("src/main/gen")
 tasks {
     generateLexer {
         // source flex file
-        source.set("src/main/grammars/Just.flex")
+        sourceFile.set(project.layout.projectDirectory.file("src/main/grammars/Just.flex"))
 
         // target directory for lexer
         targetDir.set("src/main/gen/org/mvnsearch/plugins/just/lang/lexer/")
@@ -71,7 +69,7 @@ tasks {
 
     generateParser {
         // source bnf file
-        source.set("src/main/grammars/Just.bnf")
+        sourceFile.set(project.layout.projectDirectory.file("src/main/grammars/Just.bnf"))
 
         // optional, task-specific root for the generated files. Default: none
         targetRoot.set("src/main/gen")

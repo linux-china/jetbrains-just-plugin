@@ -67,4 +67,7 @@ class RunJustRecipeAction(private val recipeName: String, private val text: Stri
         e.presentation.icon = JustIcons.RUN_ICON
     }
 
+    override fun getActionUpdateThread(): ActionUpdateThread {
+        return ActionUpdateThread.BGT
+    }
 }

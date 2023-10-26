@@ -38,7 +38,7 @@ class JustRecipeDependencyCompletionContributor : CompletionContributor() {
                         justfileMetadata.recipes.filter { !excludedNames.contains(it) }.forEach {
                             val buildItem = if (prefixText.endsWith("(")) {
                                 LookupElementBuilder.create("$it \"\")").withPresentableText(it)
-                                    .withInsertHandler { context, item ->
+                                    .withInsertHandler { context, _ ->
                                         run {
                                             context.editor.caretModel.moveToOffset(caret.offset - 2)
                                         }
