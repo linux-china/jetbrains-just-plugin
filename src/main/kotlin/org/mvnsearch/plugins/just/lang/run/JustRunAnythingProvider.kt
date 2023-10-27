@@ -22,7 +22,6 @@ import org.mvnsearch.plugins.just.ide.icons.JustIcons
 import org.mvnsearch.plugins.just.lang.psi.JustFile
 import javax.swing.Icon
 
-@Suppress("UnstableApiUsage")
 class JustRunAnythingProvider : RunAnythingCommandLineProvider() {
 
 
@@ -32,6 +31,10 @@ class JustRunAnythingProvider : RunAnythingCommandLineProvider() {
 
     override fun getHelpGroupTitle(): String {
         return "Just"
+    }
+
+    override fun execute(dataContext: DataContext, value: String) {
+        super.execute(dataContext, value)
     }
 
     override fun getCompletionGroupTitle(): String {
