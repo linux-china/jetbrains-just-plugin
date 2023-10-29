@@ -2,64 +2,71 @@
 
 # jetbrains-just-plugin Changelog
 
-## [Unreleased]
+## Unreleased
 
-## [0.3.6] - 2023-05-13
+## 0.3.7 - 2023-10-29
+
+### Changed
+
+- Compatible with JetBrains IDE 2023.3
+- Bug fix for expressions in recipe dependencies
+
+## 0.3.6 - 2023-05-13
 
 ### Changed
 
 - Compatible with JetBrains IDE 2023.2
 
-## [0.3.5] - 2023-04-25
+## 0.3.5 - 2023-04-25
 
 ### Changed
 
 - Fix match pattern for Strings
 
-## [0.3.4] - 2023-01-26
+## 0.3.4 - 2023-01-26
 
 - Compatible with JetBrains IDE 2023.1
 
-## [0.3.3] - 2022-11-26
+## 0.3.3 - 2022-11-26
 
 - Add attributes: `[private]`, `[no-cd]`, `[no-exit-message]`
 - Code completion for `set fallback := true`
 
-## [0.3.2] - 2022-11-06
+## 0.3.2 - 2022-11-06
 
 - Use command line `just -l` for recipe list on popup menu
 
-## [0.3.1] - 2022-11-03
+## 0.3.1 - 2022-11-03
 
 - Popup menu for executing Just recipes: `Run Menu -> Run Just Recipe on Root Module` or `ctrl shift alt J` #7
 
-## [0.3.0] - 2022-11-03
+## 0.3.0 - 2022-11-03
 
 ### Added
 
 - OS Recipe Attributes support
 
-## [0.2.8] - 2022-10-30
+## 0.2.8 - 2022-10-30
 
 ### Changed
 
 - NPE bug fix when shell language not found
 - Code completion for `set fallback := false`
 
-## [0.2.7] - 2022-09-25
+## 0.2.7 - 2022-09-25
 
 ### Changed
 
 - Compatible with JetBrains IDE 2022.3
 
-## [0.2.6] - 2022-06-21
+## 0.2.6 - 2022-06-21
 
 ### Changed
 
 - Shell language injection: sh, bash, zsh and nu
 - Justfile template for Node.js app
 
-## [0.2.5] - 2022-06-17
+## 0.2.5 - 2022-06-17
 
 ### Changed
 
@@ -67,40 +74,40 @@
 - Justfile structure view
 - Fix blank line in recipe's code block
 
-## [0.2.4] - 2022-06-16
+## 0.2.4 - 2022-06-16
 
 ### Changed
 
 - Shell language injection
 - windows-shell completion
 
-## [0.2.3] - 2022-05-31
+## 0.2.3 - 2022-05-31
 
 ### Changed
 
 - Adjust justfile icon in file explorer to 12x12
 - Bug fix syntax error for export statement
 
-## [0.2.2] - 2022-05-20
+## 0.2.2 - 2022-05-20
 
 ### Changed
 
 - Compatible with JetBrains IDEs 2022.*
 
-## [0.2.1] - 2022-03-27
+## 0.2.1 - 2022-03-27
 
 ### Added
 
 - `&&` support for "Running Recipes at the End of a Recipe" syntax
 
-## [0.2.0] - 2022-03-26
+## 0.2.0 - 2022-03-26
 
 ### Added
 
 - Adjust title and icon for command console
 - Run Anything Support:  Input `just ` then choose recipe name
 
-## [0.1.0] - 2022-02-18
+## 0.1.0 - 2022-02-18
 
 ### Added
 
