@@ -111,8 +111,11 @@ class NewJustfileAction : AnAction() {
         } else {
             JUSTFILE
         }
-        val psiElement = e.getData(CommonDataKeys.PSI_ELEMENT)!!
-        if (psiElement is PsiDirectory || psiElement is PsiFile) {
+        var psiElement = e.getData(CommonDataKeys.PSI_ELEMENT)
+        if (psiElement == null) {
+            psiElement = e.getData(CommonDataKeys.PSI_FILE)
+        }
+        if (psiElement != null && (psiElement is PsiDirectory || psiElement is PsiFile)) {
             val psiDirectory = if (psiElement is PsiFile) {
                 psiElement.parent!!
             } else {
