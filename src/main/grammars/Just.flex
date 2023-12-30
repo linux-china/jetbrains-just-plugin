@@ -47,6 +47,7 @@ ID=[a-zA-Z_][a-zA-Z0-9_\-]*
 ATTRIBUTE=(\[[a-zA-Z0-9_\-]*\])
 ID_LITERAL=[a-zA-Z_][a-zA-Z0-9_\-]*
 SETTING=[a-zA-Z_][a-zA-Z0-9_\-]*
+MOD_NAME=[a-zA-Z_][a-zA-Z0-9_\-]*
 RECIPE_NAME=[a-zA-Z_][a-zA-Z0-9_\-]*
 DEPENDENCY_NAME=[a-zA-Z_][a-zA-Z0-9_\-]*
 DEPENDENCY_WITH_PARAMS=[a-zA-Z_][a-zA-Z0-9_\-]*\([^\(\n]*\)
@@ -69,12 +70,19 @@ CODE=((\n[ \t]+[^\n]*)|(\n[ \t]*))*
 KEYWORD_ALIAS=(alias)
 KEYWORD_EXPORT=(export)
 KEYWORD_SET=(set)
+KEYWORD_MOD=(mod)
 KEYWORD_IF=(if)
 KEYWORD_ELSE=(else)
 
-%state ALIAS VARIABLE CONDITIONAL EXPORT EXPORT_VALUE SET SET_VALUE RECIPE PARAMS PARAM_WITH_VALUE DEPENDENCIES DEPENDENCY_WITH_PARAMS
+%state MOD ALIAS VARIABLE CONDITIONAL EXPORT EXPORT_VALUE SET SET_VALUE RECIPE PARAMS PARAM_WITH_VALUE DEPENDENCIES DEPENDENCY_WITH_PARAMS
 
 %%
+
+<MOD> {
+  {WHITE_SPACE}+     {  yybegin(MOD); return TokenType.WHITE_SPACE; }
+  {MOD_NAME}         {  yybegin(MOD); return MOD_NAME; }
+  {NEW_LINE}         {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
+}
 
 <ALIAS> {
   {WHITE_SPACE}+     {  yybegin(ALIAS); return TokenType.WHITE_SPACE; }
@@ -193,6 +201,7 @@ KEYWORD_ELSE=(else)
   {SHEBANG}                            { yybegin(YYINITIAL); return JustTypes.SHEBANG; }
   {COMMENT}                            { yybegin(YYINITIAL); return JustTypes.COMMENT; }
 
+  {KEYWORD_MOD}                        { yybegin(MOD); return JustTypes.KEYWORD_MOD; }
   {KEYWORD_ALIAS}                      { yybegin(ALIAS); return JustTypes.KEYWORD_ALIAS; }
   {KEYWORD_EXPORT}                     { yybegin(EXPORT); return JustTypes.KEYWORD_EXPORT; }
   {KEYWORD_SET}                        { yybegin(SET); return JustTypes.KEYWORD_SET; }
