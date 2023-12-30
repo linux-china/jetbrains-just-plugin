@@ -27,6 +27,8 @@ class QuickRunJustRecipesAction : QuickSwitchSchemeAction(), DumbAware {
                 return "justfile"
             } else if (projectDir.findChild("Justfile") != null) {
                 return "Justfile"
+            } else if (projectDir.findChild(".justfile") != null) {
+                return ".justfile"
             }
         }
         return null
