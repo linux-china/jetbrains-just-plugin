@@ -16,7 +16,7 @@ class JustElementType(debugName: String) : IElementType(debugName, JustLanguage)
 object JustFileType : LanguageFileType(JustLanguage) {
     override fun getName(): String = "justfile"
     override fun getDescription(): String = "Just file"
-    override fun getDefaultExtension(): String = "justfile"
+    override fun getDefaultExtension(): String = "just"
 
     override fun getIcon(): Icon = JUST_FILE_12
 }
