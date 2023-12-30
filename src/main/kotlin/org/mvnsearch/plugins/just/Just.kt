@@ -15,4 +15,10 @@ object Just {
             }
         }
     }
+
+    fun isDefaultJustfile(justfileName: String): Boolean {
+        return justfileName == "justfile"
+                || justfileName == "Justfile"
+                || justfileName == ".justfile"
+    }
 }
