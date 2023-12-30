@@ -29,6 +29,7 @@ class JustAttributeCompletionContributor : CompletionContributor() {
                         result.addElement(LookupElementBuilder.create("private"))
                         result.addElement(LookupElementBuilder.create("no-cd"))
                         result.addElement(LookupElementBuilder.create("no-exit-message"))
+                        result.addElement(LookupElementBuilder.create("confirm"))
                     }
                 }
             }
