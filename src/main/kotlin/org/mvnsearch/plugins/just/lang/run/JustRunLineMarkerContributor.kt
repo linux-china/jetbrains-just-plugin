@@ -63,10 +63,17 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
 
 
     private fun runJustRecipeByRunAnything(project: Project, psiElement: PsiElement, taskName: String) {
+        val justfile = psiElement.containingFile.virtualFile
+        val commandString = if (Just.isDefaultJustfile(justfile.name)) {
+            "just $taskName"
+        } else {
+            "just -f ${justfile.name} $taskName"
+        }
         runJustCommand(
             project,
-            psiElement.containingFile.virtualFile.parent,
-            "${Just.getJustCmdAbsolutionPath()} $taskName",
+            justfile.parent,
+            justfile,
+            commandString,
             SimpleDataContext.getProjectContext(project)
         )
     }
@@ -74,15 +81,23 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
 
 }
 
-fun runJustCommand(project: Project, workDirectory: VirtualFile, commandString: String, dataContext: DataContext) {
+fun runJustCommand(
+    project: Project,
+    workDirectory: VirtualFile,
+    justfile: VirtualFile,
+    commandString: String,
+    dataContext: DataContext
+) {
     var commandDataContext = dataContext
     commandDataContext = RunAnythingCommandCustomizer.customizeContext(commandDataContext)
     val initialCommandLine = GeneralCommandLine(ParametersListUtil.parse(commandString, false, true))
         .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
         .withWorkDirectory(workDirectory.path)
-    val commandLine = RunAnythingCommandCustomizer.customizeCommandLine(commandDataContext, workDirectory, initialCommandLine)
+    val commandLine =
+        RunAnythingCommandCustomizer.customizeCommandLine(commandDataContext, workDirectory, initialCommandLine)
     try {
-        val generalCommandLine = if (Registry.`is`("run.anything.use.pty", false)) PtyCommandLine(commandLine) else commandLine
+        val generalCommandLine =
+            if (Registry.`is`("run.anything.use.pty", false)) PtyCommandLine(commandLine) else commandLine
         val runAnythingRunProfile = RunJustProfile(generalCommandLine, commandString)
         ExecutionEnvironmentBuilder.create(project, DefaultRunExecutor.getRunExecutorInstance(), runAnythingRunProfile)
             .dataContext(commandDataContext)
@@ -92,7 +107,8 @@ fun runJustCommand(project: Project, workDirectory: VirtualFile, commandString: 
     }
 }
 
-class RunJustProfile(commandLine: GeneralCommandLine, originalCommand: String) : RunAnythingRunProfile(commandLine, originalCommand) {
+class RunJustProfile(commandLine: GeneralCommandLine, originalCommand: String) :
+    RunAnythingRunProfile(commandLine, originalCommand) {
     override fun getIcon(): Icon {
         return JUST_FILE
     }
