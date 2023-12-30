@@ -34,6 +34,7 @@ COMMA = [,]
 EQUAL = [=]
 OPEN_BRACE = [{]
 CLOSE_BRACE = [}]
+QUESTION_MARK = ("?")
 BACKTICK=`[^`]*`
 BOOL_LITERAL=(true) | (false)
 NUMBER_LITERAL=[\d]+
@@ -48,6 +49,7 @@ ATTRIBUTE=(\[[a-zA-Z0-9_\-]*\])
 ID_LITERAL=[a-zA-Z_][a-zA-Z0-9_\-]*
 SETTING=[a-zA-Z_][a-zA-Z0-9_\-]*
 MOD_NAME=[a-zA-Z_][a-zA-Z0-9_\-]*
+MOD_PATH=[\"'][^\n]*[\"']
 RECIPE_NAME=[a-zA-Z_][a-zA-Z0-9_\-]*
 DEPENDENCY_NAME=[a-zA-Z_][a-zA-Z0-9_\-]*
 DEPENDENCY_WITH_PARAMS=[a-zA-Z_][a-zA-Z0-9_\-]*\([^\(\n]*\)
@@ -79,8 +81,10 @@ KEYWORD_ELSE=(else)
 %%
 
 <MOD> {
+  {QUESTION_MARK}    {  yybegin(MOD); return QUESTION_MARK; }
   {WHITE_SPACE}+     {  yybegin(MOD); return TokenType.WHITE_SPACE; }
   {MOD_NAME}         {  yybegin(MOD); return MOD_NAME; }
+  {MOD_PATH}         {  yybegin(MOD); return MOD_PATH; }
   {NEW_LINE}         {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
 }
 

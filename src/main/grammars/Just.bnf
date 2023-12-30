@@ -29,6 +29,7 @@
       DOUBLE_AND='regexp:(&&)'
       ASSIGN='regexp:(:=)'
       SEPERATOR='regexp:(:)'
+      QUESTION_MARK='regexp:(\?)'
       BACKTICK="regexp:`[^`]*`"
       INDENTED_BACKTICK="regexp:(```)[^`]*(```)"
       RAW_STRING="regexp:'[^']*'"
@@ -43,6 +44,7 @@
       ID_LITERAL='regexp:[a-zA-Z_][a-zA-Z0-9_\-]*'
       VARIABLE='regexp:([a-zA-Z_][a-zA-Z0-9_-]*)'
       MOD_NAME='regexp:[a-zA-Z_][a-zA-Z0-9_\-]*'
+      MOD_PATH="regexp:(['\"])[^\n]*(['\"])"
       RECIPE_NAME='regexp:[a-zA-Z_][a-zA-Z0-9_\-]*'
       DEPENDENCY_NAME='regexp:[a-zA-Z_][a-zA-Z0-9_\-]*'
       RECIPE_PARAM_NAME='regexp:[$*+]?[a-zA-Z_][a-zA-Z0-9_\-]*'
@@ -53,7 +55,7 @@
       COMMENT='regexp:#.*'
       CODE='regexp:(\n[ \t]+[^\n]*)*'
 
-      KEYWORD_MOD='regexp:(mod)'
+      KEYWORD_MOD='regexp:(mod)[?]?'
       KEYWORD_ALIAS='regexp:(alias)'
       KEYWORD_EXPORT='regexp:(export)'
       KEYWORD_SET='regexp:(set)'
@@ -73,7 +75,7 @@ SHEBANG_STATEMENT ::= SHEBANG
 TEXT_ITEM ::= (STRING|RAW_STRING|BACKTICK|LITERAL|ID_LITERAL)
 TEXT_EXPRESSION ::= TEXT_ITEM ( '+' TEXT_ITEM)*
 ANY_TEXT_ITEM ::= (INDENTED_RAW_STRING|INDENTED_STRING|INDENTED_BACKTICK|STRING|RAW_STRING|BACKTICK|PAREN_STRING|LITERAL|ID_LITERAL)
-MOD_STATEMENT ::= KEYWORD_MOD MOD_NAME
+MOD_STATEMENT ::= KEYWORD_MOD QUESTION_MARK? MOD_NAME MOD_PATH?
 EXPORT_STATEMENT ::= KEYWORD_EXPORT ID ASSIGN TEXT_ITEM*
 ALIAS_STATEMENT ::= KEYWORD_ALIAS RECIPE_NAME ASSIGN RECIPE_NAME
 SET_STATEMENT ::= KEYWORD_SET SETTING ASSIGN? (BOOL_LITERAL|LITERAL)*
