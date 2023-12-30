@@ -4,6 +4,14 @@
 
 ## Unreleased
 
+## 0.4.0 - 2023-12-30
+
+### Changed
+
+- Module support
+- Allow to run recipe for `*.just`
+- Justfile name pattern updated to `justfile`, `Justfile`, `.justfile`, `*.just`
+
 ## 0.3.7 - 2023-10-29
 
 ### Changed
