@@ -35,7 +35,9 @@ class JustRecipeDependencyCompletionContributor : CompletionContributor() {
                         }
                         val justfile = element.containingFile as JustFile
                         val justfileMetadata = justfile.parseMetadata(false)
-                        justfileMetadata.recipes.filter { !excludedNames.contains(it) }.forEach {
+                        val includedRecipes = justfileMetadata.imports.flatMap { it.parseMetadata(false).recipes }
+                        val recipes = (justfileMetadata.recipes + includedRecipes)
+                        recipes.filter { !excludedNames.contains(it) }.forEach {
                             val buildItem = if (prefixText.endsWith("(")) {
                                 LookupElementBuilder.create("$it \"\")").withPresentableText(it)
                                     .withInsertHandler { context, _ ->

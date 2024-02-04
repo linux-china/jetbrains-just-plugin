@@ -2,8 +2,12 @@ package org.mvnsearch.plugins.just.lang.psi
 
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.project.guessProjectDir
+import com.intellij.openapi.util.text.StringUtil
+import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.FileViewProvider
+import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
+import com.intellij.psi.util.PsiTreeUtil
 import org.mvnsearch.plugins.just.lang.JustLanguage
 import org.mvnsearch.plugins.just.parseRecipeName
 
@@ -13,12 +17,25 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
 
 
     fun findRecipeElement(recipe: String): JustRecipeStatement? {
-        return this.children
+        val currentRecipes = this.children
             .filterIsInstance<JustRecipeStatement>()
             .firstOrNull {
                 val recipeName = it.recipeName.text
                 recipeName == recipe || recipeName == "@${recipe}"
             }
+
+        if (currentRecipes != null) {
+            return currentRecipes
+        }
+
+        parseIncludedFiles().forEach { file ->
+            val recipeElement = file.findRecipeElement(recipe)
+            if (recipeElement != null) {
+                return recipeElement
+            }
+        }
+
+        return null
     }
 
 
@@ -72,7 +89,42 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
                 }
             }
         }
+
+        justfileMetadata.imports.addAll(parseIncludedFiles())
+
         return justfileMetadata
+    }
+
+    fun parseIncludedFiles(): List<JustFile> {
+        val includedFiles = mutableListOf<JustFile>()
+        val importStatements = PsiTreeUtil.getChildrenOfType(this, JustImportStatement::class.java)
+
+        importStatements?.forEach { importStatement ->
+            val importPath = StringUtil.unquoteString(importStatement.justfilePath.importPath.text)
+            val resolvedFile = resolveImportPathToFile(importPath)
+
+            if (resolvedFile is JustFile) {
+                includedFiles.add(resolvedFile)
+            }
+        }
+
+        return includedFiles
+    }
+
+    private fun resolveImportPathToFile(importPath: String): PsiFile? {
+        if (importPath.isBlank()) {
+            return null
+        }
+
+        val resolvedFileVirtualFile = if (importPath.startsWith("/")) {
+            LocalFileSystem.getInstance().findFileByPath(importPath)
+        } else {
+            val currentFile = originalFile.virtualFile
+            val parentDir = currentFile.parent
+            parentDir?.findFileByRelativePath(importPath)
+        }
+
+        return resolvedFileVirtualFile?.let { PsiManager.getInstance(project).findFile(it) }
     }
 }
 
@@ -81,6 +133,7 @@ class JustfileMetadata {
     val recipes = mutableListOf<String>()
     val variables = mutableListOf<String>()
     val envVariables = mutableListOf<String>()
+    val imports = mutableListOf<JustFile>()
     var dotenvLoad = false
     var variablesExported = false
 }
