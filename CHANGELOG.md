@@ -9,6 +9,7 @@
 ### Fixed
 
 - Import statement causes syntax error [#19](https://github.com/linux-china/jetbrains-just-plugin/issues/19)
+- Highlighting for `mod` keyword
 
 ## 0.4.1 - 2023-02-17
 
