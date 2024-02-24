@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.4.2 - 2023-02-24
+
+### Fixed
+
+- Import statement causes syntax error [#19](https://github.com/linux-china/jetbrains-just-plugin/issues/19)
+
 ## 0.4.1 - 2023-02-17
 
 ### Changed
