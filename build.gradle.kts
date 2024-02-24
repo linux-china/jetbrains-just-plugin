@@ -8,15 +8,15 @@ plugins {
     // Java support
     id("java")
     // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "1.9.10"
+    id("org.jetbrains.kotlin.jvm") version "1.9.20"
     // Gradle IntelliJ Plugin
-    id("org.jetbrains.intellij") version "1.16.0"
+    id("org.jetbrains.intellij") version "1.16.1"
     // Gradle Changelog Plugin
     id("org.jetbrains.changelog") version "2.2.0"
     // Gradle Qodana Plugin
     id("org.jetbrains.qodana") version "2023.2.1"
     
-    id("org.jetbrains.grammarkit") version "2022.3.2"
+    id("org.jetbrains.grammarkit") version "2022.3.2.2"
 }
 
 group = properties("pluginGroup")
@@ -31,6 +31,7 @@ repositories {
 intellij {
     pluginName.set(properties("pluginName"))
     version.set(properties("platformVersion"))
+    //localPath.set("/Users/linux_china/Applications/IntelliJ IDEA Ultimate.app/Contents")
     type.set(properties("platformType"))
 
     // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
@@ -58,10 +59,8 @@ tasks {
         sourceFile.set(project.layout.projectDirectory.file("src/main/grammars/Just.flex"))
 
         // target directory for lexer
-        targetDir.set("src/main/gen/org/mvnsearch/plugins/just/lang/lexer/")
+        targetOutputDir.set(project.layout.projectDirectory.dir("src/main/gen/org/mvnsearch/plugins/just/lang/lexer/"))
 
-        // target classname, target file will be targetDir/targetClass.java
-        targetClass.set("JustLexer")
 
         // if set, plugin will remove a lexer output file before generating new one. Default: false
         purgeOldFiles.set(true)
@@ -72,7 +71,7 @@ tasks {
         sourceFile.set(project.layout.projectDirectory.file("src/main/grammars/Just.bnf"))
 
         // optional, task-specific root for the generated files. Default: none
-        targetRoot.set("src/main/gen")
+        targetRootOutputDir.set(project.layout.projectDirectory.dir("src/main/gen"))
 
         // path to a parser file, relative to the targetRoot
         pathToParser.set("/org/mvnsearch/plugins/just/parser/JustParserGenerated.java")
