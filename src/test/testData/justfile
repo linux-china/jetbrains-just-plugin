@@ -195,6 +195,12 @@ _ruby:
 pwd:
   echo {{invocation_directory()}}
 
+line-break-depends:\
+depends
+
+depends:
+  echo "it works"
+
 # Local Variables:
 # mode: makefile
 # End:
