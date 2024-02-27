@@ -24,8 +24,8 @@ import com.intellij.psi.TokenType;
 %type IElementType
 %unicode
 
+WHITE_SPACE=[ \t]|(\\\n)
 NEW_LINE=\n
-WHITE_SPACE=[ \t]
 ASSIGN=(:=)
 SEPERATOR=(:)
 OPEN_PAREN = [\(]
