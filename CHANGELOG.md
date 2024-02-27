@@ -8,6 +8,7 @@
 
 ### Fixed
 
+- Syntax highlighting fails with double quotes inside triple quotes [#23](https://github.com/linux-china/jetbrains-just-plugin/issues/23)
 - Understand escaped line breaks in dependencies [#24](https://github.com/linux-china/jetbrains-just-plugin/issues/24)
 
 ## 0.4.2 - 2023-02-24
