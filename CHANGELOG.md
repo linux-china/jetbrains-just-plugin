@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.4.3 - 2023-02-28
+
+### Fixed
+
+- Understand escaped line breaks in dependencies [#24](https://github.com/linux-china/jetbrains-just-plugin/issues/24)
+
 ## 0.4.2 - 2023-02-24
 
 ### Fixed
