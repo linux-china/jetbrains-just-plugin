@@ -38,7 +38,7 @@ QUESTION_MARK = ("?")
 BACKTICK=`[^`]*`
 BOOL_LITERAL=(true) | (false)
 NUMBER_LITERAL=[\d]+
-INDENTED_BACKTICK=(```)([`]{0,2}([^`]))*(```)
+INDENTED_BACKTICK=(```)([^`]*)(```)
 RAW_STRING=('[^']*')
 INDENTED_RAW_STRING=(''')([']{0,2}([^']))*(''')
 STRING=(\"[^\"]*\")
@@ -114,6 +114,7 @@ KEYWORD_ELSE=(else)
    {ASSIGN}           {  yybegin(EXPORT_VALUE); return ASSIGN; }
    {STRING}           {  yybegin(EXPORT_VALUE); return STRING; }
    {RAW_STRING}       {  yybegin(EXPORT_VALUE); return RAW_STRING; }
+   {INDENTED_BACKTICK} {  yybegin(EXPORT_VALUE); return INDENTED_BACKTICK; }
    {BACKTICK}         {  yybegin(EXPORT_VALUE); return BACKTICK; }
    {LITERAL}          {  yybegin(EXPORT_VALUE); return LITERAL; }
    {NEW_LINE}         {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
