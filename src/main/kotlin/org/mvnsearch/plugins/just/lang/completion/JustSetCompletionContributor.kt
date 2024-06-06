@@ -25,6 +25,7 @@ class JustSetCompletionContributor : CompletionContributor() {
                     if (element.elementType == JustTypes.SETTING) {
                         result.addElement(LookupElementBuilder.create("allow-duplicate-recipes"))
                         result.addElement(LookupElementBuilder.create("dotenv-load := true").withPresentableText("dotenv-load"))
+                        result.addElement(LookupElementBuilder.create("dotenv-required"))
                         result.addElement(LookupElementBuilder.create("dotenv-filename := \"\""))
                         result.addElement(LookupElementBuilder.create("dotenv-path := \"\""))
                         result.addElement(LookupElementBuilder.create("ignore-comments"))
