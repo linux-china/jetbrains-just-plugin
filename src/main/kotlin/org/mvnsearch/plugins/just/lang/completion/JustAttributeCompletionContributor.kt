@@ -28,6 +28,7 @@ class JustAttributeCompletionContributor : CompletionContributor() {
                         result.addElement(LookupElementBuilder.create("windows"))
                         result.addElement(LookupElementBuilder.create("private"))
                         result.addElement(LookupElementBuilder.create("no-cd"))
+                        result.addElement(LookupElementBuilder.create("doc"))
                         result.addElement(LookupElementBuilder.create("no-exit-message"))
                         result.addElement(LookupElementBuilder.create("confirm"))
                         result.addElement(LookupElementBuilder.create("no-quiet"))
