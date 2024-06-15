@@ -4,21 +4,29 @@
 
 ## Unreleased
 
-## 0.4.3 - 2023-02-28
+## 0.4.4 - 2024-06-15
 
 ### Fixed
 
-- Syntax highlighting fails with double quotes inside triple quotes [#23](https://github.com/linux-china/jetbrains-just-plugin/issues/23)
+- Add `[doc('hello')]` attribute support
+- Add `set dotenv-required`
+
+## 0.4.3 - 2024-02-28
+
+### Fixed
+
+- Syntax highlighting fails with double quotes inside triple
+  quotes [#23](https://github.com/linux-china/jetbrains-just-plugin/issues/23)
 - Understand escaped line breaks in dependencies [#24](https://github.com/linux-china/jetbrains-just-plugin/issues/24)
 
-## 0.4.2 - 2023-02-24
+## 0.4.2 - 2024-02-24
 
 ### Fixed
 
 - Import statement causes syntax error [#19](https://github.com/linux-china/jetbrains-just-plugin/issues/19)
 - Highlighting for `mod` keyword
 
-## 0.4.1 - 2023-02-17
+## 0.4.1 - 2024-02-17
 
 ### Changed
 
