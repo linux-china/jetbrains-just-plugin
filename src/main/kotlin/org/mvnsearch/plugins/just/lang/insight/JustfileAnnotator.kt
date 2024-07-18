@@ -60,7 +60,7 @@ class JustfileAnnotator : Annotator {
             }
 
             JustTypes.ATTRIBUTE -> {
-                holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(element.textRange).textAttributes(DefaultLanguageHighlighterColors.INSTANCE_FIELD).create()
+                holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(element.textRange).textAttributes(DefaultLanguageHighlighterColors.METADATA).create()
             }
 
             JustTypes.RECIPE_PARAM_NAME -> {
