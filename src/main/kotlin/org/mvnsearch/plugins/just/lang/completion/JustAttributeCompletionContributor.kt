@@ -35,6 +35,8 @@ class JustAttributeCompletionContributor : CompletionContributor() {
                         result.addElement(LookupElementBuilder.create("no-quiet"))
                         result.addElement(LookupElementBuilder.create("no-exit-message"))
                         result.addElement(LookupElementBuilder.create("positional-arguments"))
+                        result.addElement(LookupElementBuilder.create("script"))
+                        result.addElement(LookupElementBuilder.create("extension"))
                     }
                 }
             }

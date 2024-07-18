@@ -47,7 +47,9 @@ PAREN_STRING=\([^\(]*\)
 ID=[a-zA-Z_][a-zA-Z0-9_\-]*
 ATTRIBUTE1=(\[[a-zA-Z0-9_\-]*\])
 ATTRIBUTE2=(\[[a-zA-Z0-9_\-]*\('[^']*'\)\])
-ATTRIBUTE3=(\[[a-zA-Z0-9_\-]*:[ ]*'[^']*'\])
+ATTRIBUTE3=(\[[a-zA-Z0-9_\-]*\(\"[^\"]*\"\)\])
+ATTRIBUTE4=(\[[a-zA-Z0-9_\-]*:[ ]*'[^']*'\])
+ATTRIBUTE5=(\[[a-zA-Z0-9_\-]*:[ ]*\"[^\"]*\"\])
 ID_LITERAL=[a-zA-Z_][a-zA-Z0-9_\-]*
 SETTING=[a-zA-Z_][a-zA-Z0-9_\-]*
 MOD_NAME=[a-zA-Z_][a-zA-Z0-9_\-]*
@@ -225,6 +227,8 @@ KEYWORD_ELSE=(else)
   {ATTRIBUTE1}                          { yybegin(YYINITIAL); return JustTypes.ATTRIBUTE1; }
   {ATTRIBUTE2}                          { yybegin(YYINITIAL); return JustTypes.ATTRIBUTE2; }
   {ATTRIBUTE3}                          { yybegin(YYINITIAL); return JustTypes.ATTRIBUTE3; }
+  {ATTRIBUTE4}                          { yybegin(YYINITIAL); return JustTypes.ATTRIBUTE4; }
+  {ATTRIBUTE5}                          { yybegin(YYINITIAL); return JustTypes.ATTRIBUTE5; }
 
   // Flex: Lookahead predicate
   {VARIABLE} / (\s*)(":=")             { yybegin(VARIABLE); return JustTypes.VARIABLE; }
