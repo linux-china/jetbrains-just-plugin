@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.5.0 - 2024-07-18
+
+### Added
+
+- Refactor `attribute` lexer
+
 ## 0.4.4 - 2024-06-15
 
 ### Fixed
