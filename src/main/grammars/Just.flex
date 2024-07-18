@@ -34,6 +34,8 @@ COMMA = [,]
 EQUAL = [=]
 OPEN_BRACE = [{]
 CLOSE_BRACE = [}]
+OPEN_BRACKET = ("[")
+CLOSE_BRACKET =  ("]")
 QUESTION_MARK = ("?")
 BACKTICK=`[^`]*`
 BOOL_LITERAL=(true) | (false)
@@ -45,11 +47,7 @@ STRING=(\"[^\"]*\")
 INDENTED_STRING=(\"\"\")([\"]{0,2}([^\"]))*(\"\"\")
 PAREN_STRING=\([^\(]*\)
 ID=[a-zA-Z_][a-zA-Z0-9_\-]*
-ATTRIBUTE1=(\[[a-zA-Z0-9_\-]*\])
-ATTRIBUTE2=(\[[a-zA-Z0-9_\-]*\('[^']*'\)\])
-ATTRIBUTE3=(\[[a-zA-Z0-9_\-]*\(\"[^\"]*\"\)\])
-ATTRIBUTE4=(\[[a-zA-Z0-9_\-]*:[ ]*'[^']*'\])
-ATTRIBUTE5=(\[[a-zA-Z0-9_\-]*:[ ]*\"[^\"]*\"\])
+ATTRIBUTE_NAME=([a-zA-Z0-9_\-]+)
 ID_LITERAL=[a-zA-Z_][a-zA-Z0-9_\-]*
 SETTING=[a-zA-Z_][a-zA-Z0-9_\-]*
 MOD_NAME=[a-zA-Z_][a-zA-Z0-9_\-]*
@@ -82,7 +80,7 @@ KEYWORD_IMPORT=(import)
 KEYWORD_IF=(if)
 KEYWORD_ELSE=(else)
 
-%state MOD IMPORT ALIAS VARIABLE CONDITIONAL EXPORT EXPORT_VALUE SET SET_VALUE RECIPE PARAMS PARAM_WITH_VALUE DEPENDENCIES DEPENDENCY_WITH_PARAMS
+%state MOD IMPORT ALIAS VARIABLE CONDITIONAL EXPORT EXPORT_VALUE SET SET_VALUE ATTRIBUTE RECIPE PARAMS PARAM_WITH_VALUE DEPENDENCIES DEPENDENCY_WITH_PARAMS
 
 %%
 
@@ -209,6 +207,17 @@ KEYWORD_ELSE=(else)
  {CLOSE_PAREN}                           {  yybegin(DEPENDENCIES); return CLOSE_PAREN; }
 }
 
+<ATTRIBUTE> {
+ {ATTRIBUTE_NAME}                       {  yybegin(ATTRIBUTE); return ATTRIBUTE_NAME; }
+ {WHITE_SPACE}+                          {  yybegin(ATTRIBUTE); return TokenType.WHITE_SPACE; }
+ {SEPERATOR}                           {  yybegin(ATTRIBUTE); return SEPERATOR; }
+ {OPEN_PAREN}                           {  yybegin(ATTRIBUTE); return OPEN_PAREN; }
+ {STRING}                                {  yybegin(ATTRIBUTE); return STRING; }
+ {RAW_STRING}                            {  yybegin(ATTRIBUTE); return RAW_STRING; }
+ {CLOSE_PAREN}                           {  yybegin(ATTRIBUTE); return CLOSE_PAREN; }
+ {CLOSE_BRACKET}                           {  yybegin(YYINITIAL); return CLOSE_BRACKET; }
+}
+
 <RECIPE> {
   {WHITE_SPACE}+     {  yybegin(PARAMS); return TokenType.WHITE_SPACE; }
   {SEPERATOR}        {  yybegin(DEPENDENCIES); return SEPERATOR; }
@@ -224,11 +233,7 @@ KEYWORD_ELSE=(else)
   {KEYWORD_ALIAS}                      { yybegin(ALIAS); return JustTypes.KEYWORD_ALIAS; }
   {KEYWORD_EXPORT}                     { yybegin(EXPORT); return JustTypes.KEYWORD_EXPORT; }
   {KEYWORD_SET}                        { yybegin(SET); return JustTypes.KEYWORD_SET; }
-  {ATTRIBUTE1}                          { yybegin(YYINITIAL); return JustTypes.ATTRIBUTE1; }
-  {ATTRIBUTE2}                          { yybegin(YYINITIAL); return JustTypes.ATTRIBUTE2; }
-  {ATTRIBUTE3}                          { yybegin(YYINITIAL); return JustTypes.ATTRIBUTE3; }
-  {ATTRIBUTE4}                          { yybegin(YYINITIAL); return JustTypes.ATTRIBUTE4; }
-  {ATTRIBUTE5}                          { yybegin(YYINITIAL); return JustTypes.ATTRIBUTE5; }
+  {OPEN_BRACKET}                       { yybegin(ATTRIBUTE); return JustTypes.OPEN_BRACKET; }
 
   // Flex: Lookahead predicate
   {VARIABLE} / (\s*)(":=")             { yybegin(VARIABLE); return JustTypes.VARIABLE; }
