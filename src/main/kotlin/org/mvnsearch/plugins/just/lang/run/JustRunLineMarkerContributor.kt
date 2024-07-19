@@ -92,6 +92,7 @@ fun runJustCommand(
     commandDataContext = RunAnythingCommandCustomizer.customizeContext(commandDataContext)
     val initialCommandLine = GeneralCommandLine(ParametersListUtil.parse(commandString, false, true))
         .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
+        .withEnvironment("JUST_UNSTABLE", "1")
         .withWorkDirectory(workDirectory.path)
     val commandLine =
         RunAnythingCommandCustomizer.customizeCommandLine(commandDataContext, workDirectory, initialCommandLine)
