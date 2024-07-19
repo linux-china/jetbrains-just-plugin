@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.5.1 - 2024-07-19
+
+### Added
+
+- Add `JUST_UNSTABLE` environment variable to run recipe
+
 ## 0.5.0 - 2024-07-18
 
 ### Added
