@@ -24,6 +24,7 @@ class JustSetCompletionContributor : CompletionContributor() {
                     val element = parameters.position
                     if (element.elementType == JustTypes.SETTING) {
                         result.addElement(LookupElementBuilder.create("allow-duplicate-recipes"))
+                        result.addElement(LookupElementBuilder.create("allow-duplicate-variables"))
                         result.addElement(LookupElementBuilder.create("dotenv-load := true").withPresentableText("dotenv-load"))
                         result.addElement(LookupElementBuilder.create("dotenv-required"))
                         result.addElement(LookupElementBuilder.create("dotenv-filename := \"\""))
@@ -31,7 +32,9 @@ class JustSetCompletionContributor : CompletionContributor() {
                         result.addElement(LookupElementBuilder.create("ignore-comments"))
                         result.addElement(LookupElementBuilder.create("export"))
                         result.addElement(LookupElementBuilder.create("quiet"))
+                        result.addElement(LookupElementBuilder.create("unstable"))
                         result.addElement(LookupElementBuilder.create("fallback"))
+                        result.addElement(LookupElementBuilder.create("script-interpreter"))
                         result.addElement(LookupElementBuilder.create("tempdir := \"\""))
                         result.addElement(LookupElementBuilder.create("positional-arguments"))
                         result.addElement(LookupElementBuilder.create("shell := [\"bash\", \"-c\"]").withPresentableText("shell"))
