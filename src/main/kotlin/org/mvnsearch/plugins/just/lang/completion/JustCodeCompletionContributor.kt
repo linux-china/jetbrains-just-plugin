@@ -24,7 +24,9 @@ import org.mvnsearch.plugins.just.removeVariablePrefix
  */
 class JustCodeCompletionContributor : CompletionContributor() {
     companion object {
-        val JUST_FUNCTIONS = listOf("invocation_directory()", "justfile_directory()")
+        val JUST_FUNCTIONS = listOf("home_dir()", "invocation_dir()", "justfile_dir()",
+            "absolute_path()", "file_name()",
+            "env()", "uuid()", "datetime()")
     }
 
     init {
