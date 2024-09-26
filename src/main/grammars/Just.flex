@@ -32,6 +32,9 @@ OPEN_PAREN = [\(]
 CLOSE_PAREN = [\)]
 COMMA = [,]
 EQUAL = [=]
+EQEQ = ("==")
+NOEQ = ("!=")
+REEQ = ("=~")
 OPEN_BRACE = [{]
 CLOSE_BRACE = [}]
 OPEN_BRACKET = ("[")
@@ -47,6 +50,7 @@ INDENTED_RAW_STRING=(''')([']{0,2}([^']))*(''')
 STRING=(\"[^\"]*\")
 INDENTED_STRING=(\"\"\")([\"]{0,2}([^\"]))*(\"\"\")
 PAREN_STRING=\([^\(]*\)
+CONDITIONAL_BLOCK=(\{[^}]*\})
 ID=[a-zA-Z_][a-zA-Z0-9_\-]*
 ATTRIBUTE_NAME=([a-zA-Z0-9_\-]+)
 ID_LITERAL=[a-zA-Z_][a-zA-Z0-9_\-]*
@@ -80,8 +84,9 @@ KEYWORD_MOD=(mod)
 KEYWORD_IMPORT=(import)
 KEYWORD_IF=(if)
 KEYWORD_ELSE=(else)
+KEYWORD_ELSE_IF=("else if")
 
-%state MOD IMPORT ALIAS VARIABLE CONDITIONAL EXPORT EXPORT_VALUE SET SET_VALUE ATTRIBUTE RECIPE PARAMS PARAM_WITH_VALUE DEPENDENCIES DEPENDENCY_WITH_PARAMS
+%state MOD IMPORT ALIAS VARIABLE CONDITIONAL CONDITIONAL_END EXPORT EXPORT_VALUE SET SET_VALUE ATTRIBUTE RECIPE PARAMS PARAM_WITH_VALUE DEPENDENCIES DEPENDENCY_WITH_PARAMS
 
 %%
 
@@ -156,22 +161,28 @@ KEYWORD_ELSE=(else)
 
 <CONDITIONAL> {
   {WHITE_SPACE}+             {  yybegin(CONDITIONAL); return TokenType.WHITE_SPACE; }
-  {NEW_LINE}             {  yybegin(CONDITIONAL); return NEW_LINE; }
-  {OPEN_BRACE}               {  yybegin(CONDITIONAL); return OPEN_BRACE; }
-  {CLOSE_BRACE}               {  yybegin(CONDITIONAL); return CLOSE_BRACE; }
-  {KEYWORD_IF}/ {WHITE_SPACE}               {  yybegin(CONDITIONAL); return KEYWORD_IF; }
-  {KEYWORD_ELSE}/ {WHITE_SPACE}               {  yybegin(CONDITIONAL); return KEYWORD_ELSE; }
+  {EQEQ}                     {  yybegin(CONDITIONAL); return EQEQ; }
+  {NOEQ}                     {  yybegin(CONDITIONAL); return NOEQ; }
+  {REEQ}                     {  yybegin(CONDITIONAL); return REEQ; }
+  {CONDITIONAL_BLOCK}        {  yybegin(CONDITIONAL); return CONDITIONAL_BLOCK; }
+  {KEYWORD_ELSE}             {  yybegin(CONDITIONAL_END); return KEYWORD_ELSE; }
+  {KEYWORD_ELSE_IF}           {  yybegin(CONDITIONAL); return KEYWORD_ELSE_IF; }
   {INDENTED_BACKTICK}          {  yybegin(CONDITIONAL); return INDENTED_BACKTICK; }
-    {INDENTED_RAW_STRING}        {  yybegin(CONDITIONAL); return INDENTED_RAW_STRING; }
-    {INDENTED_STRING}            {  yybegin(CONDITIONAL); return INDENTED_STRING; }
-    {STRING}                     {  yybegin(CONDITIONAL); return STRING; }
-    {RAW_STRING}                 {  yybegin(CONDITIONAL); return RAW_STRING; }
-    {BACKTICK}                   {  yybegin(CONDITIONAL); return BACKTICK; }
-    {PAREN_STRING}               {  yybegin(CONDITIONAL); return PAREN_STRING; }
-    {LITERAL}                    {  yybegin(CONDITIONAL); return LITERAL; }
-  {CLOSE_BRACE} / {NEW_LINE}        {  yybegin(YYINITIAL); return CLOSE_BRACE; }
+  {INDENTED_RAW_STRING}        {  yybegin(CONDITIONAL); return INDENTED_RAW_STRING; }
+  {INDENTED_STRING}            {  yybegin(CONDITIONAL); return INDENTED_STRING; }
+  {STRING}                     {  yybegin(CONDITIONAL); return STRING; }
+  {RAW_STRING}                 {  yybegin(CONDITIONAL); return RAW_STRING; }
+  {BACKTICK}                   {  yybegin(CONDITIONAL); return BACKTICK; }
+  {PAREN_STRING}               {  yybegin(CONDITIONAL); return PAREN_STRING; }
+  {LITERAL}                    {  yybegin(CONDITIONAL); return LITERAL; }
+  {NEW_LINE}                  {  yybegin(CONDITIONAL); return JustTypes.NEW_LINE; }
 }
 
+<CONDITIONAL_END> {
+   {WHITE_SPACE}+             {  yybegin(CONDITIONAL_END); return TokenType.WHITE_SPACE; }
+   {NEW_LINE}                  {  yybegin(CONDITIONAL_END); return JustTypes.NEW_LINE; }
+   {CONDITIONAL_BLOCK}        {  yybegin(YYINITIAL); return CONDITIONAL_BLOCK; }
+}
 
 <PARAMS> {
   {WHITE_SPACE}+             {  yybegin(PARAMS); return TokenType.WHITE_SPACE; }
