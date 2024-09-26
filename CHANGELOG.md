@@ -4,6 +4,14 @@
 
 ## Unreleased
 
+## 0.5.2 - 2024-09-26
+
+### Added
+
+- Shell expended string support: `foobar := x'~/$FOO/${BAR}'`
+- Add more functions for code completion
+- Compatible with JetBrains IDE 2024.3
+
 ## 0.5.1 - 2024-07-19
 
 ### Added
