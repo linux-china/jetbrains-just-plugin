@@ -60,9 +60,9 @@ class JustRunAnythingProvider : RunAnythingCommandLineProvider() {
         val workDirectory = project.guessProjectDir()!!
         val commandString = Just.getJustCmdAbsolutionPath() + " " + commandLine.command
         val commandDataContext = RunAnythingCommandCustomizer.customizeContext(dataContext)
-        var justColor = "auto";
+        var justColor = "auto"
         if (SystemInfo.isWindows) {
-            justColor = "never";
+            justColor = "never"
         }
         val initialCommandLine = GeneralCommandLine(ParametersListUtil.parse(commandString, false, true))
             .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
