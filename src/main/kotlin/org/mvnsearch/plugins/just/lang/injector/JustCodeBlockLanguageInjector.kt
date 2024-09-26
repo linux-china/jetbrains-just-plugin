@@ -51,7 +51,7 @@ class JustCodeBlockLanguageInjector : MultiHostInjector {
 
     private fun isShellCode(code: String): Boolean {
         if (!code.startsWith("#!/usr/bin/env")) {
-            return true
+            return !code.startsWith("{{") && !code.startsWith("\${")
         }
         return code.startsWith("#!/usr/bin/env sh")
                 || code.startsWith("#!/usr/bin/env bash")
