@@ -61,6 +61,7 @@ class JustRunAnythingProvider : RunAnythingCommandLineProvider() {
         val commandDataContext = RunAnythingCommandCustomizer.customizeContext(dataContext)
         val initialCommandLine = GeneralCommandLine(ParametersListUtil.parse(commandString, false, true))
             .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
+            .withEnvironment("JUST_COLOR", "never")
             .withWorkDirectory(workDirectory.path)
         val newCommandLine = RunAnythingCommandCustomizer.customizeCommandLine(commandDataContext, workDirectory, initialCommandLine)
         try {
