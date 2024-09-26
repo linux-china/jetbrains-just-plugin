@@ -172,6 +172,7 @@ KEYWORD_ELSE_IF=("else if")
   {INDENTED_STRING}            {  yybegin(CONDITIONAL); return INDENTED_STRING; }
   {STRING}                     {  yybegin(CONDITIONAL); return STRING; }
   {RAW_STRING}                 {  yybegin(CONDITIONAL); return RAW_STRING; }
+  {RAW_EXPANDED_STRING}        {  yybegin(CONDITIONAL); return RAW_EXPANDED_STRING; }
   {BACKTICK}                   {  yybegin(CONDITIONAL); return BACKTICK; }
   {PAREN_STRING}               {  yybegin(CONDITIONAL); return PAREN_STRING; }
   {LITERAL}                    {  yybegin(CONDITIONAL); return LITERAL; }
