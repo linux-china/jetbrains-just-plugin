@@ -14,6 +14,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.psi.PsiManager
 import com.intellij.util.execution.ParametersListUtil
@@ -59,15 +60,25 @@ class JustRunAnythingProvider : RunAnythingCommandLineProvider() {
         val workDirectory = project.guessProjectDir()!!
         val commandString = Just.getJustCmdAbsolutionPath() + " " + commandLine.command
         val commandDataContext = RunAnythingCommandCustomizer.customizeContext(dataContext)
+        var justColor = "auto";
+        if (SystemInfo.isWindows) {
+            justColor = "never";
+        }
         val initialCommandLine = GeneralCommandLine(ParametersListUtil.parse(commandString, false, true))
             .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
-            .withEnvironment("JUST_COLOR", "never")
+            .withEnvironment("JUST_COLOR", justColor)
             .withWorkDirectory(workDirectory.path)
-        val newCommandLine = RunAnythingCommandCustomizer.customizeCommandLine(commandDataContext, workDirectory, initialCommandLine)
+        val newCommandLine =
+            RunAnythingCommandCustomizer.customizeCommandLine(commandDataContext, workDirectory, initialCommandLine)
         try {
-            val generalCommandLine = if (Registry.`is`("run.anything.use.pty", false)) PtyCommandLine(newCommandLine) else newCommandLine
+            val generalCommandLine =
+                if (Registry.`is`("run.anything.use.pty", false)) PtyCommandLine(newCommandLine) else newCommandLine
             val runAnythingRunProfile = RunJustProfile(generalCommandLine, commandString)
-            ExecutionEnvironmentBuilder.create(project, DefaultRunExecutor.getRunExecutorInstance(), runAnythingRunProfile)
+            ExecutionEnvironmentBuilder.create(
+                project,
+                DefaultRunExecutor.getRunExecutorInstance(),
+                runAnythingRunProfile
+            )
                 .dataContext(commandDataContext)
                 .buildAndExecute()
         } catch (e: ExecutionException) {
