@@ -9,6 +9,7 @@
 ### Added
 
 - Shell expended string support: `foobar := x'~/$FOO/${BAR}'`
+- Add conditionals support: `foo := if "hello" =~ 'hel+o' { "match" } else { "mismatch" }` 
 - Add more functions for code completion
 - Compatible with JetBrains IDE 2024.3
 
