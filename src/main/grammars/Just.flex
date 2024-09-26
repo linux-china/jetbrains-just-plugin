@@ -97,6 +97,7 @@ KEYWORD_ELSE=(else)
   {QUESTION_MARK}    {  yybegin(IMPORT); return QUESTION_MARK; }
   {WHITE_SPACE}+     {  yybegin(IMPORT); return TokenType.WHITE_SPACE; }
   {IMPORT_PATH}      {  yybegin(IMPORT); return IMPORT_PATH; }
+  {RAW_EXPANDED_STRING} {  yybegin(IMPORT); return RAW_EXPANDED_STRING; }
   {NEW_LINE}         {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
 }
 
@@ -132,6 +133,7 @@ KEYWORD_ELSE=(else)
    {WHITE_SPACE}+      {  yybegin(SET_VALUE); return TokenType.WHITE_SPACE; }
    {ASSIGN}           {  yybegin(SET_VALUE); return ASSIGN; }
    {BOOL_LITERAL}      {  yybegin(SET_VALUE); return BOOL_LITERAL; }
+   {RAW_EXPANDED_STRING} {  yybegin(SET_VALUE); return RAW_EXPANDED_STRING; }
    {LITERAL}           {  yybegin(SET_VALUE); return LITERAL; }
    {NEW_LINE}          {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
 }
@@ -181,6 +183,7 @@ KEYWORD_ELSE=(else)
   {EQUAL}                     {  yybegin(PARAM_WITH_VALUE); return EQUAL; }
   {STRING}                    {  yybegin(PARAMS); return STRING; }
   {RAW_STRING}                {  yybegin(PARAMS); return RAW_STRING; }
+  {RAW_EXPANDED_STRING}       {  yybegin(PARAMS); return RAW_EXPANDED_STRING; }
   {BACKTICK}                  {  yybegin(PARAMS); return BACKTICK; }
   {PAREN_STRING}              {  yybegin(PARAMS); return BACKTICK; }
   {ID_LITERAL}                {  yybegin(PARAMS); return ID_LITERAL; }
