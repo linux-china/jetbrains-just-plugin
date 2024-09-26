@@ -36,6 +36,10 @@ class JustfileAnnotator : Annotator {
             JustTypes.KEYWORD_ALIAS,
             JustTypes.KEYWORD_SET,
             JustTypes.KEYWORD_EXPORT,
+            JustTypes.KEYWORD_IF,
+            JustTypes.KEYWORD_ELSE,
+            JustTypes.KEYWORD_ELSE_IF,
+            JustTypes.KEYWORD_EXPORT,
             JustTypes.KEYWORD_IMPORT -> {
                 holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(element.textRange)
                     .textAttributes(DefaultLanguageHighlighterColors.KEYWORD).create()
