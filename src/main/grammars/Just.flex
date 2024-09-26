@@ -42,6 +42,7 @@ BOOL_LITERAL=(true) | (false)
 NUMBER_LITERAL=[\d]+
 INDENTED_BACKTICK=(```)([`]{0,2}([^`]))*(```)
 RAW_STRING=('[^']*')
+RAW_EXPANDED_STRING=(x'[^']*')
 INDENTED_RAW_STRING=(''')([']{0,2}([^']))*(''')
 STRING=(\"[^\"]*\")
 INDENTED_STRING=(\"\"\")([\"]{0,2}([^\"]))*(\"\"\")
@@ -144,6 +145,7 @@ KEYWORD_ELSE=(else)
   {INDENTED_STRING}            {  yybegin(VARIABLE); return INDENTED_STRING; }
   {STRING}                     {  yybegin(VARIABLE); return STRING; }
   {RAW_STRING}                 {  yybegin(VARIABLE); return RAW_STRING; }
+  {RAW_EXPANDED_STRING}        {  yybegin(VARIABLE); return RAW_EXPANDED_STRING; }
   {BACKTICK}                   {  yybegin(VARIABLE); return BACKTICK; }
   {PAREN_STRING}               {  yybegin(VARIABLE); return PAREN_STRING; }
   {LITERAL}                    {  yybegin(VARIABLE); return LITERAL; }
