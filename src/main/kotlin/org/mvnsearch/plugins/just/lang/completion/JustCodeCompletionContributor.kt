@@ -24,14 +24,32 @@ import org.mvnsearch.plugins.just.removeVariablePrefix
  */
 class JustCodeCompletionContributor : CompletionContributor() {
     companion object {
-        val JUST_FUNCTIONS = listOf("home_dir()", "invocation_dir()", "justfile_dir()",
-            "absolute_path()", "file_name()",
-            "env()", "uuid()", "datetime()")
+        val JUST_FUNCTIONS = listOf(
+            "home_dir()",
+            "invocation_dir()",
+            "justfile_dir()",
+            "path_exists()",
+            "absolute_path()",
+            "file_name()",
+            "extension()",
+            "parent_directory()",
+            "canonicalize()",
+            "clean()",
+            "join()",
+            "sha256_file()",
+            "error()",
+            "shell()",
+            "env()",
+            "uuid()",
+            "datetime()"
+        )
     }
 
     init {
         extend(
-            CompletionType.BASIC, PlatformPatterns.psiElement(PsiElement::class.java).withElementType(JustTypes.CODE).withLanguage(JustLanguage),
+            CompletionType.BASIC,
+            PlatformPatterns.psiElement(PsiElement::class.java).withElementType(JustTypes.CODE)
+                .withLanguage(JustLanguage),
             object : CompletionProvider<CompletionParameters>() {
                 override fun addCompletions(
                     parameters: CompletionParameters,
@@ -57,12 +75,18 @@ class JustCodeCompletionContributor : CompletionContributor() {
                             val recipeSmt = element.parentOfType<JustRecipeStatement>()!!
                             extractRecipeVariables(recipeSmt).filter { it.startsWith("$") }.forEach {
                                 val name = removeVariablePrefix(it)
-                                prefixMatcher.addElement(LookupElementBuilder.create("$${name}${suffix}").withPresentableText(name).withIcon(AllIcons.Nodes.Variable))
+                                prefixMatcher.addElement(
+                                    LookupElementBuilder.create("$${name}${suffix}").withPresentableText(name)
+                                        .withIcon(AllIcons.Nodes.Variable)
+                                )
                             }
                             val justfile = element.containingFile as JustFile
                             val justfileMetadata = justfile.parseMetadata(true)
                             justfileMetadata.envVariables.forEach {
-                                prefixMatcher.addElement(LookupElementBuilder.create("$${it}${suffix}").withPresentableText(it).withIcon(AllIcons.Nodes.Variable))
+                                prefixMatcher.addElement(
+                                    LookupElementBuilder.create("$${it}${suffix}").withPresentableText(it)
+                                        .withIcon(AllIcons.Nodes.Variable)
+                                )
                             }
                         } else if (prefixText.endsWith("{{")) {
                             val prefixMatcher = result.withPrefixMatcher("{{")
@@ -78,7 +102,8 @@ class JustCodeCompletionContributor : CompletionContributor() {
                                 val name = removeVariablePrefix(it)
                                 prefixMatcher.addElement(
                                     priority(
-                                        LookupElementBuilder.create("{{$name}}${suffix}").withPresentableText(name).withIcon(AllIcons.Nodes.Variable),
+                                        LookupElementBuilder.create("{{$name}}${suffix}").withPresentableText(name)
+                                            .withIcon(AllIcons.Nodes.Variable),
                                         3.0
                                     )
                                 )
@@ -86,10 +111,20 @@ class JustCodeCompletionContributor : CompletionContributor() {
                             val justfile = element.containingFile as JustFile
                             val justfileMetadata = justfile.parseMetadata(true)
                             justfileMetadata.variables.forEach {
-                                prefixMatcher.addElement(priority(LookupElementBuilder.create("{{$it}}${suffix}").withPresentableText(it).withIcon(AllIcons.Nodes.Variable), 2.0))
+                                prefixMatcher.addElement(
+                                    priority(
+                                        LookupElementBuilder.create("{{$it}}${suffix}").withPresentableText(it)
+                                            .withIcon(AllIcons.Nodes.Variable), 2.0
+                                    )
+                                )
                             }
                             JUST_FUNCTIONS.forEach {
-                                prefixMatcher.addElement(priority(LookupElementBuilder.create("{{$it}}${suffix}").withPresentableText(it).withIcon(AllIcons.Nodes.Function), 0.0))
+                                prefixMatcher.addElement(
+                                    priority(
+                                        LookupElementBuilder.create("{{$it}}${suffix}").withPresentableText(it)
+                                            .withIcon(AllIcons.Nodes.Function), 0.0
+                                    )
+                                )
                             }
                         }
                     }
