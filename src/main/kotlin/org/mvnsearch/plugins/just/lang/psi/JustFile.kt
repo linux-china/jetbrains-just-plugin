@@ -100,11 +100,14 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
         val importStatements = PsiTreeUtil.getChildrenOfType(this, JustImportStatement::class.java)
 
         importStatements?.forEach { importStatement ->
-            val importPath = StringUtil.unquoteString(importStatement.justfilePath.importPath.text)
-            val resolvedFile = resolveImportPathToFile(importPath)
-
-            if (resolvedFile is JustFile) {
-                includedFiles.add(resolvedFile)
+            if (importStatement.justfilePath?.importPath != null) {
+                val importPath = StringUtil.unquoteString(importStatement.justfilePath?.importPath?.text ?: "")
+                if (importPath != "") {
+                    val resolvedFile = resolveImportPathToFile(importPath)
+                    if (resolvedFile is JustFile) {
+                        includedFiles.add(resolvedFile)
+                    }
+                }
             }
         }
 
