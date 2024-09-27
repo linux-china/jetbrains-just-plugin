@@ -48,6 +48,7 @@ RAW_STRING=('[^']*')
 RAW_EXPANDED_STRING=(x'[^']*')
 INDENTED_RAW_STRING=(''')([']{0,2}([^']))*(''')
 STRING=(\"[^\"]*\")
+EXPANDED_STRING=(x\"[^\"]*\")
 INDENTED_STRING=(\"\"\")([\"]{0,2}([^\"]))*(\"\"\")
 PAREN_STRING=\([^\(]*\)
 CONDITIONAL_BLOCK=(\{[^}]*\})
@@ -102,7 +103,9 @@ KEYWORD_ELSE_IF=("else if")
   {QUESTION_MARK}    {  yybegin(IMPORT); return QUESTION_MARK; }
   {WHITE_SPACE}+     {  yybegin(IMPORT); return TokenType.WHITE_SPACE; }
   {IMPORT_PATH}      {  yybegin(IMPORT); return IMPORT_PATH; }
+  {EXPANDED_STRING}      {  yybegin(IMPORT); return EXPANDED_STRING; }
   {RAW_EXPANDED_STRING} {  yybegin(IMPORT); return RAW_EXPANDED_STRING; }
+  {EXPANDED_STRING} {  yybegin(IMPORT); return EXPANDED_STRING; }
   {NEW_LINE}         {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
 }
 
@@ -138,6 +141,9 @@ KEYWORD_ELSE_IF=("else if")
    {WHITE_SPACE}+      {  yybegin(SET_VALUE); return TokenType.WHITE_SPACE; }
    {ASSIGN}           {  yybegin(SET_VALUE); return ASSIGN; }
    {BOOL_LITERAL}      {  yybegin(SET_VALUE); return BOOL_LITERAL; }
+   {STRING}        {  yybegin(SET_VALUE); return STRING; }
+   {EXPANDED_STRING} {  yybegin(SET_VALUE); return EXPANDED_STRING; }
+   {RAW_STRING} {  yybegin(SET_VALUE); return RAW_STRING; }
    {RAW_EXPANDED_STRING} {  yybegin(SET_VALUE); return RAW_EXPANDED_STRING; }
    {LITERAL}           {  yybegin(SET_VALUE); return LITERAL; }
    {NEW_LINE}          {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
@@ -151,6 +157,7 @@ KEYWORD_ELSE_IF=("else if")
   {INDENTED_RAW_STRING}        {  yybegin(VARIABLE); return INDENTED_RAW_STRING; }
   {INDENTED_STRING}            {  yybegin(VARIABLE); return INDENTED_STRING; }
   {STRING}                     {  yybegin(VARIABLE); return STRING; }
+  {EXPANDED_STRING}                     {  yybegin(VARIABLE); return EXPANDED_STRING; }
   {RAW_STRING}                 {  yybegin(VARIABLE); return RAW_STRING; }
   {RAW_EXPANDED_STRING}        {  yybegin(VARIABLE); return RAW_EXPANDED_STRING; }
   {BACKTICK}                   {  yybegin(VARIABLE); return BACKTICK; }
@@ -171,6 +178,7 @@ KEYWORD_ELSE_IF=("else if")
   {INDENTED_RAW_STRING}        {  yybegin(CONDITIONAL); return INDENTED_RAW_STRING; }
   {INDENTED_STRING}            {  yybegin(CONDITIONAL); return INDENTED_STRING; }
   {STRING}                     {  yybegin(CONDITIONAL); return STRING; }
+  {EXPANDED_STRING}            {  yybegin(CONDITIONAL); return EXPANDED_STRING; }
   {RAW_STRING}                 {  yybegin(CONDITIONAL); return RAW_STRING; }
   {RAW_EXPANDED_STRING}        {  yybegin(CONDITIONAL); return RAW_EXPANDED_STRING; }
   {BACKTICK}                   {  yybegin(CONDITIONAL); return BACKTICK; }
@@ -194,6 +202,7 @@ KEYWORD_ELSE_IF=("else if")
 <PARAM_WITH_VALUE>{
   {EQUAL}                     {  yybegin(PARAM_WITH_VALUE); return EQUAL; }
   {STRING}                    {  yybegin(PARAMS); return STRING; }
+  {EXPANDED_STRING}           {  yybegin(PARAMS); return EXPANDED_STRING; }
   {RAW_STRING}                {  yybegin(PARAMS); return RAW_STRING; }
   {RAW_EXPANDED_STRING}       {  yybegin(PARAMS); return RAW_EXPANDED_STRING; }
   {BACKTICK}                  {  yybegin(PARAMS); return BACKTICK; }
