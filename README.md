@@ -35,7 +35,8 @@ Quick to understand `justfile`, please click [Justfile cheat sheet](https://chea
 <!-- Plugin description end -->
 
 # References
- 
+         
+* justfile grammar: https://github.com/casey/just/blob/master/GRAMMAR.md
 * just VS Code extension: https://marketplace.visualstudio.com/items?itemName=skellock.just
 * Justfile cheat sheet: https://cheatography.com/linux-china/cheat-sheets/justfile/
 * Grammar-Kit: https://github.com/JetBrains/Grammar-Kit
