@@ -50,7 +50,7 @@ INDENTED_RAW_STRING=(''')([']{0,2}([^']))*(''')
 STRING=(\"[^\"]*\")
 EXPANDED_STRING=(x\"[^\"]*\")
 INDENTED_STRING=(\"\"\")([\"]{0,2}([^\"]))*(\"\"\")
-PAREN_STRING=\([^\(]*\)
+PAREN_PAIRS=\([^\)]*\)
 CONDITIONAL_BLOCK=(\{[^}]*\})
 ID=[a-zA-Z_][a-zA-Z0-9_\-]*
 ATTRIBUTE_NAME=([a-zA-Z0-9_\-]+)
@@ -63,7 +63,7 @@ RECIPE_NAME=[a-zA-Z_][a-zA-Z0-9_\-]*
 DEPENDENCY_NAME=[a-zA-Z_][a-zA-Z0-9_\-]*
 DEPENDENCY_WITH_PARAMS=[a-zA-Z_][a-zA-Z0-9_\-]*\([^\(\n]*\)
 DEPENDENCY_PARAMS=[^\(\n\)]*
-LITERAL=([^\n \t]*)
+LITERAL=([^\n \t\(\)]*)
 SHEBANG=("#!")[^\n]*
 COMMENT=("#")[^\n]*
 DOUBLE_AND=("&&")
@@ -128,6 +128,7 @@ KEYWORD_ELSE_IF=("else if")
    {RAW_STRING}       {  yybegin(EXPORT_VALUE); return RAW_STRING; }
    {INDENTED_BACKTICK} {  yybegin(EXPORT_VALUE); return INDENTED_BACKTICK; }
    {BACKTICK}         {  yybegin(EXPORT_VALUE); return BACKTICK; }
+   {PAREN_PAIRS}      {  yybegin(DEPENDENCY_WITH_PARAMS); return BACKTICK; }
    {LITERAL}          {  yybegin(EXPORT_VALUE); return LITERAL; }
    {NEW_LINE}         {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
 }
@@ -157,11 +158,11 @@ KEYWORD_ELSE_IF=("else if")
   {INDENTED_RAW_STRING}        {  yybegin(VARIABLE); return INDENTED_RAW_STRING; }
   {INDENTED_STRING}            {  yybegin(VARIABLE); return INDENTED_STRING; }
   {STRING}                     {  yybegin(VARIABLE); return STRING; }
-  {EXPANDED_STRING}                     {  yybegin(VARIABLE); return EXPANDED_STRING; }
+  {EXPANDED_STRING}            {  yybegin(VARIABLE); return EXPANDED_STRING; }
   {RAW_STRING}                 {  yybegin(VARIABLE); return RAW_STRING; }
   {RAW_EXPANDED_STRING}        {  yybegin(VARIABLE); return RAW_EXPANDED_STRING; }
   {BACKTICK}                   {  yybegin(VARIABLE); return BACKTICK; }
-  {PAREN_STRING}               {  yybegin(VARIABLE); return PAREN_STRING; }
+  {PAREN_PAIRS}               {  yybegin(VARIABLE); return PAREN_PAIRS; }
   {LITERAL}                    {  yybegin(VARIABLE); return LITERAL; }
   {NEW_LINE}                   {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
 }
@@ -182,7 +183,7 @@ KEYWORD_ELSE_IF=("else if")
   {RAW_STRING}                 {  yybegin(CONDITIONAL); return RAW_STRING; }
   {RAW_EXPANDED_STRING}        {  yybegin(CONDITIONAL); return RAW_EXPANDED_STRING; }
   {BACKTICK}                   {  yybegin(CONDITIONAL); return BACKTICK; }
-  {PAREN_STRING}               {  yybegin(CONDITIONAL); return PAREN_STRING; }
+  {PAREN_PAIRS}               {  yybegin(CONDITIONAL); return PAREN_PAIRS; }
   {LITERAL}                    {  yybegin(CONDITIONAL); return LITERAL; }
   {NEW_LINE}                  {  yybegin(CONDITIONAL); return JustTypes.NEW_LINE; }
 }
@@ -206,7 +207,7 @@ KEYWORD_ELSE_IF=("else if")
   {RAW_STRING}                {  yybegin(PARAMS); return RAW_STRING; }
   {RAW_EXPANDED_STRING}       {  yybegin(PARAMS); return RAW_EXPANDED_STRING; }
   {BACKTICK}                  {  yybegin(PARAMS); return BACKTICK; }
-  {PAREN_STRING}              {  yybegin(PARAMS); return BACKTICK; }
+  {PAREN_PAIRS}              {  yybegin(PARAMS); return BACKTICK; }
   {ID_LITERAL}                {  yybegin(PARAMS); return ID_LITERAL; }
   {WHITE_SPACE}+              {  yybegin(PARAMS); return TokenType.WHITE_SPACE; }
   {SEPERATOR}                 {  yybegin(DEPENDENCIES); return SEPERATOR; }
@@ -227,7 +228,7 @@ KEYWORD_ELSE_IF=("else if")
  {STRING}                                {  yybegin(DEPENDENCY_WITH_PARAMS); return STRING; }
  {RAW_STRING}                            {  yybegin(DEPENDENCY_WITH_PARAMS); return RAW_STRING; }
  {BACKTICK}                              {  yybegin(DEPENDENCY_WITH_PARAMS); return BACKTICK; }
- {PAREN_STRING}                          {  yybegin(DEPENDENCY_WITH_PARAMS); return BACKTICK; }
+ {PAREN_PAIRS}                          {  yybegin(DEPENDENCY_WITH_PARAMS); return BACKTICK; }
  {ID_LITERAL}                            {  yybegin(DEPENDENCY_WITH_PARAMS); return BACKTICK; }
  {COMMA}                                 {  yybegin(DEPENDENCY_WITH_PARAMS); return COMMA; }
  {CLOSE_PAREN}                           {  yybegin(DEPENDENCIES); return CLOSE_PAREN; }
