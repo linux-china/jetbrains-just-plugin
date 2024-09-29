@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.5.3 - 2024-09-29
+
+### Added
+
+- Fix variable with function call: `foo := env("FOO","default")`
+
 ## 0.5.2 - 2024-09-26
 
 ### Added
