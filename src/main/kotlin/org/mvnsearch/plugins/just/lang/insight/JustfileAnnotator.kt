@@ -134,16 +134,19 @@ class JustfileAnnotator : Annotator {
     private fun highLightStringInParenPairs(element: PsiElement, holder: AnnotationHolder) {
         val rangeOffset = element.textRange.startOffset
         val text = element.text
-        var offset = text.indexOf("\"")
-        while (offset > 0) {
-            val endOffset = text.indexOf("\"", offset + 1)
-            if (endOffset > offset) {
-                val range = TextRange(rangeOffset + offset, rangeOffset + endOffset + 1)
-                holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(range)
-                    .textAttributes(DefaultLanguageHighlighterColors.STRING).create()
-                offset = text.indexOf("\"", endOffset + 1)
-            } else {
-                offset = -1
+        val chars = arrayOf('\'', '"')
+        for (char in chars) {
+            var offset = text.indexOf(char)
+            while (offset > 0) {
+                val endOffset = text.indexOf(char, offset + 1)
+                if (endOffset > offset) {
+                    val range = TextRange(rangeOffset + offset, rangeOffset + endOffset + 1)
+                    holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(range)
+                        .textAttributes(DefaultLanguageHighlighterColors.STRING).create()
+                    offset = text.indexOf(char, endOffset + 1)
+                } else {
+                    offset = -1
+                }
             }
         }
     }
