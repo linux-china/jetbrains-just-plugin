@@ -51,6 +51,9 @@ class JustCodeBlockLanguageInjector : MultiHostInjector {
     private fun isShellCode(code: String): Boolean {
         if (!code.startsWith("#!")) { // no shebang found
             var offset = code.indexOf("{{")
+            if (offset == 0) {
+                return false
+            }
             while (offset > 0) {
                 val endOffset = code.indexOf("}}", offset)
                 if (endOffset > offset) {
