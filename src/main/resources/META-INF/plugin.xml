@@ -27,6 +27,8 @@
         <!--suppress PluginXmlValidity -->
         <lang.directNavigationProvider implementation="org.mvnsearch.plugins.just.lang.navigation.RecipeRefNavigation"/>
         <runAnything.executionProvider implementation="org.mvnsearch.plugins.just.lang.run.JustRunAnythingProvider"/>
+        <!-- run configuration -->
+        <configurationType implementation="org.mvnsearch.plugins.just.lang.run.JustConfigurationType"/>
     </extensions>
 
     <actions>
