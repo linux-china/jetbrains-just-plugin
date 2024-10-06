@@ -25,8 +25,8 @@ class JustRunConfiguration(
         return options.getFileName()
     }
 
-    fun setFileName(scriptName: String?) {
-        options.setFileName(scriptName)
+    fun setFileName(fileName: String?) {
+        options.setFileName(fileName)
     }
 
     fun getRecipeName(): String? {
