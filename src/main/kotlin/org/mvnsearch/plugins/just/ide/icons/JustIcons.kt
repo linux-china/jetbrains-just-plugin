@@ -8,5 +8,8 @@ object JustIcons {
     val JUST_FILE_12 = IconLoader.findIcon("/icons/just-12x12.svg", JustIcons::class.java.classLoader)!!
     val RUN_ICON = AllIcons.RunConfigurations.TestState.Run
     val VARIABLE_ICON = AllIcons.Nodes.Variable
+    val SET_ICON = AllIcons.General.Settings
+    val MOD_ICON = AllIcons.Nodes.Module
     var EXPORT_ICON = AllIcons.Nodes.Gvariable
+    var IMPORT_ICON = AllIcons.ToolbarDecorator.Import
 }
