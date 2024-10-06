@@ -142,11 +142,15 @@ KEYWORD_ELSE_IF=("else if")
    {WHITE_SPACE}+      {  yybegin(SET_VALUE); return TokenType.WHITE_SPACE; }
    {ASSIGN}           {  yybegin(SET_VALUE); return ASSIGN; }
    {BOOL_LITERAL}      {  yybegin(SET_VALUE); return BOOL_LITERAL; }
-   {STRING}        {  yybegin(SET_VALUE); return STRING; }
-   {EXPANDED_STRING} {  yybegin(SET_VALUE); return EXPANDED_STRING; }
-   {RAW_STRING} {  yybegin(SET_VALUE); return RAW_STRING; }
+   {NUMBER_LITERAL}    {  yybegin(SET_VALUE); return NUMBER_LITERAL; }
+   {STRING}            {  yybegin(SET_VALUE); return STRING; }
+   {EXPANDED_STRING}   {  yybegin(SET_VALUE); return EXPANDED_STRING; }
+   {RAW_STRING}        {  yybegin(SET_VALUE); return RAW_STRING; }
    {RAW_EXPANDED_STRING} {  yybegin(SET_VALUE); return RAW_EXPANDED_STRING; }
    {LITERAL}           {  yybegin(SET_VALUE); return LITERAL; }
+   {OPEN_BRACKET}      {  yybegin(SET_VALUE); return OPEN_BRACKET; }
+   {CLOSE_BRACKET}      {  yybegin(SET_VALUE); return CLOSE_BRACKET; }
+   {COMMA}              {  yybegin(SET_VALUE); return COMMA; }
    {NEW_LINE}          {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
 }
 
