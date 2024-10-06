@@ -47,6 +47,18 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
             }.toList()
     }
 
+    fun isBashAlike(): Boolean {
+        val shellItem = this.children
+            .filterIsInstance<JustSetStatement>().firstOrNull() {
+                it.setting.text == "shell" || it.setting.text == "windows-powershell"
+            }
+        return if (shellItem == null) {
+            true
+        } else {
+            shellItem.text.contains("sh\"")
+        }
+    }
+
     fun parseMetadata(loadDotenv: Boolean): JustfileMetadata {
         val justfileMetadata = JustfileMetadata()
         text.lines().forEach { line ->
