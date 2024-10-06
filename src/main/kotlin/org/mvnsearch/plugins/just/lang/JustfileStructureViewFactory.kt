@@ -12,10 +12,7 @@ import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
-import org.mvnsearch.plugins.just.lang.psi.JustExportStatement
-import org.mvnsearch.plugins.just.lang.psi.JustFile
-import org.mvnsearch.plugins.just.lang.psi.JustRecipeStatement
-import org.mvnsearch.plugins.just.lang.psi.JustVariableStatement
+import org.mvnsearch.plugins.just.lang.psi.*
 
 
 class JustfileStructureViewFactory : PsiStructureViewFactory {
@@ -28,7 +25,8 @@ class JustfileStructureViewFactory : PsiStructureViewFactory {
     }
 }
 
-class JustfileStructureViewModel(editor: Editor?, psiFile: JustFile) : StructureViewModelBase(psiFile, editor, JustfileStructureViewElement(psiFile)),
+class JustfileStructureViewModel(editor: Editor?, psiFile: JustFile) :
+    StructureViewModelBase(psiFile, editor, JustfileStructureViewElement(psiFile)),
     StructureViewModel.ElementInfoProvider {
     override fun isAlwaysShowsPlus(element: StructureViewTreeElement?): Boolean {
         return false
@@ -54,6 +52,12 @@ class JustfileStructureViewElement(private val myElement: PsiElement) : Structur
             return PresentationData(myElement.variable.text, "Variable", JustIcons.VARIABLE_ICON, null)
         } else if (myElement is JustExportStatement) {
             return PresentationData(myElement.exportName.text, "Export", JustIcons.EXPORT_ICON, null)
+        } else if (myElement is JustImportStatement) {
+            return PresentationData(myElement.justfilePath.text, "Import", JustIcons.IMPORT_ICON, null)
+        } else if (myElement is JustSetStatement) {
+            return PresentationData(myElement.setting.text, "Set", JustIcons.SET_ICON, null)
+        } else if (myElement is JustModStatement) {
+            return PresentationData(myElement.modName.text, "Mod", JustIcons.MOD_ICON, null)
         } else {
             return PresentationData("", "run", JustIcons.JUST_FILE, null)
         }
@@ -74,7 +78,9 @@ class JustfileStructureViewElement(private val myElement: PsiElement) : Structur
     }
 
     override fun navigate(requestFocus: Boolean) {
-        OpenFileDescriptor(myElement.project, myElement.containingFile.virtualFile, myElement.textOffset).navigate(requestFocus)
+        OpenFileDescriptor(myElement.project, myElement.containingFile.virtualFile, myElement.textOffset).navigate(
+            requestFocus
+        )
     }
 
     override fun canNavigate(): Boolean {
