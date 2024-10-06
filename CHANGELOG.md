@@ -4,11 +4,14 @@
 
 ## Unreleased
 
-## 0.5.4 - 2024-10-06
+## 0.6.0 - 2024-10-06
 
 ### Added
 
-- Rewrite `set` statement parser
+- Rewrite lexer and parser to support more features
+- Add Just run configuration
+- Enhance shell language injection with `shell` detection
+- Disable shell language injection if the code is not legal shell script
 
 ## 0.5.3 - 2024-09-29
 
@@ -21,7 +24,7 @@
 ### Added
 
 - Shell expended string support: `foobar := x'~/$FOO/${BAR}'`
-- Add conditionals support: `foo := if "hello" =~ 'hel+o' { "match" } else { "mismatch" }` 
+- Add conditionals support: `foo := if "hello" =~ 'hel+o' { "match" } else { "mismatch" }`
 - Add more functions for code completion
 - Compatible with JetBrains IDE 2024.3
 
