@@ -55,6 +55,10 @@ class JustfileAnnotator : Annotator {
                     .textAttributes(DefaultLanguageHighlighterColors.OPERATION_SIGN).create()
             }
 
+            JustTypes.PAREN_PAIRS -> {  // high light variable
+                highLightStringInParenPairs(element, holder)
+            }
+
             JustTypes.CODE -> {  // high light variable
                 highLightVariablesInCodeBlock(element, holder)
             }
@@ -121,6 +125,23 @@ class JustfileAnnotator : Annotator {
                 holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(range)
                     .textAttributes(DefaultLanguageHighlighterColors.STATIC_FIELD).create()
                 offset = text.indexOf("{{", endOffset + 2)
+            } else {
+                offset = -1
+            }
+        }
+    }
+
+    private fun highLightStringInParenPairs(element: PsiElement, holder: AnnotationHolder) {
+        val rangeOffset = element.textRange.startOffset
+        val text = element.text
+        var offset = text.indexOf("\"")
+        while (offset > 0) {
+            val endOffset = text.indexOf("\"", offset + 1)
+            if (endOffset > offset) {
+                val range = TextRange(rangeOffset + offset, rangeOffset + endOffset + 1)
+                holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(range)
+                    .textAttributes(DefaultLanguageHighlighterColors.STRING).create()
+                offset = text.indexOf("\"", endOffset + 1)
             } else {
                 offset = -1
             }
