@@ -22,7 +22,7 @@ class JustfileAnnotator : Annotator {
 
             JustTypes.RECIPE_NAME,
             JustTypes.DEPENDENCY_NAME,
-            -> {
+                -> {
                 holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(element.textRange)
                     .textAttributes(DefaultLanguageHighlighterColors.STATIC_METHOD).create()
             }
@@ -60,19 +60,33 @@ class JustfileAnnotator : Annotator {
             }
 
             JustTypes.COMMENT -> {
-                holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(element.textRange).textAttributes(DefaultLanguageHighlighterColors.LINE_COMMENT).create()
+                holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(element.textRange)
+                    .textAttributes(DefaultLanguageHighlighterColors.LINE_COMMENT).create()
             }
 
             JustTypes.ATTRIBUTE -> {
-                holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(element.textRange).textAttributes(DefaultLanguageHighlighterColors.METADATA).create()
+                holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(element.textRange)
+                    .textAttributes(DefaultLanguageHighlighterColors.METADATA).create()
             }
 
             JustTypes.RECIPE_PARAM_NAME -> {
-                holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(element.textRange).textAttributes(DefaultLanguageHighlighterColors.STATIC_FIELD).create()
+                holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(element.textRange)
+                    .textAttributes(DefaultLanguageHighlighterColors.STATIC_FIELD).create()
             }
 
             JustTypes.SETTING -> {
-                holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(element.textRange).textAttributes(DefaultLanguageHighlighterColors.MARKUP_ENTITY).create()
+                holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(element.textRange)
+                    .textAttributes(DefaultLanguageHighlighterColors.MARKUP_ENTITY).create()
+            }
+
+            JustTypes.FUNCTION_NAME -> {
+                holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(element.textRange)
+                    .textAttributes(DefaultLanguageHighlighterColors.FUNCTION_CALL).create()
+            }
+
+            JustTypes.X_INDICATOR -> {
+                holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(element.textRange)
+                    .textAttributes(DefaultLanguageHighlighterColors.KEYWORD).create()
             }
 
             JustTypes.STRING,  //text pair
@@ -104,7 +118,8 @@ class JustfileAnnotator : Annotator {
             val endOffset = text.indexOf("}}", offset + 2)
             if (endOffset > offset) {
                 val range = TextRange(rangeOffset + offset, rangeOffset + endOffset + 2)
-                holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(range).textAttributes(DefaultLanguageHighlighterColors.STATIC_FIELD).create()
+                holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(range)
+                    .textAttributes(DefaultLanguageHighlighterColors.STATIC_FIELD).create()
                 offset = text.indexOf("{{", endOffset + 2)
             } else {
                 offset = -1
