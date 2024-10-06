@@ -53,7 +53,7 @@ class JustfileStructureViewElement(private val myElement: PsiElement) : Structur
         } else if (myElement is JustVariableStatement) {
             return PresentationData(myElement.variable.text, "Variable", JustIcons.VARIABLE_ICON, null)
         } else if (myElement is JustExportStatement) {
-            return PresentationData(myElement.id.text, "Export", JustIcons.EXPORT_ICON, null)
+            return PresentationData(myElement.exportName.text, "Export", JustIcons.EXPORT_ICON, null)
         } else {
             return PresentationData("", "run", JustIcons.JUST_FILE, null)
         }

@@ -27,7 +27,7 @@ class JustfileAnnotator : Annotator {
                     .textAttributes(DefaultLanguageHighlighterColors.STATIC_METHOD).create()
             }
 
-            JustTypes.ID -> {
+            JustTypes.EXPORT_NAME -> {
                 holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(element.textRange)
                     .textAttributes(DefaultLanguageHighlighterColors.STATIC_FIELD).create()
             }
@@ -77,7 +77,6 @@ class JustfileAnnotator : Annotator {
 
             JustTypes.STRING,  //text pair
             JustTypes.RAW_STRING,
-            JustTypes.RAW_EXPANDED_STRING,
             JustTypes.BACKTICK,
             JustTypes.INDENTED_BACKTICK,
             JustTypes.INDENTED_RAW_STRING,
