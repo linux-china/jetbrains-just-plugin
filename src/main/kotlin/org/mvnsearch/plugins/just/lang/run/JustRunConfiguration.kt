@@ -9,6 +9,7 @@ import com.intellij.execution.process.ProcessTerminatedListener
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.project.Project
 import com.intellij.util.execution.ParametersListUtil
+import org.mvnsearch.plugins.just.Just
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
 import java.io.File
 import java.util.regex.Matcher
@@ -84,7 +85,7 @@ class JustRunConfiguration(
     override fun getState(executor: Executor, executionEnvironment: ExecutionEnvironment): RunProfileState {
         return object : CommandLineState(executionEnvironment) {
             override fun startProcess(): ProcessHandler {
-                var justCmd = "just"
+                var justCmd = Just.getJustCmdAbsolutionPath()
                 val command = mutableListOf(justCmd)
                 val fileName = getFileName()
                 val recipeName = getRecipeName()
