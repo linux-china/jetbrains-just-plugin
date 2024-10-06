@@ -50,7 +50,7 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
     fun isBashAlike(): Boolean {
         val shellItem = this.children
             .filterIsInstance<JustSetStatement>().firstOrNull() {
-                it.setting.text == "shell" || it.setting.text == "windows-powershell"
+                it.setting.text == "shell" || it.setting.text == "windows-shell"
             }
         return if (shellItem == null) {
             true
