@@ -8,7 +8,8 @@ Plugin features:
 
 * Just language and file types
 * Syntax high light
-* Run recipes
+* Run recipes by click
+* Run configuration support: `Run -> Edit Configurations -> Just` or right click on recipe name
 * New justfile by project type, such as Maven/Gradle
 * Code completion: settings names, recipe dependencies, variables with dotenv support
 * Navigation for dependency name

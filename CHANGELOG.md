@@ -9,7 +9,7 @@
 ### Added
 
 - Rewrite lexer and parser to support more features
-- Add Just run configuration
+- Add Just run configuration: `Run -> Edit Configurations -> Just` or right click on recipe name
 - Enhance shell language injection with `shell` detection
 - Disable shell language injection if the code is not legal shell script
 
