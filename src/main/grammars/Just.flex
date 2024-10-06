@@ -35,6 +35,7 @@ EQUAL = [=]
 EQEQ = ("==")
 NOEQ = ("!=")
 REEQ = ("=~")
+PLUS = ("+")
 OPEN_BRACE = [{]
 CLOSE_BRACE = [}]
 OPEN_BRACKET = ("[")
@@ -57,11 +58,8 @@ ATTRIBUTE_NAME=([a-zA-Z0-9_\-]+)
 ID_LITERAL=[a-zA-Z_][a-zA-Z0-9_\-]*
 SETTING=[a-zA-Z_][a-zA-Z0-9_\-]*
 MOD_NAME=[a-zA-Z_][a-zA-Z0-9_\-]*
-MOD_PATH=[\"'][^\n]*[\"']
 RECIPE_NAME=[a-zA-Z_][a-zA-Z0-9_\-]*
 DEPENDENCY_NAME=[a-zA-Z_][a-zA-Z0-9_\-]*
-DEPENDENCY_WITH_PARAMS=[a-zA-Z_][a-zA-Z0-9_\-]*\([^\(\n]*\)
-DEPENDENCY_PARAMS=[^\(\n\)]*
 LITERAL=[a-zA-Z0-9_\.-]*
 SHEBANG=("#!")[^\n]*
 COMMENT=("#")[^\n]*
@@ -86,7 +84,7 @@ KEYWORD_IF=(if)
 KEYWORD_ELSE=(else)
 KEYWORD_ELSE_IF=("else if")
 
-%state MOD IMPORT ALIAS VARIABLE CONDITIONAL CONDITIONAL_END EXPORT EXPORT_VALUE SET SET_VALUE ATTRIBUTE RECIPE PARAMS PARAM_WITH_VALUE DEPENDENCIES DEPENDENCY_WITH_PARAMS
+%state MOD IMPORT ALIAS VARIABLE CONDITIONAL CONDITIONAL_END EXPORT EXPORT_VALUE SET SET_VALUE ATTRIBUTE RECIPE PARAMS PARAM_WITH_VALUE DEPENDENCIES DEPENDENCY_WITH_PARAMS DEPENDENCY_CALL_PARAMS
 
 %%
 
@@ -94,7 +92,9 @@ KEYWORD_ELSE_IF=("else if")
   {QUESTION_MARK}    {  yybegin(MOD); return QUESTION_MARK; }
   {WHITE_SPACE}+     {  yybegin(MOD); return TokenType.WHITE_SPACE; }
   {MOD_NAME}         {  yybegin(MOD); return MOD_NAME; }
-  {MOD_PATH}         {  yybegin(MOD); return MOD_PATH; }
+  {STRING}           {  yybegin(MOD); return STRING; }
+  {RAW_STRING}       {  yybegin(MOD); return RAW_STRING; }
+  {X_INDICATOR}/ {STRING_STARTER}  {  yybegin(MOD); return X_INDICATOR; }
   {NEW_LINE}         {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
 }
 
@@ -123,6 +123,7 @@ KEYWORD_ELSE_IF=("else if")
    {WHITE_SPACE}+     {  yybegin(EXPORT_VALUE); return TokenType.WHITE_SPACE; }
    {ASSIGN}           {  yybegin(EXPORT_VALUE); return ASSIGN; }
    {X_INDICATOR}/ {STRING_STARTER}  {  yybegin(EXPORT_VALUE); return X_INDICATOR; }
+   {PLUS}           {  yybegin(EXPORT_VALUE); return PLUS; }
    {STRING}           {  yybegin(EXPORT_VALUE); return STRING; }
    {RAW_STRING}       {  yybegin(EXPORT_VALUE); return RAW_STRING; }
    {INDENTED_BACKTICK} {  yybegin(EXPORT_VALUE); return INDENTED_BACKTICK; }
@@ -139,7 +140,7 @@ KEYWORD_ELSE_IF=("else if")
 
 <SET_VALUE> {
    {WHITE_SPACE}+      {  yybegin(SET_VALUE); return TokenType.WHITE_SPACE; }
-   {ASSIGN}           {  yybegin(SET_VALUE); return ASSIGN; }
+   {ASSIGN}            {  yybegin(SET_VALUE); return ASSIGN; }
    {BOOL_LITERAL}      {  yybegin(SET_VALUE); return BOOL_LITERAL; }
    {NUMBER_LITERAL}    {  yybegin(SET_VALUE); return NUMBER_LITERAL; }
    {X_INDICATOR}/ {STRING_STARTER}   {  yybegin(SET_VALUE); return X_INDICATOR; }
@@ -164,6 +165,7 @@ KEYWORD_ELSE_IF=("else if")
   {RAW_STRING}                 {  yybegin(VARIABLE); return RAW_STRING; }
   {BACKTICK}                   {  yybegin(VARIABLE); return BACKTICK; }
   {ID_LITERAL}                    {  yybegin(VARIABLE); return ID_LITERAL; }
+  {PLUS}                      {  yybegin(VARIABLE); return PLUS; }
   {PAREN_PAIRS}               {  yybegin(VARIABLE); return PAREN_PAIRS; }
   {NEW_LINE}                   {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
 }
@@ -224,13 +226,19 @@ KEYWORD_ELSE_IF=("else if")
 
 <DEPENDENCY_WITH_PARAMS> {
  {WHITE_SPACE}+                          {  yybegin(DEPENDENCY_WITH_PARAMS); return TokenType.WHITE_SPACE; }
- {DEPENDENCY_NAME} / {WHITE_SPACE}           {  yybegin(DEPENDENCY_WITH_PARAMS); return DEPENDENCY_NAME; }
- {STRING}                                {  yybegin(DEPENDENCY_WITH_PARAMS); return STRING; }
- {RAW_STRING}                            {  yybegin(DEPENDENCY_WITH_PARAMS); return RAW_STRING; }
- {BACKTICK}                              {  yybegin(DEPENDENCY_WITH_PARAMS); return BACKTICK; }
+ {DEPENDENCY_NAME} / {WHITE_SPACE}       {  yybegin(DEPENDENCY_CALL_PARAMS); return DEPENDENCY_NAME; }
+ {CLOSE_PAREN}                           {  yybegin(DEPENDENCIES); return CLOSE_PAREN; }
+}
+
+<DEPENDENCY_CALL_PARAMS> {
+ {WHITE_SPACE}+                          {  yybegin(DEPENDENCY_CALL_PARAMS); return TokenType.WHITE_SPACE; }
+ {STRING}                                {  yybegin(DEPENDENCY_CALL_PARAMS); return STRING; }
+ {RAW_STRING}                            {  yybegin(DEPENDENCY_CALL_PARAMS); return RAW_STRING; }
+ {BACKTICK}                              {  yybegin(DEPENDENCY_CALL_PARAMS); return BACKTICK; }
  {PAREN_PAIRS}                          {  yybegin(DEPENDENCY_WITH_PARAMS); return BACKTICK; }
- {ID_LITERAL}                            {  yybegin(DEPENDENCY_WITH_PARAMS); return BACKTICK; }
- {COMMA}                                 {  yybegin(DEPENDENCY_WITH_PARAMS); return COMMA; }
+ {ID_LITERAL}                              {  yybegin(DEPENDENCY_CALL_PARAMS); return ID_LITERAL; }
+ {X_INDICATOR}/ {STRING_STARTER}        {  yybegin(DEPENDENCY_CALL_PARAMS); return X_INDICATOR; }
+ {COMMA}                                 {  yybegin(DEPENDENCY_CALL_PARAMS); return COMMA; }
  {CLOSE_PAREN}                           {  yybegin(DEPENDENCIES); return CLOSE_PAREN; }
 }
 
