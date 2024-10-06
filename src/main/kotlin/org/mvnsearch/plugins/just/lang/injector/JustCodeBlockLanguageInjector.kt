@@ -9,6 +9,7 @@ import com.intellij.psi.PsiLanguageInjectionHost
 import org.mvnsearch.plugins.just.INDENT_CHARS
 import org.mvnsearch.plugins.just.PARAM_PREFIX_LIST
 import org.mvnsearch.plugins.just.lang.psi.JustCodeBlock
+import org.mvnsearch.plugins.just.lang.psi.JustFile
 
 
 class JustCodeBlockLanguageInjector : MultiHostInjector {
@@ -25,19 +26,22 @@ class JustCodeBlockLanguageInjector : MultiHostInjector {
     override fun getLanguagesToInject(registrar: MultiHostRegistrar, context: PsiElement) {
         if (shellLanguage != null) {
             val text = context.text
-            if (isShellCode(text.trim())) {
-                val offset = text.indexOfFirst { !INDENT_CHARS.contains(it) && !PARAM_PREFIX_LIST.contains(it) }
-                if (offset > 0) {
-                    var trailLength = text.toCharArray().reversedArray().indexOfFirst { !INDENT_CHARS.contains(it) }
-                    if (trailLength < 0) {
-                        trailLength = 0
-                    }
-                    val endOffset = context.textLength - trailLength
-                    if (endOffset > offset) {
-                        val injectionTextRange = TextRange(offset, context.textLength - trailLength)
-                        registrar.startInjecting(shellLanguage!!)
-                        registrar.addPlace(null, null, context as PsiLanguageInjectionHost, injectionTextRange)
-                        registrar.doneInjecting()
+            val justFile = context.containingFile as JustFile
+            if (justFile.isBashAlike()) { // validate global shell setting
+                if (isShellCode(text.trim())) {
+                    val offset = text.indexOfFirst { !INDENT_CHARS.contains(it) && !PARAM_PREFIX_LIST.contains(it) }
+                    if (offset > 0) {
+                        var trailLength = text.toCharArray().reversedArray().indexOfFirst { !INDENT_CHARS.contains(it) }
+                        if (trailLength < 0) {
+                            trailLength = 0
+                        }
+                        val endOffset = context.textLength - trailLength
+                        if (endOffset > offset) {
+                            val injectionTextRange = TextRange(offset, context.textLength - trailLength)
+                            registrar.startInjecting(shellLanguage!!)
+                            registrar.addPlace(null, null, context as PsiLanguageInjectionHost, injectionTextRange)
+                            registrar.doneInjecting()
+                        }
                     }
                 }
             }
