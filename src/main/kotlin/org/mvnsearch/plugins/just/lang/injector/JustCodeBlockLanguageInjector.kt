@@ -3,7 +3,6 @@ package org.mvnsearch.plugins.just.lang.injector
 import com.intellij.lang.Language
 import com.intellij.lang.injection.MultiHostInjector
 import com.intellij.lang.injection.MultiHostRegistrar
-import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiLanguageInjectionHost
@@ -50,14 +49,25 @@ class JustCodeBlockLanguageInjector : MultiHostInjector {
     }
 
     private fun isShellCode(code: String): Boolean {
-        if (!code.startsWith("#!/usr/bin/env")) {
-            return !code.startsWith("{{") && !code.startsWith("\${")
+        if (!code.startsWith("#!")) { // no shebang found
+            var offset = code.indexOf("{{")
+            while (offset > 0) {
+                val endOffset = code.indexOf("}}", offset)
+                if (endOffset > offset) {
+                    val expression = code.substring(offset + 2, endOffset)
+                    if (expression.contains("(")) {
+                        return false
+                    }
+                }
+                offset = code.indexOf("{{", offset + 2)
+            }
+            return true
         }
+        // check shell shebang
         return code.startsWith("#!/usr/bin/env sh")
                 || code.startsWith("#!/usr/bin/env bash")
                 || code.startsWith("#!/usr/bin/env zsh")
                 || code.startsWith("#!/usr/bin/env fish")
-                || code.startsWith("#!/usr/bin/env nu")
     }
 
 }
