@@ -23,9 +23,6 @@ object Just {
     }
 
     fun isJustfile(justfileName: String): Boolean {
-           return justfileName == "justfile"
-                   || justfileName == "Justfile"
-                   || justfileName == ".justfile"
-                   || justfileName.endsWith(".just")
-       }
+        return isDefaultJustfile(justfileName) || justfileName.endsWith(".just")
+    }
 }
