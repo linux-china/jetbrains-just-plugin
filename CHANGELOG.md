@@ -11,6 +11,9 @@
 - Fix justfile name not saved in run configuration
 - Change env variable to text area for multiline
 - Use 16x16 icon for justfile
+
+### Added
+
 - Structure view: add import and export support
 - New justfile for uv, zig projects
 
