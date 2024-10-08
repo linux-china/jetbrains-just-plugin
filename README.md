@@ -2,7 +2,8 @@ JetBrains Just plugin
 ========================
 
 <!-- Plugin description -->
-**JetBrains Just Command Runner Plugin** is a plugin to integrate [just commander](https://github.com/casey/just) in JetBrains IDEs.
+**JetBrains Just Command Runner Plugin** is a plugin to integrate [just commander](https://github.com/casey/just) in
+JetBrains IDEs.
 
 Plugin features:
 
@@ -10,10 +11,10 @@ Plugin features:
 * Syntax high light
 * Run recipes by click
 * Run configuration support: `Run -> Edit Configurations -> Just` or right click on recipe name
-* New justfile by project type, such as Maven/Gradle
+* New justfile by project type, such as Maven, Gradle, Cargo, uv, zig etc.
 * Code completion: settings names, recipe dependencies, variables with dotenv support
 * Navigation for dependency name
-* Language injection for shell
+* Language injection for legal Shell script
 * Justfile structure view
 
 How to use?
@@ -31,14 +32,15 @@ hello:
 
 * Click run button in Gutter and run a recipe/target!
 
-Quick to understand `justfile`, please click [Justfile cheat sheet](https://cheatography.com/linux-china/cheat-sheets/justfile/)  
+Quick to understand `justfile`, please
+click [Justfile cheat sheet](https://cheatography.com/linux-china/cheat-sheets/justfile/)
 
 **Attention**: keywords could not be recipe names, such as `import`, `export`, `alias` etc.
 
 <!-- Plugin description end -->
 
 # References
-         
+
 * justfile grammar: https://github.com/casey/just/blob/master/GRAMMAR.md
 * just VS Code extension: https://marketplace.visualstudio.com/items?itemName=skellock.just
 * Justfile cheat sheet: https://cheatography.com/linux-china/cheat-sheets/justfile/
