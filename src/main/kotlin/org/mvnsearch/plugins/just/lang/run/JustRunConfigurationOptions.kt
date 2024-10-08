@@ -4,7 +4,7 @@ import com.intellij.execution.configurations.RunConfigurationOptions
 import com.intellij.openapi.components.StoredProperty
 
 class JustRunConfigurationOptions : RunConfigurationOptions() {
-    private val justfileName: StoredProperty<String?> = string("").provideDelegate(this, "justfileName")
+    private val justfileName: StoredProperty<String?> = string("").provideDelegate(this, "fileName")
     private val justRecipeName: StoredProperty<String?> = string("").provideDelegate(this, "recipeName")
     private val justRecipeArgs: StoredProperty<String?> = string("").provideDelegate(this, "recipeArgs")
     private val justRecipeEnvVariables: StoredProperty<String?> = string("").provideDelegate(this, "envVariables")
