@@ -12,6 +12,7 @@
 - Change env variable to text area for multiline
 - Use 16x16 icon for justfile
 - Structure view: add import and export support
+- New justfile for uv, zig projects
 
 ## 0.6.0 - 2024-10-06
 
