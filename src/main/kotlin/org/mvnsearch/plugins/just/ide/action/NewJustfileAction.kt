@@ -26,11 +26,11 @@ class NewJustfileAction : AnAction() {
         build:
            mvn -DskipTests clean package
        
-        # dependencies tree for compile
+        # dump compile dependencies to dependencies.txt
         dependencies:
           mvn dependency:tree -Dscope=compile > dependencies.txt
         
-        # display updates
+        # dump dependencies updates to updates.txt
         updates:
           mvn versions:display-dependency-updates > updates.txt    
         """.trimIndent()
@@ -45,11 +45,11 @@ class NewJustfileAction : AnAction() {
         start:
            mvn -DskipTests spring-boot:run
                    
-        # dependencies tree for compile
+        # dump compile dependencies to dependencies.txt
         dependencies:
           mvn dependency:tree -Dscope=compile > dependencies.txt
         
-        # display updates
+        # dump dependencies updates to updates.txt
         updates:
           mvn versions:display-dependency-updates > updates.txt    
         """.trimIndent()
@@ -67,7 +67,7 @@ class NewJustfileAction : AnAction() {
           ./gradlew dependencyUpdates > updates.txt
         
         wrapper:
-          ./gradlew wrapper --gradle-version=7.6
+          ./gradlew wrapper --gradle-version=8.10.1
         """.trimIndent()
         val JUSTFILE_CARGO = """
         #!/usr/bin/env just --justfile
