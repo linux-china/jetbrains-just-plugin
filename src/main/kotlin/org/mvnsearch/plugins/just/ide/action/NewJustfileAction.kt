@@ -100,14 +100,14 @@ class NewJustfileAction : AnAction() {
         """.trimIndent()
         val JUSTFILE_NODEJS = """
         #!/usr/bin/env just --justfile
-        export PATH := justfile_directory() + "/node_modules/.bin:" + env_var('PATH')
+        export PATH := join(justfile_directory(), "node_modules", "bin") + ":" + env_var('PATH')
         
         build:
           npm run build
         """.trimIndent()
         val JUSTFILE_UV = """
          #!/usr/bin/env just --justfile
-         export PATH := justfile_directory() + "/.venv/bin:" + env_var('PATH')
+         export PATH := join(justfile_directory(), ".env", "bin") + ":" + env_var('PATH')
          
          upgrade:
            uv lock --upgrade
