@@ -11,6 +11,7 @@
 - Fix justfile name not saved in run configuration
 - Change env variable to text area for multiline
 - Use 16x16 icon for justfile
+- Code structure: add import and export
 
 ## 0.6.0 - 2024-10-06
 
