@@ -3,6 +3,8 @@ package org.mvnsearch.plugins.just.lang.run
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.ui.LabeledComponent
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
+import com.intellij.ui.components.JBTextArea
+import com.intellij.ui.components.JBTextField
 import javax.swing.BoxLayout
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -12,20 +14,20 @@ import javax.swing.JTextField
 class JustRunSettingsEditor : SettingsEditor<JustRunConfiguration>() {
     private val myPanel: JPanel = JPanel()
     private var myJustFileName: LabeledComponent<TextFieldWithBrowseButton> = LabeledComponent()
-    private var myRecipeName: LabeledComponent<JTextField> = LabeledComponent()
-    private var myRecipeArgs: LabeledComponent<JTextField> = LabeledComponent()
-    private var myEnvVariables: LabeledComponent<JTextField> = LabeledComponent()
+    private var myRecipeName: LabeledComponent<JBTextField> = LabeledComponent()
+    private var myRecipeArgs: LabeledComponent<JBTextField> = LabeledComponent()
+    private var myEnvVariables: LabeledComponent<JBTextArea> = LabeledComponent()
 
     init {
         myPanel.layout = BoxLayout(myPanel, BoxLayout.Y_AXIS)
         myJustFileName.component = TextFieldWithBrowseButton()
-        myRecipeName.component = JTextField()
-        myRecipeArgs.component = JTextField()
-        myEnvVariables.component = JTextField()
-        myJustFileName.label.text = "Justfile name"
-        myRecipeName.label.text = "Recipe name"
-        myRecipeArgs.label.text = "Recipe args"
-        myEnvVariables.label.text = "Env variables"
+        myRecipeName.component = JBTextField()
+        myRecipeArgs.component = JBTextField()
+        myEnvVariables.component = JBTextArea(3,0)
+        myJustFileName.label.text = "Justfile name:"
+        myRecipeName.label.text = "Recipe name:"
+        myRecipeArgs.label.text = "Recipe args:"
+        myEnvVariables.label.text = "Env variables(.env style):"
         myPanel.add(myJustFileName)
         myPanel.add(myRecipeName)
         myPanel.add(myRecipeArgs)
