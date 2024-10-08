@@ -33,6 +33,8 @@ hello:
 
 Quick to understand `justfile`, please click [Justfile cheat sheet](https://cheatography.com/linux-china/cheat-sheets/justfile/)  
 
+**Attention**: keywords could not be recipe names, such as `import`, `export`, `alias` etc.
+
 <!-- Plugin description end -->
 
 # References
