@@ -4,6 +4,14 @@
 
 ## Unreleased
 
+## 0.6.1 - 2024-10-08
+
+### Fixed
+
+- Fix justfile name not saved in run configuration
+- Change env variable to text area for multiline
+- Use 16x16 icon for justfile
+
 ## 0.6.0 - 2024-10-06
 
 ### Added
