@@ -52,7 +52,6 @@ RAW_STRING=('[^']*')
 INDENTED_RAW_STRING=(''')([']{0,2}([^']))*(''')
 STRING=(\"[^\"]*\")
 INDENTED_STRING=(\"\"\")([\"]{0,2}([^\"]))*(\"\"\")
-PAREN_PAIRS=\([^\n\+]*\)
 CONDITIONAL_BLOCK=(\{[^}]*\})
 EXPORT_NAME=[a-zA-Z_][a-zA-Z0-9_\-]*
 ATTRIBUTE_NAME=([a-zA-Z0-9_\-]+)
@@ -61,7 +60,6 @@ SETTING=[a-zA-Z_][a-zA-Z0-9_\-]*
 MOD_NAME=[a-zA-Z_][a-zA-Z0-9_\-]*
 RECIPE_NAME=[a-zA-Z_][a-zA-Z0-9_\-]*
 DEPENDENCY_NAME=[a-zA-Z_][a-zA-Z0-9_\-]*
-LITERAL=[a-zA-Z0-9_\.-]*
 SHEBANG=("#!")[^\n]*
 COMMENT=("#")[^\n]*
 DOUBLE_AND=("&&")
@@ -130,7 +128,9 @@ KEYWORD_ELSE_IF=("else if")
    {RAW_STRING}       {  yybegin(EXPORT_VALUE); return RAW_STRING; }
    {INDENTED_BACKTICK} {  yybegin(EXPORT_VALUE); return INDENTED_BACKTICK; }
    {BACKTICK}         {  yybegin(EXPORT_VALUE); return BACKTICK; }
-   {PAREN_PAIRS}      {  yybegin(EXPORT_VALUE); return PAREN_PAIRS; }
+   {OPEN_PAREN}      {  yybegin(EXPORT_VALUE); return OPEN_PAREN; }
+   {CLOSE_PAREN}      {  yybegin(EXPORT_VALUE); return CLOSE_PAREN; }
+   {COMMA}      {  yybegin(EXPORT_VALUE); return COMMA; }
    {ID_LITERAL}          {  yybegin(EXPORT_VALUE); return ID_LITERAL; }
    {NEW_LINE}         {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
 }
@@ -148,7 +148,7 @@ KEYWORD_ELSE_IF=("else if")
    {X_INDICATOR}/ {STRING_STARTER}   {  yybegin(SET_VALUE); return X_INDICATOR; }
    {STRING}            {  yybegin(SET_VALUE); return STRING; }
    {RAW_STRING}        {  yybegin(SET_VALUE); return RAW_STRING; }
-   {LITERAL}           {  yybegin(SET_VALUE); return LITERAL; }
+   {ID_LITERAL}           {  yybegin(SET_VALUE); return ID_LITERAL; }
    {OPEN_BRACKET}      {  yybegin(SET_VALUE); return OPEN_BRACKET; }
    {CLOSE_BRACKET}      {  yybegin(SET_VALUE); return CLOSE_BRACKET; }
    {COMMA}              {  yybegin(SET_VALUE); return COMMA; }
@@ -169,7 +169,9 @@ KEYWORD_ELSE_IF=("else if")
   {ID_LITERAL}                    {  yybegin(VARIABLE); return ID_LITERAL; }
   {PLUS}                      {  yybegin(VARIABLE); return PLUS; }
   {SLASH}                      {  yybegin(VARIABLE); return SLASH; }
-  {PAREN_PAIRS}               {  yybegin(VARIABLE); return PAREN_PAIRS; }
+  {OPEN_PAREN}               {  yybegin(VARIABLE); return OPEN_PAREN; }
+  {CLOSE_PAREN}               {  yybegin(VARIABLE); return CLOSE_PAREN; }
+  {COMMA}               {  yybegin(VARIABLE); return COMMA; }
   {NEW_LINE}                   {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
 }
 
@@ -188,8 +190,12 @@ KEYWORD_ELSE_IF=("else if")
   {X_INDICATOR}/ {STRING_STARTER}            {  yybegin(CONDITIONAL); return X_INDICATOR; }
   {RAW_STRING}                 {  yybegin(CONDITIONAL); return RAW_STRING; }
   {BACKTICK}                   {  yybegin(CONDITIONAL); return BACKTICK; }
-  {ID_LITERAL}                    {  yybegin(CONDITIONAL); return LITERAL; }
-  {PAREN_PAIRS}               {  yybegin(CONDITIONAL); return PAREN_PAIRS; }
+  {ID_LITERAL}                    {  yybegin(CONDITIONAL); return ID_LITERAL; }
+  {PLUS}               {  yybegin(CONDITIONAL); return PLUS; }
+  {SLASH}               {  yybegin(CONDITIONAL); return SLASH; }
+  {OPEN_PAREN}               {  yybegin(CONDITIONAL); return OPEN_PAREN; }
+  {CLOSE_PAREN}               {  yybegin(CONDITIONAL); return CLOSE_PAREN; }
+  {COMMA}                    {  yybegin(CONDITIONAL); return COMMA; }
   {NEW_LINE}                  {  yybegin(CONDITIONAL); return JustTypes.NEW_LINE; }
 }
 
@@ -212,7 +218,11 @@ KEYWORD_ELSE_IF=("else if")
   {RAW_STRING}                {  yybegin(PARAMS); return RAW_STRING; }
   {BACKTICK}                  {  yybegin(PARAMS); return BACKTICK; }
   {ID_LITERAL}              {  yybegin(PARAMS); return ID_LITERAL; }
-  {PAREN_PAIRS}              {  yybegin(PARAMS); return BACKTICK; }
+  {PLUS}                   {  yybegin(PARAMS); return PLUS; }
+  {SLASH}                  {  yybegin(PARAMS); return SLASH; }
+  {OPEN_PAREN}              {  yybegin(PARAMS); return OPEN_PAREN; }
+  {CLOSE_PAREN}              {  yybegin(PARAMS); return CLOSE_PAREN; }
+  {COMMA}                    {  yybegin(PARAMS); return COMMA; }
   {BOOL_LITERAL}              {  yybegin(PARAMS); return BOOL_LITERAL; }
   {WHITE_SPACE}+              {  yybegin(PARAMS); return TokenType.WHITE_SPACE; }
   {SEPERATOR}                 {  yybegin(DEPENDENCIES); return SEPERATOR; }
@@ -238,10 +248,12 @@ KEYWORD_ELSE_IF=("else if")
  {STRING}                                {  yybegin(DEPENDENCY_CALL_PARAMS); return STRING; }
  {RAW_STRING}                            {  yybegin(DEPENDENCY_CALL_PARAMS); return RAW_STRING; }
  {BACKTICK}                              {  yybegin(DEPENDENCY_CALL_PARAMS); return BACKTICK; }
- {PAREN_PAIRS}                          {  yybegin(DEPENDENCY_WITH_PARAMS); return BACKTICK; }
+ {PLUS}                          {  yybegin(DEPENDENCY_WITH_PARAMS); return PLUS; }
+ {SLASH}                          {  yybegin(DEPENDENCY_WITH_PARAMS); return SLASH; }
+ {OPEN_PAREN}                          {  yybegin(DEPENDENCY_WITH_PARAMS); return OPEN_PAREN; }
+ {COMMA}                          {  yybegin(DEPENDENCY_WITH_PARAMS); return COMMA; }
  {ID_LITERAL}                              {  yybegin(DEPENDENCY_CALL_PARAMS); return ID_LITERAL; }
  {X_INDICATOR}/ {STRING_STARTER}        {  yybegin(DEPENDENCY_CALL_PARAMS); return X_INDICATOR; }
- {COMMA}                                 {  yybegin(DEPENDENCY_CALL_PARAMS); return COMMA; }
  {CLOSE_PAREN}                           {  yybegin(DEPENDENCIES); return CLOSE_PAREN; }
 }
 
