@@ -55,8 +55,8 @@ class JustfileAnnotator : Annotator {
                     .textAttributes(DefaultLanguageHighlighterColors.OPERATION_SIGN).create()
             }
 
-            JustTypes.PAREN_PAIRS -> {  // high light variable
-                highLightStringInParenPairs(element, holder)
+            JustTypes.CONDITIONAL_BLOCK -> {  // high light variable
+                highLightStringInConditionalBlock(element, holder)
             }
 
             JustTypes.CODE -> {  // high light variable
@@ -131,7 +131,7 @@ class JustfileAnnotator : Annotator {
         }
     }
 
-    private fun highLightStringInParenPairs(element: PsiElement, holder: AnnotationHolder) {
+    private fun highLightStringInConditionalBlock(element: PsiElement, holder: AnnotationHolder) {
         val rangeOffset = element.textRange.startOffset
         val text = element.text
         val chars = arrayOf('\'', '"')
