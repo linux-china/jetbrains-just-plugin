@@ -36,6 +36,7 @@ EQEQ = ("==")
 NOEQ = ("!=")
 REEQ = ("=~")
 PLUS = ("+")
+SLASH = ("/")
 OPEN_BRACE = [{]
 CLOSE_BRACE = [}]
 OPEN_BRACKET = ("[")
@@ -124,6 +125,7 @@ KEYWORD_ELSE_IF=("else if")
    {ASSIGN}           {  yybegin(EXPORT_VALUE); return ASSIGN; }
    {X_INDICATOR}/ {STRING_STARTER}  {  yybegin(EXPORT_VALUE); return X_INDICATOR; }
    {PLUS}           {  yybegin(EXPORT_VALUE); return PLUS; }
+   {SLASH}           {  yybegin(EXPORT_VALUE); return SLASH; }
    {STRING}           {  yybegin(EXPORT_VALUE); return STRING; }
    {RAW_STRING}       {  yybegin(EXPORT_VALUE); return RAW_STRING; }
    {INDENTED_BACKTICK} {  yybegin(EXPORT_VALUE); return INDENTED_BACKTICK; }
@@ -166,6 +168,7 @@ KEYWORD_ELSE_IF=("else if")
   {BACKTICK}                   {  yybegin(VARIABLE); return BACKTICK; }
   {ID_LITERAL}                    {  yybegin(VARIABLE); return ID_LITERAL; }
   {PLUS}                      {  yybegin(VARIABLE); return PLUS; }
+  {SLASH}                      {  yybegin(VARIABLE); return SLASH; }
   {PAREN_PAIRS}               {  yybegin(VARIABLE); return PAREN_PAIRS; }
   {NEW_LINE}                   {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
 }
