@@ -53,25 +53,12 @@ class JustCodeBlockLanguageInjector : MultiHostInjector {
     }
 
     private fun isShellCode(code: String): Boolean {
-        if (!code.startsWith("#!")) { // no shebang found
-            var offset = code.indexOf("{{")
-            if (offset == 0) {
-                return false
-            }
-            while (offset > 0) {
-                val endOffset = code.indexOf("}}", offset)
-                if (endOffset > offset) {
-                    val expression = code.substring(offset + 2, endOffset)
-                    if (expression.contains("(")) {
-                        return false
-                    }
-                }
-                offset = code.indexOf("{{", offset + 2)
-            }
-            return true
+        if (code.contains("{{") || code.contains("}}")) {
+            return false
         }
         // check shell shebang
-        return code.startsWith("#!/usr/bin/env sh")
+        return !code.startsWith("#!")
+                || code.startsWith("#!/usr/bin/env sh")
                 || code.startsWith("#!/usr/bin/env bash")
                 || code.startsWith("#!/usr/bin/env zsh")
                 || code.startsWith("#!/usr/bin/env fish")
