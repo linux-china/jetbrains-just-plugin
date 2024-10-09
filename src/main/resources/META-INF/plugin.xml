@@ -12,25 +12,38 @@
                   fieldName="INSTANCE" fileNamesCaseInsensitive="false"
                   extensions="just"
                   language="Just" fileNames="justfile;Justfile;.justfile"/>
-        <codeInsight.lineMarkerProvider language="Just" implementationClass="org.mvnsearch.plugins.just.lang.run.JustRunLineMarkerContributor"/>
+        <codeInsight.lineMarkerProvider language="Just"
+                                        implementationClass="org.mvnsearch.plugins.just.lang.run.JustRunLineMarkerContributor"/>
         <lang.parserDefinition language="Just"
                                implementationClass="org.mvnsearch.plugins.just.lang.parser.JustParserDefinition"/>
-        <lang.psiStructureViewFactory language="Just" implementationClass="org.mvnsearch.plugins.just.lang.JustfileStructureViewFactory"/>
+        <lang.psiStructureViewFactory language="Just"
+                                      implementationClass="org.mvnsearch.plugins.just.lang.JustfileStructureViewFactory"/>
         <lang.syntaxHighlighterFactory language="Just"
                                        implementationClass="org.mvnsearch.plugins.just.lang.lighter.JustSyntaxHighlighterFactory"/>
         <annotator language="Just" implementationClass="org.mvnsearch.plugins.just.lang.insight.JustfileAnnotator"/>
         <lang.braceMatcher language="Just"
-                                   implementationClass="org.mvnsearch.plugins.just.lang.insight.JustBraceMatcher"/>
-        <lang.commenter language="Just" implementationClass="org.mvnsearch.plugins.just.lang.comment.JustfileCommenter"/>
-        <lang.foldingBuilder language="Just" implementationClass="org.mvnsearch.plugins.just.lang.JustfileFoldingBuilder"/>
+                           implementationClass="org.mvnsearch.plugins.just.lang.insight.JustBraceMatcher"/>
+        <lang.commenter language="Just"
+                        implementationClass="org.mvnsearch.plugins.just.lang.comment.JustfileCommenter"/>
+        <lang.foldingBuilder language="Just"
+                             implementationClass="org.mvnsearch.plugins.just.lang.JustfileFoldingBuilder"/>
         <notificationGroup id="just fmt" displayType="BALLOON" isLogByDefault="false"/>
         <formattingService implementation="org.mvnsearch.plugins.just.lang.format.JustExternalFormatter"/>
-        <completion.contributor language="Just" implementationClass="org.mvnsearch.plugins.just.lang.completion.JustCodeCompletionContributor"/>
-        <completion.contributor language="Just" implementationClass="org.mvnsearch.plugins.just.lang.completion.JustSetCompletionContributor"/>
-        <completion.contributor language="Just" implementationClass="org.mvnsearch.plugins.just.lang.completion.JustRecipeDependencyCompletionContributor"/>
-        <completion.contributor language="Just" implementationClass="org.mvnsearch.plugins.just.lang.completion.JustAttributeCompletionContributor"/>
+        <completion.contributor language="Just"
+                                implementationClass="org.mvnsearch.plugins.just.lang.completion.JustCodeCompletionContributor"/>
+        <completion.contributor language="Just"
+                                implementationClass="org.mvnsearch.plugins.just.lang.completion.JustSetCompletionContributor"/>
+        <completion.contributor language="Just"
+                                implementationClass="org.mvnsearch.plugins.just.lang.completion.JustRecipeDependencyCompletionContributor"/>
+        <completion.contributor language="Just"
+                                implementationClass="org.mvnsearch.plugins.just.lang.completion.JustAttributeCompletionContributor"/>
         <multiHostInjector implementation="org.mvnsearch.plugins.just.lang.injector.JustCodeBlockLanguageInjector"/>
-        <gotoSymbolContributor implementation="org.mvnsearch.plugins.just.lang.navigation.JustChooseByRecipeNameContributor"/>
+        <gotoSymbolContributor
+                implementation="org.mvnsearch.plugins.just.lang.navigation.JustChooseByRecipeNameContributor"/>
+        <!-- live templates-->
+        <liveTemplateContext contextId="JUST"
+                             implementation="org.mvnsearch.plugins.just.lang.insight.JustfileTemplateContext"/>
+        <defaultLiveTemplates file="/liveTemplates/Just.xml"/>
         <!--suppress PluginXmlValidity -->
         <lang.directNavigationProvider implementation="org.mvnsearch.plugins.just.lang.navigation.RecipeRefNavigation"/>
         <runAnything.executionProvider implementation="org.mvnsearch.plugins.just.lang.run.JustRunAnythingProvider"/>
