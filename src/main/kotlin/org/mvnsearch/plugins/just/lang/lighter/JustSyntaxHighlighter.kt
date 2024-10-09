@@ -23,7 +23,7 @@ class JustSyntaxHighlighter : SyntaxHighlighterBase() {
             KEYWORD_IMPORT -> DefaultLanguageHighlighterColors.KEYWORD
 
             VARIABLE -> DefaultLanguageHighlighterColors.STATIC_FIELD
-            ASSIGN, PLUS, SLASH -> DefaultLanguageHighlighterColors.OPERATION_SIGN
+            ASSIGN, PLUS, SLASH, EQEQ, NOEQ, REEQ -> DefaultLanguageHighlighterColors.OPERATION_SIGN
             COMMENT -> DefaultLanguageHighlighterColors.LINE_COMMENT
             ATTRIBUTE -> DefaultLanguageHighlighterColors.METADATA
             SETTING -> DefaultLanguageHighlighterColors.MARKUP_ENTITY
