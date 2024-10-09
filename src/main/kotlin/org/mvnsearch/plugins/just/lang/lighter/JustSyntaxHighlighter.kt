@@ -24,6 +24,8 @@ class JustSyntaxHighlighter : SyntaxHighlighterBase() {
 
             VARIABLE -> DefaultLanguageHighlighterColors.STATIC_FIELD
             ASSIGN, PLUS, SLASH, EQEQ, NOEQ, REEQ -> DefaultLanguageHighlighterColors.OPERATION_SIGN
+            OPEN_PAREN, CLOSE_PAREN -> DefaultLanguageHighlighterColors.PARENTHESES
+            OPEN_BRACKET, CLOSE_BRACKET -> DefaultLanguageHighlighterColors.BRACES
             COMMENT -> DefaultLanguageHighlighterColors.LINE_COMMENT
             ATTRIBUTE -> DefaultLanguageHighlighterColors.METADATA
             SETTING -> DefaultLanguageHighlighterColors.MARKUP_ENTITY
