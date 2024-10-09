@@ -1,0 +1,26 @@
+<templateSet group="Just">
+    <template name="var" value="$name$ := $END$" description="Declare variable"
+              toReformat="false"
+              toShortenFQNames="true">
+        <variable name="name" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="JUST" value="true"/>
+        </context>
+    </template>
+    <template name="exp" value="export $name$ := $END$" description="Export environment variable"
+              toReformat="false"
+              toShortenFQNames="true">
+        <variable name="name" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="JUST" value="true"/>
+        </context>
+    </template>
+    <template name="script" value="[script]&#10;$name$:&#10;  $END$" description="Declare a script recipe"
+              toReformat="false"
+              toShortenFQNames="true">
+        <variable name="name" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="JUST" value="true"/>
+        </context>
+    </template>
+</templateSet>
