@@ -4,6 +4,16 @@
 
 ## Unreleased
 
+## 0.6.2 - 2024-10-09
+
+### Added
+
+- Code format for justfile
+- Pair Match for `()` and `[]`
+- Go To Symbol for recipe names
+- live templates: `var`, `exp`, `script`.
+- Enhancement for syntax highlight
+
 ## 0.6.1 - 2024-10-08
 
 ### Fixed
