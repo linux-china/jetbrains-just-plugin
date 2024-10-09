@@ -23,6 +23,8 @@
                                    implementationClass="org.mvnsearch.plugins.just.lang.insight.JustBraceMatcher"/>
         <lang.commenter language="Just" implementationClass="org.mvnsearch.plugins.just.lang.comment.JustfileCommenter"/>
         <lang.foldingBuilder language="Just" implementationClass="org.mvnsearch.plugins.just.lang.JustfileFoldingBuilder"/>
+        <notificationGroup id="just fmt" displayType="BALLOON" isLogByDefault="false"/>
+        <formattingService implementation="org.mvnsearch.plugins.just.lang.format.JustExternalFormatter"/>
         <completion.contributor language="Just" implementationClass="org.mvnsearch.plugins.just.lang.completion.JustCodeCompletionContributor"/>
         <completion.contributor language="Just" implementationClass="org.mvnsearch.plugins.just.lang.completion.JustSetCompletionContributor"/>
         <completion.contributor language="Just" implementationClass="org.mvnsearch.plugins.just.lang.completion.JustRecipeDependencyCompletionContributor"/>
