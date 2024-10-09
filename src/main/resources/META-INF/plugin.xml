@@ -30,6 +30,7 @@
         <completion.contributor language="Just" implementationClass="org.mvnsearch.plugins.just.lang.completion.JustRecipeDependencyCompletionContributor"/>
         <completion.contributor language="Just" implementationClass="org.mvnsearch.plugins.just.lang.completion.JustAttributeCompletionContributor"/>
         <multiHostInjector implementation="org.mvnsearch.plugins.just.lang.injector.JustCodeBlockLanguageInjector"/>
+        <gotoSymbolContributor implementation="org.mvnsearch.plugins.just.lang.navigation.JustChooseByRecipeNameContributor"/>
         <!--suppress PluginXmlValidity -->
         <lang.directNavigationProvider implementation="org.mvnsearch.plugins.just.lang.navigation.RecipeRefNavigation"/>
         <runAnything.executionProvider implementation="org.mvnsearch.plugins.just.lang.run.JustRunAnythingProvider"/>
