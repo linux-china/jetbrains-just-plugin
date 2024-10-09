@@ -24,12 +24,11 @@ class JustfileFoldingBuilder : FoldingBuilderEx(), DumbAware {
         }
         return PsiTreeUtil.findChildrenOfAnyType(root, JustRecipeStatement::class.java, JustVariableStatement::class.java)
             .mapNotNull { statement ->
-                val textRange = TextRange(statement.textRange.startOffset, statement.textRange.endOffset - 2)
                 if (statement is JustRecipeStatement) {
-                    JustfileRecipeFoldingDescriptor(statement, textRange)
+                    JustfileRecipeFoldingDescriptor(statement, statement.textRange)
                 } else if (statement is JustVariableStatement) {
                     if (statement.text.trim().contains('\n')) {
-                        JustfileVariableFoldingDescriptor(statement, textRange)
+                        JustfileVariableFoldingDescriptor(statement, statement.textRange)
                     } else {
                         null
                     }
