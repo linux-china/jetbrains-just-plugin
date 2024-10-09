@@ -4,12 +4,13 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.icons.AllIcons
 import com.intellij.lang.ASTNode
 import com.intellij.navigation.ItemPresentation
+import com.intellij.navigation.NavigationItem
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNameIdentifierOwner
 import org.mvnsearch.plugins.just.lang.psi.JustfileElementFactory.createRecipe
 import javax.swing.Icon
 
-interface JustNamedElement : PsiNameIdentifierOwner {
+interface JustNamedElement : PsiNameIdentifierOwner, NavigationItem {
     fun getKey(): String?
 
     fun getValue(): String?
@@ -20,7 +21,7 @@ interface JustNamedElement : PsiNameIdentifierOwner {
 
     override fun getNameIdentifier(): PsiElement?
 
-    fun getPresentation(): ItemPresentation?
+    override fun getPresentation(): ItemPresentation?
 }
 
 abstract class JustNamedElementImpl(node: ASTNode) : ASTWrapperPsiElement(node), JustNamedElement {
