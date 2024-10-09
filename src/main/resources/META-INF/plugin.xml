@@ -19,6 +19,8 @@
         <lang.syntaxHighlighterFactory language="Just"
                                        implementationClass="org.mvnsearch.plugins.just.lang.lighter.JustSyntaxHighlighterFactory"/>
         <annotator language="Just" implementationClass="org.mvnsearch.plugins.just.lang.insight.JustfileAnnotator"/>
+        <lang.braceMatcher language="Just"
+                                   implementationClass="org.mvnsearch.plugins.just.lang.insight.JustBraceMatcher"/>
         <lang.commenter language="Just" implementationClass="org.mvnsearch.plugins.just.lang.comment.JustfileCommenter"/>
         <lang.foldingBuilder language="Just" implementationClass="org.mvnsearch.plugins.just.lang.JustfileFoldingBuilder"/>
         <completion.contributor language="Just" implementationClass="org.mvnsearch.plugins.just.lang.completion.JustCodeCompletionContributor"/>
