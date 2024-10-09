@@ -16,6 +16,8 @@
         <lang.parserDefinition language="Just"
                                implementationClass="org.mvnsearch.plugins.just.lang.parser.JustParserDefinition"/>
         <lang.psiStructureViewFactory language="Just" implementationClass="org.mvnsearch.plugins.just.lang.JustfileStructureViewFactory"/>
+        <lang.syntaxHighlighterFactory language="Just"
+                                       implementationClass="org.mvnsearch.plugins.just.lang.lighter.JustSyntaxHighlighterFactory"/>
         <annotator language="Just" implementationClass="org.mvnsearch.plugins.just.lang.insight.JustfileAnnotator"/>
         <lang.commenter language="Just" implementationClass="org.mvnsearch.plugins.just.lang.comment.JustfileCommenter"/>
         <lang.foldingBuilder language="Just" implementationClass="org.mvnsearch.plugins.just.lang.JustfileFoldingBuilder"/>
