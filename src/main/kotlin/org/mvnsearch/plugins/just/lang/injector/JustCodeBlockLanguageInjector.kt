@@ -39,6 +39,7 @@ class JustCodeBlockLanguageInjector : MultiHostInjector {
                         if (endOffset > offset) {
                             val injectionTextRange = TextRange(offset, context.textLength - trailLength)
                             registrar.startInjecting(shellLanguage!!)
+                            // add prefix to declare variables
                             registrar.addPlace(null, null, context as PsiLanguageInjectionHost, injectionTextRange)
                             registrar.doneInjecting()
                         }
