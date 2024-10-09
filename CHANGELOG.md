@@ -12,6 +12,7 @@
 - Pair Match for `()` and `[]`
 - Go To Symbol for recipe names
 - live templates: `var`, `exp`, `script`.
+- Add project SDK bin directory to PATH env for running justfile
 - Enhancement for syntax highlight
 
 ## 0.6.1 - 2024-10-08
