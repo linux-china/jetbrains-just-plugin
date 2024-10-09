@@ -3,7 +3,7 @@ package org.mvnsearch.plugins.just.lang
 import com.intellij.lang.ASTNode
 import com.intellij.lang.folding.FoldingBuilderEx
 import com.intellij.lang.folding.FoldingDescriptor
-import com.intellij.lang.folding.FoldingDescriptor.EMPTY
+import com.intellij.lang.folding.FoldingDescriptor.EMPTY_ARRAY
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.util.TextRange
@@ -20,9 +20,13 @@ class JustfileFoldingBuilder : FoldingBuilderEx(), DumbAware {
 
     override fun buildFoldRegions(root: PsiElement, document: Document, quick: Boolean): Array<FoldingDescriptor> {
         if (root !is JustFile) {
-            return EMPTY
+            return EMPTY_ARRAY
         }
-        return PsiTreeUtil.findChildrenOfAnyType(root, JustRecipeStatement::class.java, JustVariableStatement::class.java)
+        return PsiTreeUtil.findChildrenOfAnyType(
+            root,
+            JustRecipeStatement::class.java,
+            JustVariableStatement::class.java
+        )
             .mapNotNull { statement ->
                 if (statement is JustRecipeStatement) {
                     JustfileRecipeFoldingDescriptor(statement, statement.textRange)
@@ -47,10 +51,12 @@ class JustfileFoldingBuilder : FoldingBuilderEx(), DumbAware {
     }
 }
 
-class JustfileRecipeFoldingDescriptor(private val recipeStatement: JustRecipeStatement, textRange: TextRange) : FoldingDescriptor(recipeStatement, textRange) {
+class JustfileRecipeFoldingDescriptor(private val recipeStatement: JustRecipeStatement, textRange: TextRange) :
+    FoldingDescriptor(recipeStatement, textRange) {
     override fun getPlaceholderText() = recipeStatement.recipeName.text + ":"
 }
 
-class JustfileVariableFoldingDescriptor(private val variableStatement: JustVariableStatement, textRange: TextRange) : FoldingDescriptor(variableStatement, textRange) {
+class JustfileVariableFoldingDescriptor(private val variableStatement: JustVariableStatement, textRange: TextRange) :
+    FoldingDescriptor(variableStatement, textRange) {
     override fun getPlaceholderText() = variableStatement.variable.text + " := ..."
 }
