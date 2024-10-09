@@ -8,7 +8,9 @@ import com.intellij.execution.process.ProcessHandlerFactory
 import com.intellij.execution.process.ProcessTerminatedListener
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.util.execution.ParametersListUtil
+import com.intellij.util.system.OS
 import org.mvnsearch.plugins.just.Just
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
 import java.io.File
@@ -97,6 +99,28 @@ class JustRunConfiguration(
                 val envVariables = getEnvVariablesAsMap()
                 if (envVariables.isNotEmpty()) {
                     commandLine.environment.putAll(envVariables)
+                }
+                // add project SDK bin directory to PATH
+                val projectSdk = ProjectRootManager.getInstance(project).projectSdk
+                if (projectSdk != null) {
+                    val homeDirectory = projectSdk.homeDirectory
+                    if (homeDirectory != null) {
+                        var pathEnvName = "PATH"
+                        if (OS.CURRENT == OS.Windows) {
+                            pathEnvName = "Path"
+                        }
+                        val pathVariable = System.getenv(pathEnvName)
+                        val binDir = homeDirectory.findChild("bin")
+                        if (binDir != null && binDir.exists()) {
+                            commandLine.environment.put(
+                                pathEnvName, binDir.path + File.pathSeparator + pathVariable
+                            )
+                        } else {
+                            commandLine.environment.put(
+                                pathEnvName, homeDirectory.path + File.pathSeparator + pathVariable
+                            )
+                        }
+                    }
                 }
                 val processHandler = ProcessHandlerFactory.getInstance()
                     .createColoredProcessHandler(commandLine) as ColoredProcessHandler

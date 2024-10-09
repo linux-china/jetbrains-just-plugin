@@ -14,17 +14,20 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.elementType
 import com.intellij.util.execution.ParametersListUtil
+import com.intellij.util.system.OS
 import org.mvnsearch.plugins.just.Just
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
 import org.mvnsearch.plugins.just.ide.icons.JustIcons.JUST_FILE
 import org.mvnsearch.plugins.just.lang.psi.JustTypes
 import org.mvnsearch.plugins.just.parseRecipeName
+import java.io.File
 import javax.swing.Icon
 
 @Suppress("DialogTitleCapitalization")
@@ -94,6 +97,24 @@ fun runJustCommand(
         .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
         .withEnvironment("JUST_UNSTABLE", "1")
         .withWorkDirectory(workDirectory.path)
+    // add project SDK bin directory to PATH
+    val projectSdk = ProjectRootManager.getInstance(project).projectSdk
+    if (projectSdk != null) {
+        val homeDirectory = projectSdk.homeDirectory
+        if (homeDirectory != null) {
+            var pathEnvName = "PATH"
+            if (OS.CURRENT == OS.Windows) {
+                pathEnvName = "Path"
+            }
+            val pathVariable = System.getenv(pathEnvName)
+            val binDir = homeDirectory.findChild("bin")
+            if (binDir != null && binDir.exists()) {
+                initialCommandLine.withEnvironment(pathEnvName, binDir.path + File.pathSeparator + pathVariable)
+            } else {
+                initialCommandLine.withEnvironment(pathEnvName, homeDirectory.path + File.pathSeparator + pathVariable)
+            }
+        }
+    }
     val commandLine =
         RunAnythingCommandCustomizer.customizeCommandLine(commandDataContext, workDirectory, initialCommandLine)
     try {
