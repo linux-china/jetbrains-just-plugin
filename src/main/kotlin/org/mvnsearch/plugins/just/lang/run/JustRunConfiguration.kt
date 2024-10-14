@@ -9,6 +9,8 @@ import com.intellij.execution.process.ProcessTerminatedListener
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.isFile
 import com.intellij.util.EnvironmentUtil
 import com.intellij.util.execution.ParametersListUtil
 import com.intellij.util.system.OS
@@ -96,38 +98,51 @@ class JustRunConfiguration(
                     command.addAll(ParametersListUtil.parse(args, false, true, false))
                 }
                 val commandLine = GeneralCommandLine(command)
-                commandLine.workDirectory = File(project.basePath!!)
+                    .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
+                    .withEnvironment("JUST_UNSTABLE", "1")
+                    .withWorkDirectory(File(project.basePath!!))
                 val envVariables = getEnvVariablesAsMap()
                 if (envVariables.isNotEmpty()) {
                     commandLine.environment.putAll(envVariables)
                 }
                 // add project SDK bin directory to PATH
-                val projectSdk = ProjectRootManager.getInstance(project).projectSdk
-                if (projectSdk != null) {
-                    val homeDirectory = projectSdk.homeDirectory
-                    if (homeDirectory != null) {
-                        var pathEnvName = "PATH"
-                        if (OS.CURRENT == OS.Windows) {
-                            pathEnvName = "Path"
-                        }
-                        val pathVariable = EnvironmentUtil.getValue(pathEnvName)!!
-                        val binDir = homeDirectory.findChild("bin")
-                        if (binDir != null && binDir.exists()) {
-                            commandLine.environment.put(
-                                pathEnvName, binDir.path + File.pathSeparator + pathVariable
-                            )
-                        } else {
-                            commandLine.environment.put(
-                                pathEnvName, homeDirectory.path + File.pathSeparator + pathVariable
-                            )
-                        }
-                    }
-                }
+                injectProjectSdkIntoPath(project, commandLine)
                 val processHandler = ProcessHandlerFactory.getInstance()
                     .createColoredProcessHandler(commandLine) as ColoredProcessHandler
                 processHandler.setShouldKillProcessSoftly(true)
                 ProcessTerminatedListener.attach(processHandler)
                 return processHandler
+            }
+        }
+    }
+
+    companion object {
+        fun injectProjectSdkIntoPath(project: Project, commandLine: GeneralCommandLine) {
+            val projectSdk = ProjectRootManager.getInstance(project).projectSdk
+            if (projectSdk != null) {
+                var homeDirectory = projectSdk.homeDirectory
+                if (homeDirectory != null) {
+                    val pair = getPathWithProjectSdk(homeDirectory)
+                    commandLine.environment.put(pair.first, pair.second)
+                }
+            }
+        }
+
+        public fun getPathWithProjectSdk(sdkHome: VirtualFile): Pair<String, String> {
+            var homeDirectory = sdkHome
+            if (homeDirectory.isFile) {
+                homeDirectory = homeDirectory.parent!!
+            }
+            var pathEnvName = "PATH"
+            if (OS.CURRENT == OS.Windows) {
+                pathEnvName = "Path"
+            }
+            val pathVariable = EnvironmentUtil.getValue(pathEnvName)!!
+            val binDir = homeDirectory.findChild("bin")
+            return if (binDir != null && binDir.exists()) {
+                pathEnvName to (binDir.path + File.pathSeparator + pathVariable)
+            } else {
+                pathEnvName to (homeDirectory.path + File.pathSeparator + pathVariable)
             }
         }
     }
