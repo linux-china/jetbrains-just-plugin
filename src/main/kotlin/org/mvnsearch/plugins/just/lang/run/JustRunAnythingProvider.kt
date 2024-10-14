@@ -13,14 +13,18 @@ import com.intellij.ide.actions.runAnything.items.RunAnythingItemBase
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.project.guessProjectDir
+import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.psi.PsiManager
+import com.intellij.util.EnvironmentUtil
 import com.intellij.util.execution.ParametersListUtil
+import com.intellij.util.system.OS
 import org.mvnsearch.plugins.just.Just
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
 import org.mvnsearch.plugins.just.lang.psi.JustFile
+import java.io.File
 import javax.swing.Icon
 
 class JustRunAnythingProvider : RunAnythingCommandLineProvider() {
@@ -68,6 +72,26 @@ class JustRunAnythingProvider : RunAnythingCommandLineProvider() {
             .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
             .withEnvironment("JUST_COLOR", justColor)
             .withWorkDirectory(workDirectory.path)
+        val projectSdk = ProjectRootManager.getInstance(project).projectSdk
+        if (projectSdk != null) {
+            val homeDirectory = projectSdk.homeDirectory
+            if (homeDirectory != null) {
+                var pathEnvName = "PATH"
+                if (OS.CURRENT == OS.Windows) {
+                    pathEnvName = "Path"
+                }
+                val pathVariable = EnvironmentUtil.getValue(pathEnvName)!!
+                val binDir = homeDirectory.findChild("bin")
+                if (binDir != null && binDir.exists()) {
+                    initialCommandLine.withEnvironment(pathEnvName, binDir.path + File.pathSeparator + pathVariable)
+                } else {
+                    initialCommandLine.withEnvironment(
+                        pathEnvName,
+                        homeDirectory.path + File.pathSeparator + pathVariable
+                    )
+                }
+            }
+        }
         val newCommandLine =
             RunAnythingCommandCustomizer.customizeCommandLine(commandDataContext, workDirectory, initialCommandLine)
         try {

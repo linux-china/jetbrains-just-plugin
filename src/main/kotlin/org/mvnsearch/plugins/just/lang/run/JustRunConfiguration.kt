@@ -9,6 +9,7 @@ import com.intellij.execution.process.ProcessTerminatedListener
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.util.EnvironmentUtil
 import com.intellij.util.execution.ParametersListUtil
 import com.intellij.util.system.OS
 import org.mvnsearch.plugins.just.Just
@@ -109,7 +110,7 @@ class JustRunConfiguration(
                         if (OS.CURRENT == OS.Windows) {
                             pathEnvName = "Path"
                         }
-                        val pathVariable = System.getenv(pathEnvName)
+                        val pathVariable = EnvironmentUtil.getValue(pathEnvName)!!
                         val binDir = homeDirectory.findChild("bin")
                         if (binDir != null && binDir.exists()) {
                             commandLine.environment.put(
