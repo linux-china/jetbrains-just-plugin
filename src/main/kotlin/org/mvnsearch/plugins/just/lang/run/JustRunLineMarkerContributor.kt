@@ -20,6 +20,7 @@ import com.intellij.openapi.util.registry.Registry
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.elementType
+import com.intellij.util.EnvironmentUtil
 import com.intellij.util.execution.ParametersListUtil
 import com.intellij.util.system.OS
 import org.mvnsearch.plugins.just.Just
@@ -106,7 +107,7 @@ fun runJustCommand(
             if (OS.CURRENT == OS.Windows) {
                 pathEnvName = "Path"
             }
-            val pathVariable = System.getenv(pathEnvName)
+            val pathVariable = EnvironmentUtil.getValue(pathEnvName)!!
             val binDir = homeDirectory.findChild("bin")
             if (binDir != null && binDir.exists()) {
                 initialCommandLine.withEnvironment(pathEnvName, binDir.path + File.pathSeparator + pathVariable)
