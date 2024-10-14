@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.6.3 - 2024-10-14
+
+### Fixed
+
+- Fix PATH environment variable injection with project SDK
+
 ## 0.6.2 - 2024-10-09
 
 ### Added
