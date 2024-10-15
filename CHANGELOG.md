@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.6.4 - 2024-10-15
+
+### Fixed
+
+- `import` and `export` could be recipe names.
+
 ## 0.6.3 - 2024-10-14
 
 ### Fixed
