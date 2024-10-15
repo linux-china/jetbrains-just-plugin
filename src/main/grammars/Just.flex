@@ -279,9 +279,9 @@ KEYWORD_ELSE_IF=("else if")
   {COMMENT}                            { yybegin(YYINITIAL); return JustTypes.COMMENT; }
 
   {KEYWORD_MOD}                        { yybegin(MOD); return JustTypes.KEYWORD_MOD; }
-  {KEYWORD_IMPORT}                     { yybegin(IMPORT); return JustTypes.KEYWORD_IMPORT; }
+  {KEYWORD_IMPORT}/ ([\?]?)([\s]*)(x?)([\"\'])                   { yybegin(IMPORT); return JustTypes.KEYWORD_IMPORT; }
   {KEYWORD_ALIAS}                      { yybegin(ALIAS); return JustTypes.KEYWORD_ALIAS; }
-  {KEYWORD_EXPORT}                     { yybegin(EXPORT); return JustTypes.KEYWORD_EXPORT; }
+  {KEYWORD_EXPORT} / (\s*)([a-zA-Z_][a-zA-Z0-9_\-]*)(\s*)(":=")  { yybegin(EXPORT); return JustTypes.KEYWORD_EXPORT; }
   {KEYWORD_SET}                        { yybegin(SET); return JustTypes.KEYWORD_SET; }
   {OPEN_BRACKET}                       { yybegin(ATTRIBUTE); return JustTypes.OPEN_BRACKET; }
 
