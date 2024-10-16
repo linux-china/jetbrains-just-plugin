@@ -4,6 +4,10 @@
 
 ## Unreleased
 
+### Added
+
+- Highlight for x-string(shell expanded): `home_bin := x"${HOME}/bin`
+
 ## 0.6.4 - 2024-10-15
 
 ### Fixed
