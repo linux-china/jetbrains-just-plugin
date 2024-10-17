@@ -7,6 +7,7 @@
 ### Added
 
 - Highlight for x-string(shell expanded): `home_bin := x"${HOME}/bin`
+- inlay hints for recipe param and backtick
 
 ## 0.6.4 - 2024-10-15
 
