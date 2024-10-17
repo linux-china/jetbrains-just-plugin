@@ -14,6 +14,9 @@
                   language="Just" fileNames="justfile;Justfile;.justfile"/>
         <codeInsight.lineMarkerProvider language="Just"
                                         implementationClass="org.mvnsearch.plugins.just.lang.run.JustRunLineMarkerContributor"/>
+        <codeInsight.parameterNameHints
+                language="Just"
+                implementationClass="org.mvnsearch.plugins.just.lang.insight.hint.RecipeParameterHintsProvider"/>
         <lang.parserDefinition language="Just"
                                implementationClass="org.mvnsearch.plugins.just.lang.parser.JustParserDefinition"/>
         <lang.psiStructureViewFactory language="Just"
