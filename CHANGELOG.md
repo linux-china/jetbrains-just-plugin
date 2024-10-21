@@ -9,6 +9,7 @@
 ### Fixed
 
 - Support function call as parameter value: `a b=f('a'):`
+- Adjust color output to `auto` mode
 
 ## 0.6.5 - 2024-10-17
 
