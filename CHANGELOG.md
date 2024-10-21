@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.6.6 - 2024-10-20
+
+### Fixed
+
+- Support function call as parameter value: `a b=f('a'):`
+
 ## 0.6.5 - 2024-10-17
 
 ### Added
