@@ -15,6 +15,8 @@ object Just {
         } else {
             if (File("/usr/local/bin/just").exists()) {
                 "/usr/local/bin/just"
+            } else if (File("/opt/homebrew/bin/just").exists()) {
+                "/opt/homebrew/bin/just"
             } else {
                 "just"
             }
