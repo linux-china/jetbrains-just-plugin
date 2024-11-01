@@ -4,6 +4,13 @@
 
 ## Unreleased
 
+## 0.6.7 - 2024-11-01
+
+### Add
+
+- Shell language injection with exported variable names.
+- Add `&&` and `||` operators conditional expressions
+
 ## 0.6.6 - 2024-10-20
 
 ### Fixed
