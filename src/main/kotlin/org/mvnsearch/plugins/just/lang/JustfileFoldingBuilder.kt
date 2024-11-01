@@ -29,10 +29,18 @@ class JustfileFoldingBuilder : FoldingBuilderEx(), DumbAware {
         )
             .mapNotNull { statement ->
                 if (statement is JustRecipeStatement) {
-                    JustfileRecipeFoldingDescriptor(statement, statement.textRange)
+                    FoldingDescriptor(
+                        statement, statement.textRange.startOffset, statement.textRange.endOffset - 1,
+                        null,
+                        statement.recipeName.text + ":"
+                    )
                 } else if (statement is JustVariableStatement) {
                     if (statement.text.trim().contains('\n')) {
-                        JustfileVariableFoldingDescriptor(statement, statement.textRange)
+                        FoldingDescriptor(
+                            statement, statement.textRange.startOffset, statement.textRange.endOffset - 1,
+                            null,
+                            statement.variable.text + " := ..."
+                        )
                     } else {
                         null
                     }
@@ -49,14 +57,4 @@ class JustfileFoldingBuilder : FoldingBuilderEx(), DumbAware {
     override fun isCollapsedByDefault(node: ASTNode): Boolean {
         return false
     }
-}
-
-class JustfileRecipeFoldingDescriptor(private val recipeStatement: JustRecipeStatement, textRange: TextRange) :
-    FoldingDescriptor(recipeStatement, textRange) {
-    override fun getPlaceholderText() = recipeStatement.recipeName.text + ":"
-}
-
-class JustfileVariableFoldingDescriptor(private val variableStatement: JustVariableStatement, textRange: TextRange) :
-    FoldingDescriptor(variableStatement, textRange) {
-    override fun getPlaceholderText() = variableStatement.variable.text + " := ..."
 }
