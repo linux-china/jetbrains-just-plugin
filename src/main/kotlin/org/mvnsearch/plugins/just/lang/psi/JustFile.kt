@@ -52,11 +52,7 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
             .filterIsInstance<JustSetStatement>().firstOrNull() {
                 it.setting.text == "shell" || it.setting.text == "windows-shell"
             }
-        return if (shellItem == null) {
-            true
-        } else {
-            shellItem.text.contains("sh\"")
-        }
+        return shellItem?.text?.contains("sh\"") ?: true
     }
 
     fun getExportedVariables(): List<String> {
