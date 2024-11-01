@@ -6,10 +6,12 @@ import com.intellij.lang.injection.MultiHostRegistrar
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiLanguageInjectionHost
+import com.intellij.psi.util.parentOfType
 import org.mvnsearch.plugins.just.INDENT_CHARS
 import org.mvnsearch.plugins.just.PARAM_PREFIX_LIST
 import org.mvnsearch.plugins.just.lang.psi.JustCodeBlock
 import org.mvnsearch.plugins.just.lang.psi.JustFile
+import org.mvnsearch.plugins.just.lang.psi.JustRecipeStatement
 
 
 class JustCodeBlockLanguageInjector : MultiHostInjector {
@@ -29,7 +31,17 @@ class JustCodeBlockLanguageInjector : MultiHostInjector {
             val justFile = context.containingFile as JustFile
             if (justFile.isBashAlike()) { // validate global shell setting
                 if (isShellCode(text.trim())) {
-                    val injectionScript = justFile.getExportedVariables().joinToString(separator = "") { "$it = ''\n" }
+                    var injectionScript = justFile.getExportedVariables().joinToString(separator = "") { "$it=''\n" }
+                    val recipeStatement = context.parentOfType<JustRecipeStatement>()
+                    if (recipeStatement != null) {
+                        recipeStatement.params?.recipeParamList?.forEach {
+                            it.recipeParamName.text?.let { name ->
+                                if (name.startsWith("$")) {
+                                    injectionScript += "${name.substring(1)}=''\n"
+                                }
+                            }
+                        }
+                    }
                     val offset = text.indexOfFirst { !INDENT_CHARS.contains(it) && !PARAM_PREFIX_LIST.contains(it) }
                     if (offset > 0) {
                         var trailLength = text.toCharArray().reversedArray().indexOfFirst { !INDENT_CHARS.contains(it) }
@@ -41,7 +53,12 @@ class JustCodeBlockLanguageInjector : MultiHostInjector {
                             val injectionTextRange = TextRange(offset, context.textLength - trailLength)
                             registrar.startInjecting(shellLanguage!!)
                             // add prefix to declare variables
-                            registrar.addPlace(injectionScript, null, context as PsiLanguageInjectionHost, injectionTextRange)
+                            registrar.addPlace(
+                                injectionScript,
+                                null,
+                                context as PsiLanguageInjectionHost,
+                                injectionTextRange
+                            )
                             registrar.doneInjecting()
                         }
                     }
