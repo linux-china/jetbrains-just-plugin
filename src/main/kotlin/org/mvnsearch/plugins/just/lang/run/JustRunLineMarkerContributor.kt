@@ -65,10 +65,11 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
 
     private fun runJustRecipeByRunAnything(project: Project, psiElement: PsiElement, taskName: String) {
         val justfile = psiElement.containingFile.virtualFile
+        val justCmdPath = Just.getJustCmdAbsolutionPath(project)
         val commandString = if (Just.isDefaultJustfile(justfile.name)) {
-            "just $taskName"
+            "$justCmdPath $taskName"
         } else {
-            "just -f ${justfile.name} $taskName"
+            "$justCmdPath -f ${justfile.name} $taskName"
         }
         runJustCommand(
             project,
