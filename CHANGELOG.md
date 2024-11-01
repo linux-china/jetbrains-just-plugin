@@ -11,6 +11,7 @@
 - Shell language injection with exported variable names: `export foo := 'hello'` or `hello $foo:`
 - Add `&&` and `||` for logical operators : `foo := '' || 'goodbye'`
 - Add folding support for custom-defined regions [#38](https://github.com/linux-china/jetbrains-just-plugin/issues/38)
+- Add [devenv](https://devenv.sh/) support: load just from `{PROJECT_ROOT}/.devenv/profile/bin/just`
 
 ### Fixed
 
