@@ -8,7 +8,7 @@
 
 ### Added
 
-- Shell language injection with exported variable names.
+- Shell language injection with exported variable names: `export foo := 'hello'` or `hello $foo:`
 - Add `&&` and `||` for logical operators : `foo := '' || 'goodbye'`
 - Add folding support for custom-defined regions [#38](https://github.com/linux-china/jetbrains-just-plugin/issues/38)
 
