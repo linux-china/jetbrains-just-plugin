@@ -59,6 +59,13 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
         }
     }
 
+    fun getExportedVariables(): List<String> {
+        return this.children
+            .filterIsInstance<JustExportStatement>()
+            .map { it.exportName.text }
+            .toList()
+    }
+
     fun parseMetadata(loadDotenv: Boolean): JustfileMetadata {
         val justfileMetadata = JustfileMetadata()
         text.lines().forEach { line ->
