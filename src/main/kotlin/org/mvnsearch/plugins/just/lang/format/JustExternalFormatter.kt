@@ -31,7 +31,7 @@ class JustExternalFormatter : AsyncDocumentFormattingService() {
         val justFile: File? = request.getIOFile()
         // check physical file or not
         if (justFile != null) {
-            val justCmd: String = Just.getJustCmdAbsolutionPath()
+            val justCmd: String = Just.getJustCmdAbsolutionPath(request.context.project)
             val params: @NonNls MutableList<String?> = SmartList<String?>()
             params.add("--fmt")
             params.add("--justfile")

@@ -59,7 +59,7 @@ class JustRunAnythingProvider : RunAnythingCommandLineProvider() {
     override fun run(dataContext: DataContext, commandLine: CommandLine): Boolean {
         val project = dataContext.getData(CommonDataKeys.PROJECT)!!
         val workDirectory = project.guessProjectDir()!!
-        val commandString = Just.getJustCmdAbsolutionPath() + " " + commandLine.command
+        val commandString = Just.getJustCmdAbsolutionPath(project) + " " + commandLine.command
         val commandDataContext = RunAnythingCommandCustomizer.customizeContext(dataContext)
         var justColor = "auto"
         val initialCommandLine = GeneralCommandLine(ParametersListUtil.parse(commandString, false, true))

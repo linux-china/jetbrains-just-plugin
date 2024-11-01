@@ -30,7 +30,7 @@ open class JustRecipesActionGroup(private val justfileName: String) : ActionGrou
         val result = mutableListOf<AnAction>()
         val projectDir = project.guessProjectDir()!!
         val builder = ProcessBuilder()
-        builder.command(Just.getJustCmdAbsolutionPath(), "--color=never", "-l")
+        builder.command(Just.getJustCmdAbsolutionPath(project), "--color=never", "-l")
         builder.directory(projectDir.toNioPath().toFile())
         val process = builder.start()
         val reader = BufferedReader(InputStreamReader(process.inputStream))
@@ -55,7 +55,8 @@ class RunJustRecipeAction(private val recipeName: String, private val text: Stri
 
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project!!
-        val commandString = "${Just.getJustCmdAbsolutionPath()} $recipeName"
+        val justCmdPath = Just.getJustCmdAbsolutionPath(project)
+        val commandString = "$justCmdPath $recipeName"
         val workDirectory = project.guessProjectDir()!!
         val justfile = e.getData(CommonDataKeys.VIRTUAL_FILE)!!
         runJustCommand(project, workDirectory, justfile, commandString, e.dataContext)

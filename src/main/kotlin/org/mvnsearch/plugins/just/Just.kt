@@ -1,10 +1,11 @@
 package org.mvnsearch.plugins.just
 
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
 import java.io.File
 
 object Just {
-    fun getJustCmdAbsolutionPath(): String {
+    fun getJustCmdAbsolutionPath(project: Project): String {
         return if (SystemInfo.isWindows) {
             return "just"
         } else {

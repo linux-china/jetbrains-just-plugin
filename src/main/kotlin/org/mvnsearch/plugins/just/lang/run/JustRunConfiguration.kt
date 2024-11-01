@@ -82,7 +82,7 @@ class JustRunConfiguration(
     override fun getState(executor: Executor, executionEnvironment: ExecutionEnvironment): RunProfileState {
         return object : CommandLineState(executionEnvironment) {
             override fun startProcess(): ProcessHandler {
-                var justCmd = Just.getJustCmdAbsolutionPath()
+                var justCmd = Just.getJustCmdAbsolutionPath(project)
                 val command = mutableListOf(justCmd)
                 val fileName = getFileName()
                 val recipeName = getRecipeName()
