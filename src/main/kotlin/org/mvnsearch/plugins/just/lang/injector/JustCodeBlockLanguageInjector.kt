@@ -29,6 +29,7 @@ class JustCodeBlockLanguageInjector : MultiHostInjector {
             val justFile = context.containingFile as JustFile
             if (justFile.isBashAlike()) { // validate global shell setting
                 if (isShellCode(text.trim())) {
+                    val injectionScript = justFile.getExportedVariables().joinToString(separator = "") { "$it = ''\n" }
                     val offset = text.indexOfFirst { !INDENT_CHARS.contains(it) && !PARAM_PREFIX_LIST.contains(it) }
                     if (offset > 0) {
                         var trailLength = text.toCharArray().reversedArray().indexOfFirst { !INDENT_CHARS.contains(it) }
@@ -40,7 +41,7 @@ class JustCodeBlockLanguageInjector : MultiHostInjector {
                             val injectionTextRange = TextRange(offset, context.textLength - trailLength)
                             registrar.startInjecting(shellLanguage!!)
                             // add prefix to declare variables
-                            registrar.addPlace(null, null, context as PsiLanguageInjectionHost, injectionTextRange)
+                            registrar.addPlace(injectionScript, null, context as PsiLanguageInjectionHost, injectionTextRange)
                             registrar.doneInjecting()
                         }
                     }
