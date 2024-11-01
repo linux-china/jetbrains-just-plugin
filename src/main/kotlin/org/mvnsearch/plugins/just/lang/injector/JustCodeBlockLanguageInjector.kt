@@ -37,7 +37,8 @@ class JustCodeBlockLanguageInjector : MultiHostInjector {
                         recipeStatement.params?.recipeParamList?.forEach {
                             it.recipeParamName.text?.let { name ->
                                 if (name.startsWith("$")) {
-                                    injectionScript += "${name.substring(1)}=''\n"
+                                    val shellVariableName = name.substring(1)
+                                    injectionScript += "$shellVariableName=''\n"
                                 }
                             }
                         }
