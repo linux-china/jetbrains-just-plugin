@@ -30,6 +30,8 @@
                         implementationClass="org.mvnsearch.plugins.just.lang.comment.JustfileCommenter"/>
         <lang.foldingBuilder language="Just"
                              implementationClass="org.mvnsearch.plugins.just.lang.JustfileFoldingBuilder"/>
+        <lang.foldingBuilder language="Just"
+                                     implementationClass="org.mvnsearch.plugins.just.lang.JustfileRegionFoldingBuilder"/>
         <notificationGroup id="just fmt" displayType="BALLOON" isLogByDefault="false"/>
         <formattingService implementation="org.mvnsearch.plugins.just.lang.format.JustExternalFormatter"/>
         <completion.contributor language="Just"
