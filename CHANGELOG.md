@@ -6,10 +6,14 @@
 
 ## 0.6.7 - 2024-11-01
 
-### Add
+### Added
 
 - Shell language injection with exported variable names.
-- Add `&&` and `||` operators conditional expressions
+- Add `&&` and `||` for logical operators : `foo := '' || 'goodbye'`
+
+### Fixed
+
+- Fix error for inline comment
 
 ## 0.6.6 - 2024-10-20
 
