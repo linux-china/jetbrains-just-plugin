@@ -37,6 +37,8 @@ NOEQ = ("!=")
 REEQ = ("=~")
 PLUS = ("+")
 SLASH = ("/")
+OR = ("||")
+AND = ("&&")
 OPEN_BRACE = [{]
 CLOSE_BRACE = [}]
 OPEN_BRACKET = ("[")
@@ -180,6 +182,8 @@ KEYWORD_ELSE_IF=("else if")
   {EQEQ}                     {  yybegin(CONDITIONAL); return EQEQ; }
   {NOEQ}                     {  yybegin(CONDITIONAL); return NOEQ; }
   {REEQ}                     {  yybegin(CONDITIONAL); return REEQ; }
+  {OR}                       {  yybegin(CONDITIONAL); return OR; }
+  {AND}                      {  yybegin(CONDITIONAL); return AND; }
   {CONDITIONAL_BLOCK}        {  yybegin(CONDITIONAL); return CONDITIONAL_BLOCK; }
   {KEYWORD_ELSE}             {  yybegin(CONDITIONAL_END); return KEYWORD_ELSE; }
   {KEYWORD_ELSE_IF}           {  yybegin(CONDITIONAL); return KEYWORD_ELSE_IF; }
