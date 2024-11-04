@@ -4,6 +4,13 @@
 
 ## Unreleased
 
+## 0.6.8 - 2024-11-04
+
+### Added
+
+- Add macro support for Just run configuration: recipe args could
+  be [macros](https://www.jetbrains.com/help/idea/built-in-macros.html).
+
 ## 0.6.7 - 2024-11-01
 
 ### Added
