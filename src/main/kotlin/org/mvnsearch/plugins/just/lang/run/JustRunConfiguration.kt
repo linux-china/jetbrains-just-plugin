@@ -7,6 +7,7 @@ import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.process.ProcessHandlerFactory
 import com.intellij.execution.process.ProcessTerminatedListener
 import com.intellij.execution.runners.ExecutionEnvironment
+import com.intellij.execution.util.ProgramParametersConfigurator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VirtualFile
@@ -82,11 +83,10 @@ class JustRunConfiguration(
     override fun getState(executor: Executor, executionEnvironment: ExecutionEnvironment): RunProfileState {
         return object : CommandLineState(executionEnvironment) {
             override fun startProcess(): ProcessHandler {
-                var justCmd = Just.getJustCmdAbsolutionPath(project)
+                val justCmd = Just.getJustCmdAbsolutionPath(project)
                 val command = mutableListOf(justCmd)
                 val fileName = getFileName()
                 val recipeName = getRecipeName()
-                val args = getRecipeArgs()
                 if (!fileName.isNullOrEmpty()) {
                     command.add("-f")
                     command.add(fileName)
@@ -94,8 +94,18 @@ class JustRunConfiguration(
                 if (!recipeName.isNullOrEmpty()) {
                     command.add(recipeName)
                 }
+                var args = getRecipeArgs()
                 if (!args.isNullOrEmpty()) {
-                    command.addAll(ParametersListUtil.parse(args, false, true, false))
+                    if (args.count { it == '$' } >= 2) {
+                        args = ProgramParametersConfigurator().expandPathAndMacros(
+                            args,
+                            null,
+                            executionEnvironment.project
+                        )
+                    }
+                    if (!args.isNullOrEmpty()) {
+                        command.addAll(ParametersListUtil.parse(args, false, true, false))
+                    }
                 }
                 val commandLine = GeneralCommandLine(command)
                     .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
@@ -128,7 +138,7 @@ class JustRunConfiguration(
             }
         }
 
-        public fun getPathWithProjectSdk(sdkHome: VirtualFile): Pair<String, String> {
+        fun getPathWithProjectSdk(sdkHome: VirtualFile): Pair<String, String> {
             var homeDirectory = sdkHome
             if (homeDirectory.isFile) {
                 homeDirectory = homeDirectory.parent!!

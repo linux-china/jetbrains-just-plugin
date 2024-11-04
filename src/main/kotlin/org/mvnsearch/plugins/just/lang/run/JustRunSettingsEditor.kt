@@ -1,29 +1,31 @@
 package org.mvnsearch.plugins.just.lang.run
 
+import com.intellij.ide.macro.MacrosDialog
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.ui.LabeledComponent
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.components.JBTextArea
 import com.intellij.ui.components.JBTextField
+import com.intellij.ui.components.fields.ExtendableTextField
 import javax.swing.BoxLayout
 import javax.swing.JComponent
 import javax.swing.JPanel
-import javax.swing.JTextField
 
 
 class JustRunSettingsEditor : SettingsEditor<JustRunConfiguration>() {
     private val myPanel: JPanel = JPanel()
     private var myJustFileName: LabeledComponent<TextFieldWithBrowseButton> = LabeledComponent()
     private var myRecipeName: LabeledComponent<JBTextField> = LabeledComponent()
-    private var myRecipeArgs: LabeledComponent<JBTextField> = LabeledComponent()
+    private var myRecipeArgs: LabeledComponent<ExtendableTextField> = LabeledComponent()
     private var myEnvVariables: LabeledComponent<JBTextArea> = LabeledComponent()
 
     init {
         myPanel.layout = BoxLayout(myPanel, BoxLayout.Y_AXIS)
         myJustFileName.component = TextFieldWithBrowseButton()
         myRecipeName.component = JBTextField()
-        myRecipeArgs.component = JBTextField()
-        myEnvVariables.component = JBTextArea(3,0)
+        myRecipeArgs.component = ExtendableTextField()
+        MacrosDialog.addMacroSupport(myRecipeArgs.component, { true }, { false })
+        myEnvVariables.component = JBTextArea(3, 0)
         myJustFileName.label.text = "Justfile name:"
         myRecipeName.label.text = "Recipe name:"
         myRecipeArgs.label.text = "Recipe args:"
