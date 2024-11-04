@@ -24,7 +24,7 @@ class JustRunSettingsEditor : SettingsEditor<JustRunConfiguration>() {
         myJustFileName.component = TextFieldWithBrowseButton()
         myRecipeName.component = JBTextField()
         myRecipeArgs.component = ExtendableTextField()
-        MacrosDialog.addMacroSupport(myRecipeArgs.component, { true }, { false })
+        MacrosDialog.addMacroSupport(myRecipeArgs.component, { true }, { true })
         myEnvVariables.component = JBTextArea(3, 0)
         myJustFileName.label.text = "Justfile name:"
         myRecipeName.label.text = "Recipe name:"

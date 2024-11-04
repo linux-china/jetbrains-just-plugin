@@ -8,7 +8,9 @@ import com.intellij.execution.process.ProcessHandlerFactory
 import com.intellij.execution.process.ProcessTerminatedListener
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.util.ProgramParametersConfigurator
+import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.isFile
@@ -97,10 +99,27 @@ class JustRunConfiguration(
                 var args = getRecipeArgs()
                 if (!args.isNullOrEmpty()) {
                     if (args.count { it == '$' } >= 2) {
+                        val project = executionEnvironment.project
+                        var module: com.intellij.openapi.module.Module? = null
+                        project.guessProjectDir()?.let { projectDir ->
+                            if (!fileName.isNullOrEmpty()) {
+                                projectDir.findChild(fileName)?.let { justFile ->
+                                    module = ModuleUtil.findModuleForFile(justFile, project)
+                                }
+                            } else {  // find default justfile
+                                for (justFileName in listOf("justfile", "Justfile", ".justfile", ".Justfile")) {
+                                    val child = projectDir.findChild(justFileName)
+                                    if (child != null && child.exists()) {
+                                        module = ModuleUtil.findModuleForFile(child, project)
+                                        break
+                                    }
+                                }
+                            }
+                        }
                         args = ProgramParametersConfigurator().expandPathAndMacros(
                             args,
-                            null,
-                            executionEnvironment.project
+                            module,
+                            project
                         )
                     }
                     if (!args.isNullOrEmpty()) {
