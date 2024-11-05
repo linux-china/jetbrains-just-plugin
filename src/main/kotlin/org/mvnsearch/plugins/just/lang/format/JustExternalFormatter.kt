@@ -64,10 +64,6 @@ class JustExternalFormatter : AsyncDocumentFormattingService() {
                         handler.destroyProcess()
                         return true
                     }
-
-                    override fun isRunUnderProgress(): Boolean {
-                        return true
-                    }
                 }
             } catch (e: ExecutionException) {
                 request.onError("Just file", e.message!!)
