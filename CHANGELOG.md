@@ -11,6 +11,10 @@
 - Add macro support for Just run configuration: recipe args could
   be [macros](https://www.jetbrains.com/help/idea/built-in-macros.html).
 
+### Fixed
+
+- Fix just formatter long-running issue
+
 ## 0.6.7 - 2024-11-01
 
 ### Added
