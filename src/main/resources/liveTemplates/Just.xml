@@ -23,4 +23,10 @@
             <option name="JUST" value="true"/>
         </context>
     </template>
+    <template name="uv" value="set unstable&#10;set script-interpreter := ['uv', 'run', '--script']&#10;$END$" description="Add uv interpreter" toReformat="false"
+              toShortenFQNames="true">
+        <context>
+            <option name="JUST" value="true"/>
+        </context>
+    </template>
 </templateSet>
