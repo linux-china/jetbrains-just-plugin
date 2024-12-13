@@ -23,7 +23,7 @@
             <option name="JUST" value="true"/>
         </context>
     </template>
-    <template name="uv" value="set unstable&#10;set script-interpreter := ['uv', 'run', '--script']&#10;$END$" description="Add uv interpreter" toReformat="false"
+    <template name="venv" value="export PATH := join(justfile_directory(), '.venv', 'bin') + ':' + env_var('PATH')&#10;$END$" description="Add Python venv to PATH" toReformat="false"
               toShortenFQNames="true">
         <context>
             <option name="JUST" value="true"/>
