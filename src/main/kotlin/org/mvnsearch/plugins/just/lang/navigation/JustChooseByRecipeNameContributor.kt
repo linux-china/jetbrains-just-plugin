@@ -12,6 +12,33 @@ import org.mvnsearch.plugins.just.lang.psi.JustRecipeStatement
 
 
 class JustChooseByRecipeNameContributor : ChooseByNameContributor {
+    companion object {
+        fun findWitFiles(project: Project): List<JustFile> {
+            val result = mutableListOf<JustFile>()
+            FileTypeIndex.getFiles(JustFileType, GlobalSearchScope.allScope(project)).forEach {
+                val witFile: JustFile? = PsiManager.getInstance(project).findFile(it) as JustFile?
+                if (witFile != null) {
+                    result.add(witFile)
+                }
+            }
+            return result
+        }
+
+        fun findRecipeStatements(project: Project, recipeName: String): List<JustRecipeStatement> {
+            val result = mutableListOf<JustRecipeStatement>()
+            FileTypeIndex.getFiles(JustFileType, GlobalSearchScope.allScope(project)).forEach {
+                val witFile = PsiManager.getInstance(project).findFile(it) as JustFile
+                witFile.children.filterIsInstance<JustRecipeStatement>().forEach { item ->
+                    if (item.name == recipeName) {
+                        result.add(item)
+                    }
+                }
+            }
+            return result
+        }
+
+    }
+
     override fun getNames(project: Project, includeNonProjectItems: Boolean): Array<String> {
         val names = mutableListOf<String>()
         findWitFiles(project).forEach {
@@ -29,28 +56,5 @@ class JustChooseByRecipeNameContributor : ChooseByNameContributor {
         return findRecipeStatements(project, name).toTypedArray()
     }
 
-    private fun findWitFiles(project: Project): List<JustFile> {
-        val result = mutableListOf<JustFile>()
-        FileTypeIndex.getFiles(JustFileType, GlobalSearchScope.allScope(project)).forEach {
-            val witFile: JustFile? = PsiManager.getInstance(project).findFile(it) as JustFile?
-            if (witFile != null) {
-                result.add(witFile)
-            }
-        }
-        return result
-    }
-
-    private fun findRecipeStatements(project: Project, recipeName: String): List<JustRecipeStatement> {
-        val result = mutableListOf<JustRecipeStatement>()
-        FileTypeIndex.getFiles(JustFileType, GlobalSearchScope.allScope(project)).forEach {
-            val witFile = PsiManager.getInstance(project).findFile(it) as JustFile
-            witFile.children.filterIsInstance<JustRecipeStatement>().forEach { item ->
-                if (item.name == recipeName) {
-                    result.add(item)
-                }
-            }
-        }
-        return result
-    }
 }
 
