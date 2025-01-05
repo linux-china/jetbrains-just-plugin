@@ -10,6 +10,7 @@
 
 - Add `venv` live template for Python project with virtualenv
 - Add `node` live template for Node.js project
+- Add global search for recipe name navigation [#41](https://github.com/linux-china/jetbrains-just-plugin/issues/41)
 
 ### Fixed
 
