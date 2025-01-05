@@ -23,7 +23,17 @@
             <option name="JUST" value="true"/>
         </context>
     </template>
-    <template name="venv" value="export PATH := join(justfile_directory(), '.venv', 'bin') + ':' + env_var('PATH')&#10;$END$" description="Add Python venv to PATH" toReformat="false"
+    <template name="venv"
+              value="export PATH := join(justfile_directory(), '.venv', 'bin') + ':' + env_var('PATH')&#10;$END$"
+              description="Add Python '.venv/bin' to PATH" toReformat="false"
+              toShortenFQNames="true">
+        <context>
+            <option name="JUST" value="true"/>
+        </context>
+    </template>
+    <template name="node"
+              value="export PATH := join(justfile_directory(), 'node_modules', '.bin') + ':' + env_var('PATH')&#10;$END$"
+              description="Add Node.js 'node_modules/.bin' to PATH" toReformat="false"
               toShortenFQNames="true">
         <context>
             <option name="JUST" value="true"/>
