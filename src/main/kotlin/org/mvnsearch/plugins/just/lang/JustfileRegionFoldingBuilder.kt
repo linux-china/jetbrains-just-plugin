@@ -22,8 +22,8 @@ class JustfileRegionFoldingBuilder : FoldingBuilderEx(), DumbAware {
         }
         val regionElements = root.children
             .filter { it.elementType == JustTypes.COMMENT }
-            .filter { it.text.contains(" region") || it.text.startsWith(" endregion") }
-            .toList();
+            .filter { it.text.startsWith("# region") || it.text.startsWith("# endregion") }
+            .toList()
         val descriptors = mutableListOf<FoldingDescriptor>()
         // for loop with index
         for (i in regionElements.indices step 2) {
