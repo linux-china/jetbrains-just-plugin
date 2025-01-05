@@ -4,6 +4,17 @@
 
 ## Unreleased
 
+## 0.6.9 - 2025-01-05
+
+### Added
+
+- Add `venv` live template for Python project with virtualenv
+- Add `node` live template for Node.js project
+
+### Fixed
+
+- Fix region folding problem [#38](https://github.com/linux-china/jetbrains-just-plugin/issues/38)
+
 ## 0.6.8 - 2024-11-04
 
 ### Added
