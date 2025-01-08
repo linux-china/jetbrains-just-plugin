@@ -75,7 +75,7 @@ class JustCodeBlockLanguageInjector : MultiHostInjector {
     private fun isShellCode(code: String): Boolean {
         if (code.contains("{{") || code.contains("}}")) {
             // enable highlight for parameter in string
-            return code.contains("\"{{") || code.contains("'{{")
+            return (code.contains("\"{{") || code.contains("'{{")) && !code.contains(" {{")
         }
         // check shell shebang
         return !code.startsWith("#!")
