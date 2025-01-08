@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.6.10 - 2025-01-08
+
+### Added
+
+- Shell highlight for param in quotation mark style: `echo "{{NICK}}"` or `echo '{{NICK}}'`
+
 ## 0.6.9 - 2025-01-05
 
 ### Added
