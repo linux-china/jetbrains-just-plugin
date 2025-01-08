@@ -8,7 +8,7 @@ JetBrains IDEs.
 Plugin features:
 
 * Just language and file types
-* Syntax high light
+* Syntax highlight for shell script
 * Run recipes by click
 * Run configuration support: `Run -> Edit Configurations -> Just` or right click on recipe name
 * New justfile by project type, such as Maven, Gradle, Cargo, uv, zig etc.
@@ -36,6 +36,10 @@ Quick to understand `justfile`, please
 click [Justfile cheat sheet](https://cheatography.com/linux-china/cheat-sheets/justfile/)
 
 **Attention**: keywords could not be recipe names, such as `import`, `export`, `alias` etc.
+
+**Tips**: Please put just parameter in quotation mark, such as `echo "{{NAME}}"` or `echo '{{NAME}}'`, 
+and `echo {{NAME}}` is not legal script and will not be highlighted. 
+If param as command name, such as `{{MVN}} --version`, please use `exec '{{MVN}}' --version` instead.
 
 <!-- Plugin description end -->
 
