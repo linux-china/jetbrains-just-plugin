@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.6.12 - 2025-01-23
+
+### Added
+
+- Add multi attributes as a single line support: `[no-cd, private]`
+
 ## 0.6.11 - 2025-01-17
 
 ### Added
