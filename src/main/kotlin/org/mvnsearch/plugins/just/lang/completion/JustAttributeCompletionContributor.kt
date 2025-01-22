@@ -32,6 +32,7 @@ class JustAttributeCompletionContributor : CompletionContributor() {
                         result.addElement(LookupElementBuilder.create("working-directory"))
                         result.addElement(LookupElementBuilder.create("doc"))
                         result.addElement(LookupElementBuilder.create("group"))
+                        result.addElement(LookupElementBuilder.create("exit-message"))
                         result.addElement(LookupElementBuilder.create("no-exit-message"))
                         result.addElement(LookupElementBuilder.create("confirm"))
                         result.addElement(LookupElementBuilder.create("no-quiet"))
