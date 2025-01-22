@@ -292,6 +292,7 @@ KEYWORD_ELSE_IF=("else if")
  {ATTRIBUTE_NAME}                       {  yybegin(ATTRIBUTE); return ATTRIBUTE_NAME; }
  {WHITE_SPACE}+                          {  yybegin(ATTRIBUTE); return TokenType.WHITE_SPACE; }
  {SEPERATOR}                           {  yybegin(ATTRIBUTE); return SEPERATOR; }
+ {COMMA}                               {  yybegin(ATTRIBUTE); return COMMA; }
  {OPEN_PAREN}                           {  yybegin(ATTRIBUTE); return OPEN_PAREN; }
  {STRING}                                {  yybegin(ATTRIBUTE); return STRING; }
  {RAW_STRING}                            {  yybegin(ATTRIBUTE); return RAW_STRING; }
