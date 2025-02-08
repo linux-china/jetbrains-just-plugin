@@ -18,13 +18,14 @@ import java.nio.charset.StandardCharsets
 
 
 class JustExternalFormatter : AsyncDocumentFormattingService() {
+    val ignoreDirective= "# @formatter:off"
 
     override fun getFeatures(): MutableSet<FormattingService.Feature> {
         return mutableSetOf()
     }
 
     override fun canFormat(psiFile: PsiFile): Boolean {
-        return psiFile is JustFile
+        return psiFile is JustFile && !psiFile.text.contains(ignoreDirective)
     }
 
     override fun createFormattingTask(request: AsyncFormattingRequest): FormattingTask? {
