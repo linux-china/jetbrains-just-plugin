@@ -7,6 +7,7 @@ import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.process.ProcessHandlerFactory
 import com.intellij.execution.process.ProcessTerminatedListener
 import com.intellij.execution.runners.ExecutionEnvironment
+import com.intellij.execution.util.EnvVariablesTable
 import com.intellij.execution.util.ProgramParametersConfigurator
 import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.project.Project
@@ -20,7 +21,6 @@ import com.intellij.util.system.OS
 import org.mvnsearch.plugins.just.Just
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
 import java.io.File
-import java.util.*
 import javax.swing.Icon
 
 
@@ -65,9 +65,7 @@ class JustRunConfiguration(
         if (variables.isNullOrEmpty()) {
             return emptyMap()
         }
-        val properties = Properties()
-        properties.load(variables.reader())
-        return properties.map { it.key.toString().uppercase() to it.value.toString() }.toMap()
+        return EnvVariablesTable.parseEnvsFromText(variables)
     }
 
     override fun getConfigurationEditor(): JustRunSettingsEditor {
