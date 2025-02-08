@@ -1,12 +1,10 @@
 package org.mvnsearch.plugins.just.lang.run
 
-import com.intellij.execution.configuration.EnvironmentVariablesDialog
 import com.intellij.execution.configuration.EnvironmentVariablesTextFieldWithBrowseButton
 import com.intellij.ide.macro.MacrosDialog
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.ui.LabeledComponent
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
-import com.intellij.ui.components.JBTextArea
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.components.fields.ExtendableTextField
 import javax.swing.BoxLayout
