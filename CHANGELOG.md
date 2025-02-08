@@ -10,6 +10,7 @@
 
 - Adjust native environment variables dialog to set recipe's env 
 - Add multi attributes as a single line support: `[no-cd, private]`
+- Disable auto format if `# @formatter:off` found
 
 ## 0.6.11 - 2025-01-17
 
