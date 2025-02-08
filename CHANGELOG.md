@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.6.13 - 2025-02-08
+
+### Added
+
+- Adjust native environment variables dialog to set recipe's env 
+
 ## 0.6.12 - 2025-01-23
 
 ### Added
