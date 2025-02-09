@@ -216,6 +216,7 @@ KEYWORD_ELSE_IF=("else if")
 
 <CONDITIONAL_BLOCK_BODY> {
     {WHITE_SPACE}+               {  yybegin(CONDITIONAL_BLOCK_BODY); return TokenType.WHITE_SPACE; }
+    {NEW_LINE}                  {  yybegin(CONDITIONAL_BLOCK_BODY); return JustTypes.NEW_LINE; }
     {INDENTED_BACKTICK}          {  yybegin(CONDITIONAL_BLOCK_BODY); return INDENTED_BACKTICK; }
     {INDENTED_RAW_STRING}        {  yybegin(CONDITIONAL_BLOCK_BODY); return INDENTED_RAW_STRING; }
     {INDENTED_STRING}            {  yybegin(CONDITIONAL_BLOCK_BODY); return INDENTED_STRING; }
@@ -234,6 +235,7 @@ KEYWORD_ELSE_IF=("else if")
 
 <CONDITIONAL_END> {
    {WHITE_SPACE}+               {  yybegin(CONDITIONAL_END); return TokenType.WHITE_SPACE; }
+   {NEW_LINE}                   {  yybegin(CONDITIONAL_END); return JustTypes.NEW_LINE; }
    {OPEN_BRACE}                 {  yybegin(CONDITIONAL_END); return OPEN_BRACE; }
    {INDENTED_BACKTICK}          {  yybegin(CONDITIONAL_END); return INDENTED_BACKTICK; }
    {INDENTED_RAW_STRING}        {  yybegin(CONDITIONAL_END); return INDENTED_RAW_STRING; }
@@ -249,7 +251,6 @@ KEYWORD_ELSE_IF=("else if")
    {SLASH}                  {  yybegin(CONDITIONAL_END); return SLASH; }
    {COMMA}                    {  yybegin(CONDITIONAL_END); return COMMA; }
    {CLOSE_BRACE}                {  yybegin(YYINITIAL); return JustTypes.CLOSE_BRACE; }
-   {NEW_LINE}                   {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
 }
 
 <PARAMS> {
