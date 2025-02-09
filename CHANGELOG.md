@@ -7,7 +7,8 @@
 ## 0.6.12 - 2025-02-08
 
 ### Added
-
+      
+- Rewrite lexer for conditional block: **nested conditional block Not Supported now**, please use two expressions instead
 - Adjust native environment variables dialog to set recipe's env 
 - Add multi attributes as a single line support: `[no-cd, private]`
 - Disable auto format if `# @formatter:off` found
