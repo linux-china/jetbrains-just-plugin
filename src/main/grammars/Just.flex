@@ -54,7 +54,6 @@ RAW_STRING=('[^']*')
 INDENTED_RAW_STRING=(''')([']{0,2}([^']))*(''')
 STRING=(\"[^\"]*\")
 INDENTED_STRING=(\"\"\")([\"]{0,2}([^\"]))*(\"\"\")
-CONDITIONAL_BLOCK=(\{[^}]*\})
 EXPORT_NAME=[a-zA-Z_][a-zA-Z0-9_\-]*
 ATTRIBUTE_NAME=([a-zA-Z0-9_\-]+)
 ID_LITERAL=[a-zA-Z_][a-zA-Z0-9_\-]*
@@ -85,7 +84,7 @@ KEYWORD_IF=(if)
 KEYWORD_ELSE=(else)
 KEYWORD_ELSE_IF=("else if")
 
-%state MOD IMPORT ALIAS VARIABLE CONDITIONAL CONDITIONAL_END EXPORT EXPORT_VALUE SET SET_VALUE ATTRIBUTE RECIPE PARAMS PARAM_WITH_VALUE PARAM_WITH_VALUE_FUNCTION_CALL DEPENDENCIES DEPENDENCY_WITH_PARAMS DEPENDENCY_CALL_PARAMS
+%state MOD IMPORT ALIAS VARIABLE CONDITIONAL CONDITIONAL_BLOCK_BODY CONDITIONAL_END EXPORT EXPORT_VALUE SET SET_VALUE ATTRIBUTE RECIPE PARAMS PARAM_WITH_VALUE PARAM_WITH_VALUE_FUNCTION_CALL DEPENDENCIES DEPENDENCY_WITH_PARAMS DEPENDENCY_CALL_PARAMS
 
 %%
 
@@ -194,7 +193,7 @@ KEYWORD_ELSE_IF=("else if")
   {REEQ}                     {  yybegin(CONDITIONAL); return REEQ; }
   {OR}                       {  yybegin(CONDITIONAL); return OR; }
   {AND}                      {  yybegin(CONDITIONAL); return AND; }
-  {CONDITIONAL_BLOCK}        {  yybegin(CONDITIONAL); return CONDITIONAL_BLOCK; }
+  {KEYWORD_IF}               {  yybegin(CONDITIONAL); return KEYWORD_IF; }
   {KEYWORD_ELSE}             {  yybegin(CONDITIONAL_END); return KEYWORD_ELSE; }
   {KEYWORD_ELSE_IF}           {  yybegin(CONDITIONAL); return KEYWORD_ELSE_IF; }
   {INDENTED_BACKTICK}          {  yybegin(CONDITIONAL); return INDENTED_BACKTICK; }
@@ -207,16 +206,50 @@ KEYWORD_ELSE_IF=("else if")
   {ID_LITERAL}                    {  yybegin(CONDITIONAL); return ID_LITERAL; }
   {PLUS}               {  yybegin(CONDITIONAL); return PLUS; }
   {SLASH}               {  yybegin(CONDITIONAL); return SLASH; }
+  {OPEN_BRACE}               {  yybegin(CONDITIONAL_BLOCK_BODY); return OPEN_BRACE; }
+  {CLOSE_BRACE}               {  yybegin(CONDITIONAL); return CLOSE_BRACE; }
   {OPEN_PAREN}               {  yybegin(CONDITIONAL); return OPEN_PAREN; }
   {CLOSE_PAREN}               {  yybegin(CONDITIONAL); return CLOSE_PAREN; }
   {COMMA}                    {  yybegin(CONDITIONAL); return COMMA; }
   {NEW_LINE}                  {  yybegin(CONDITIONAL); return JustTypes.NEW_LINE; }
 }
 
+<CONDITIONAL_BLOCK_BODY> {
+    {WHITE_SPACE}+               {  yybegin(CONDITIONAL_BLOCK_BODY); return TokenType.WHITE_SPACE; }
+    {INDENTED_BACKTICK}          {  yybegin(CONDITIONAL_BLOCK_BODY); return INDENTED_BACKTICK; }
+    {INDENTED_RAW_STRING}        {  yybegin(CONDITIONAL_BLOCK_BODY); return INDENTED_RAW_STRING; }
+    {INDENTED_STRING}            {  yybegin(CONDITIONAL_BLOCK_BODY); return INDENTED_STRING; }
+    {STRING}                     {  yybegin(CONDITIONAL_BLOCK_BODY); return STRING; }
+    {X_INDICATOR}/ {STRING_STARTER}   {  yybegin(CONDITIONAL_BLOCK_BODY); return X_INDICATOR; }
+    {RAW_STRING}                 {  yybegin(CONDITIONAL_BLOCK_BODY); return RAW_STRING; }
+    {BACKTICK}                   {  yybegin(CONDITIONAL_BLOCK_BODY); return BACKTICK; }
+    {ID_LITERAL}                 {  yybegin(CONDITIONAL_BLOCK_BODY); return ID_LITERAL; }
+    {OPEN_PAREN}               {  yybegin(CONDITIONAL_BLOCK_BODY); return OPEN_PAREN; }
+    {CLOSE_PAREN}               {  yybegin(CONDITIONAL_BLOCK_BODY); return CLOSE_PAREN; }
+    {PLUS}                    {  yybegin(CONDITIONAL_BLOCK_BODY); return PLUS; }
+    {SLASH}                  {  yybegin(CONDITIONAL_BLOCK_BODY); return SLASH; }
+    {COMMA}                    {  yybegin(CONDITIONAL_BLOCK_BODY); return COMMA; }
+    {CLOSE_BRACE}                {  yybegin(CONDITIONAL); return CLOSE_BRACE; }
+}
+
 <CONDITIONAL_END> {
-   {WHITE_SPACE}+             {  yybegin(CONDITIONAL_END); return TokenType.WHITE_SPACE; }
-   {NEW_LINE}                  {  yybegin(CONDITIONAL_END); return JustTypes.NEW_LINE; }
-   {CONDITIONAL_BLOCK}        {  yybegin(YYINITIAL); return CONDITIONAL_BLOCK; }
+   {WHITE_SPACE}+               {  yybegin(CONDITIONAL_END); return TokenType.WHITE_SPACE; }
+   {OPEN_BRACE}                 {  yybegin(CONDITIONAL_END); return OPEN_BRACE; }
+   {INDENTED_BACKTICK}          {  yybegin(CONDITIONAL_END); return INDENTED_BACKTICK; }
+   {INDENTED_RAW_STRING}        {  yybegin(CONDITIONAL_END); return INDENTED_RAW_STRING; }
+   {INDENTED_STRING}            {  yybegin(CONDITIONAL_END); return INDENTED_STRING; }
+   {STRING}                     {  yybegin(CONDITIONAL_END); return STRING; }
+   {X_INDICATOR}/ {STRING_STARTER}   {  yybegin(CONDITIONAL_END); return X_INDICATOR; }
+   {RAW_STRING}                 {  yybegin(CONDITIONAL_END); return RAW_STRING; }
+   {BACKTICK}                   {  yybegin(CONDITIONAL_END); return BACKTICK; }
+   {ID_LITERAL}                 {  yybegin(CONDITIONAL_END); return ID_LITERAL; }
+   {OPEN_PAREN}               {  yybegin(CONDITIONAL_END); return OPEN_PAREN; }
+   {CLOSE_PAREN}               {  yybegin(CONDITIONAL_END); return CLOSE_PAREN; }
+   {PLUS}                    {  yybegin(CONDITIONAL_END); return PLUS; }
+   {SLASH}                  {  yybegin(CONDITIONAL_END); return SLASH; }
+   {COMMA}                    {  yybegin(CONDITIONAL_END); return COMMA; }
+   {CLOSE_BRACE}                {  yybegin(YYINITIAL); return JustTypes.CLOSE_BRACE; }
+   {NEW_LINE}                   {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
 }
 
 <PARAMS> {
