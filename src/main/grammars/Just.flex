@@ -39,6 +39,7 @@ PLUS = ("+")
 SLASH = ("/")
 OR = ("||")
 AND = ("&&")
+DUOBLE_COLON=("::")
 OPEN_BRACE = [{]
 CLOSE_BRACE = [}]
 OPEN_BRACKET = ("[")
@@ -113,6 +114,7 @@ KEYWORD_ELSE_IF=("else if")
   {WHITE_SPACE}+     {  yybegin(ALIAS); return TokenType.WHITE_SPACE; }
   {ASSIGN}           {  yybegin(ALIAS); return ASSIGN; }
   {RECIPE_NAME}      {  yybegin(ALIAS); return RECIPE_NAME; }
+  {DUOBLE_COLON}      {  yybegin(ALIAS); return DUOBLE_COLON; }
   {COMMENT}         {  yybegin(ALIAS); return JustTypes.COMMENT; }
   {NEW_LINE}         {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
 }

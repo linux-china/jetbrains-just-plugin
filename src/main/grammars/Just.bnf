@@ -29,6 +29,7 @@
       REEQ='regexp:=~'
       OR='regexp:=\|\|'
       AND='regexp:=&&'
+      DUOBLE_COLON='regexp:=(::)'
       PLUS='regexp:=+'
       SLASH='regexp:=/'
       X_INDICATOR='regexp:=x'
@@ -104,7 +105,7 @@ IMPORT_PATH ::=  TEXT_ITEM
 // export statement
 EXPORT_STATEMENT ::= KEYWORD_EXPORT EXPORT_NAME ASSIGN (EXPRESSION | ID_LITERAL)+
 // alias statement
-ALIAS_STATEMENT ::= KEYWORD_ALIAS RECIPE_NAME ASSIGN RECIPE_NAME
+ALIAS_STATEMENT ::= KEYWORD_ALIAS RECIPE_NAME ASSIGN RECIPE_NAME (DUOBLE_COLON RECIPE_NAME)*
 // set statement
 SET_STATEMENT ::= KEYWORD_SET SETTING ASSIGN? (BOOL_LITERAL | STRING_LIST | TEXT_ITEM)?
 // variable statement
