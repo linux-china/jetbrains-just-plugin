@@ -4,12 +4,19 @@
 
 ## Unreleased
 
+## 0.6.13 - 2025-03-24
+
+### Added
+
+- Add submodule support in alias: `alias baz := foo::bar`
+
 ## 0.6.12 - 2025-02-08
 
 ### Added
-      
-- Rewrite lexer for conditional block: **nested conditional block Not Supported now**, please use two expressions instead
-- Adjust native environment variables dialog to set recipe's env 
+
+- Rewrite lexer for conditional block: **nested conditional block Not Supported now**, please use two expressions
+  instead
+- Adjust native environment variables dialog to set recipe's env
 - Add multi attributes as a single line support: `[no-cd, private]`
 - Disable auto format if `# @formatter:off` found
 
