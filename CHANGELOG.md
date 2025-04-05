@@ -4,6 +4,13 @@
 
 ## Unreleased
 
+## 0.6.14 - 2025-04-05
+
+### Fixed
+
+- Fix x-string for recipe attribute
+- Fix WSL working directory problem
+
 ## 0.6.13 - 2025-03-24
 
 ### Added
