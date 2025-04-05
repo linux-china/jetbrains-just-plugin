@@ -330,6 +330,7 @@ KEYWORD_ELSE_IF=("else if")
  {SEPERATOR}                           {  yybegin(ATTRIBUTE); return SEPERATOR; }
  {COMMA}                               {  yybegin(ATTRIBUTE); return COMMA; }
  {OPEN_PAREN}                           {  yybegin(ATTRIBUTE); return OPEN_PAREN; }
+ {X_INDICATOR}/ {STRING_STARTER}        {  yybegin(ATTRIBUTE); return X_INDICATOR; }
  {STRING}                                {  yybegin(ATTRIBUTE); return STRING; }
  {RAW_STRING}                            {  yybegin(ATTRIBUTE); return RAW_STRING; }
  {CLOSE_PAREN}                           {  yybegin(ATTRIBUTE); return CLOSE_PAREN; }
