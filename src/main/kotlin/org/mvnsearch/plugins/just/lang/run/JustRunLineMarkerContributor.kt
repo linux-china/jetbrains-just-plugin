@@ -95,7 +95,7 @@ fun runJustCommand(
     val initialCommandLine = GeneralCommandLine(ParametersListUtil.parse(commandString, false, true))
         .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
         .withEnvironment("JUST_UNSTABLE", "1")
-        .withWorkDirectory(workDirectory.path)
+        .withWorkDirectory(workDirectory.toNioPath().toFile())
     // add project SDK bin directory to PATH
     injectProjectSdkIntoPath(project, initialCommandLine)
     val commandLine =

@@ -127,7 +127,7 @@ class JustRunConfiguration(
                 val commandLine = GeneralCommandLine(command)
                     .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
                     .withEnvironment("JUST_UNSTABLE", "1")
-                    .withWorkDirectory(File(project.basePath!!))
+                    .withWorkDirectory(project.guessProjectDir()!!.toNioPath().toFile())
                 val envVariables = getEnvVariablesAsMap()
                 if (envVariables.isNotEmpty()) {
                     commandLine.environment.putAll(envVariables)
