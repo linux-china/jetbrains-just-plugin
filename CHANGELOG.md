@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.6.15 - 2025-04-08
+
+### Fixed
+
+- Fixed syntax error for` *$ARGS` param name
+
 ## 0.6.14 - 2025-04-05
 
 ### Fixed
