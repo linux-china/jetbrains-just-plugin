@@ -68,7 +68,7 @@ DOUBLE_AND=("&&")
 VARIABLE=([a-zA-Z_][a-zA-Z0-9_-]*)
 VARIABLE_DECLARE=([a-zA-Z_][a-zA-Z0-9_-]*)(\s*)(":=")
 RECIPE_PARAMS=([^:\n]*)
-RECIPE_PARAM_NAME=[$*+]?[a-zA-Z_][a-zA-Z0-9_\-]*
+RECIPE_PARAM_NAME=[*+]?[$]?[a-zA-Z_][a-zA-Z0-9_\-]*
 RECIPE_SIMPLE_PARARM1=[$*+]?[a-zA-Z_][a-zA-Z0-9_\-]*
 RECIPE_SIMPLE_PARARM2=[$*+]?[a-zA-Z_][a-zA-Z0-9_\-]*=[a-zA-Z0-9_\-]*
 RECIPE_PAIR_PARARM1=[$*+]?[a-zA-Z_][a-zA-Z0-9_\-]*='[^':]*'
