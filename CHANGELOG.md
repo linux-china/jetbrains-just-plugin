@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.6.16 - 2025-04-17
+
+### Fixed
+
+- Add `JUST_SH_PATH` from `Settings -> Path Variables` to run a recipe with custom PATH
+
 ## 0.6.15 - 2025-04-08
 
 ### Fixed
