@@ -57,9 +57,11 @@ class RunJustRecipeAction(private val recipeName: String, private val text: Stri
         val project = e.project!!
         val justCmdPath = Just.getJustCmdAbsolutionPath(project)
         val commandString = "$justCmdPath $recipeName"
-        val workDirectory = project.guessProjectDir()!!
-        val justfile = e.getData(CommonDataKeys.VIRTUAL_FILE)!!
-        runJustCommand(project, workDirectory, justfile, commandString, e.dataContext)
+        val justfile = e.getData(CommonDataKeys.VIRTUAL_FILE)
+        if (justfile != null) {
+            val workDirectory = project.guessProjectDir()!!
+            runJustCommand(project, workDirectory, justfile, commandString, e.dataContext)
+        }
     }
 
     override fun update(e: AnActionEvent) {
