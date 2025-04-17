@@ -21,7 +21,7 @@ import com.intellij.util.execution.ParametersListUtil
 import org.mvnsearch.plugins.just.Just
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
 import org.mvnsearch.plugins.just.lang.psi.JustFile
-import org.mvnsearch.plugins.just.lang.run.JustRunConfiguration.Companion.injectProjectSdkIntoPath
+import org.mvnsearch.plugins.just.lang.run.JustRunConfiguration.Companion.adjustCommandLinePath
 import javax.swing.Icon
 
 class JustRunAnythingProvider : RunAnythingCommandLineProvider() {
@@ -66,7 +66,7 @@ class JustRunAnythingProvider : RunAnythingCommandLineProvider() {
             .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
             .withEnvironment("JUST_COLOR", justColor)
             .withWorkDirectory(workDirectory.toNioPath().toFile())
-        injectProjectSdkIntoPath(project, initialCommandLine)
+        adjustCommandLinePath(project, initialCommandLine)
         val newCommandLine =
             RunAnythingCommandCustomizer.customizeCommandLine(commandDataContext, workDirectory, initialCommandLine)
         try {

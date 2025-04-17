@@ -9,15 +9,14 @@ import com.intellij.execution.process.ProcessTerminatedListener
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.util.EnvVariablesTable
 import com.intellij.execution.util.ProgramParametersConfigurator
+import com.intellij.openapi.application.PathMacros
 import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.isFile
-import com.intellij.util.EnvironmentUtil
 import com.intellij.util.execution.ParametersListUtil
-import com.intellij.util.system.OS
 import org.mvnsearch.plugins.just.Just
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
 import java.io.File
@@ -144,32 +143,42 @@ class JustRunConfiguration(
     }
 
     companion object {
-        fun injectProjectSdkIntoPath(project: Project, commandLine: GeneralCommandLine) {
+        fun adjustCommandLinePath(project: Project, commandLine: GeneralCommandLine) {
+            val justShPath = PathMacros.getInstance().getValue("JUST_SH_PATH")
+            if (justShPath != null) {
+                var newPathValue = PathEnvironmentVariableUtil.getPathVariableValue()
+                newPathValue = if (newPathValue.isNullOrEmpty()) {
+                    justShPath
+                } else {
+                    "$justShPath${File.pathSeparator}$newPathValue"
+                }
+                commandLine.withEnvironment("PATH", newPathValue)
+            }
+            injectProjectSdkIntoPath(project, commandLine)
+        }
+
+        private fun injectProjectSdkIntoPath(project: Project, commandLine: GeneralCommandLine) {
             val projectSdk = ProjectRootManager.getInstance(project).projectSdk
             if (projectSdk != null) {
-                var homeDirectory = projectSdk.homeDirectory
+                val homeDirectory = projectSdk.homeDirectory
                 if (homeDirectory != null) {
-                    val pair = getPathWithProjectSdk(homeDirectory)
+                    val pair = getPathWithProjectSdk(homeDirectory, commandLine)
                     commandLine.environment.put(pair.first, pair.second)
                 }
             }
         }
 
-        fun getPathWithProjectSdk(sdkHome: VirtualFile): Pair<String, String> {
+        private fun getPathWithProjectSdk(sdkHome: VirtualFile, commandLine: GeneralCommandLine): Pair<String, String> {
             var homeDirectory = sdkHome
             if (homeDirectory.isFile) {
                 homeDirectory = homeDirectory.parent!!
             }
-            var pathEnvName = "PATH"
-            if (OS.CURRENT == OS.Windows) {
-                pathEnvName = "Path"
-            }
-            val pathVariable = EnvironmentUtil.getValue(pathEnvName)!!
+            val pathVariable = commandLine.environment["PATH"] ?: PathEnvironmentVariableUtil.getPathVariableValue()!!
             val binDir = homeDirectory.findChild("bin")
             return if (binDir != null && binDir.exists()) {
-                pathEnvName to (binDir.path + File.pathSeparator + pathVariable)
+                "PATH" to (binDir.path + File.pathSeparator + pathVariable)
             } else {
-                pathEnvName to (homeDirectory.path + File.pathSeparator + pathVariable)
+                "PATH" to (homeDirectory.path + File.pathSeparator + pathVariable)
             }
         }
     }

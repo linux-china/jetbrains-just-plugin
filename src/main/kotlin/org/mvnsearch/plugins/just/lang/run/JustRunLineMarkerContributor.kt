@@ -3,6 +3,7 @@ package org.mvnsearch.plugins.just.lang.run
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.configurations.GeneralCommandLine
+import com.intellij.execution.configurations.PathEnvironmentVariableUtil
 import com.intellij.execution.configurations.PtyCommandLine
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.lineMarker.RunLineMarkerProvider
@@ -12,9 +13,11 @@ import com.intellij.ide.actions.runAnything.commands.RunAnythingCommandCustomize
 import com.intellij.ide.actions.runAnything.execution.RunAnythingRunProfile
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext
+import com.intellij.openapi.application.PathMacros
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
@@ -24,7 +27,7 @@ import org.mvnsearch.plugins.just.Just
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
 import org.mvnsearch.plugins.just.ide.icons.JustIcons.JUST_FILE
 import org.mvnsearch.plugins.just.lang.psi.JustTypes
-import org.mvnsearch.plugins.just.lang.run.JustRunConfiguration.Companion.injectProjectSdkIntoPath
+import org.mvnsearch.plugins.just.lang.run.JustRunConfiguration.Companion.adjustCommandLinePath
 import org.mvnsearch.plugins.just.parseRecipeName
 import javax.swing.Icon
 
@@ -96,8 +99,8 @@ fun runJustCommand(
         .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
         .withEnvironment("JUST_UNSTABLE", "1")
         .withWorkDirectory(workDirectory.toNioPath().toFile())
-    // add project SDK bin directory to PATH
-    injectProjectSdkIntoPath(project, initialCommandLine)
+    // adjust PATH
+    adjustCommandLinePath(project, initialCommandLine)
     val commandLine =
         RunAnythingCommandCustomizer.customizeCommandLine(commandDataContext, workDirectory, initialCommandLine)
     try {
