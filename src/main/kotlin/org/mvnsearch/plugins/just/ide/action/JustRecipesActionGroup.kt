@@ -30,7 +30,7 @@ open class JustRecipesActionGroup(private val justfileName: String) : ActionGrou
         val result = mutableListOf<AnAction>()
         val projectDir = project.guessProjectDir()!!
         val builder = ProcessBuilder()
-        builder.command(Just.getJustCmdAbsolutionPath(project), "--color=never", "-l")
+        builder.command(Just.getJustCmdAbsolutionPath(project), "--color=never", "-l", "--unsorted")
         builder.directory(projectDir.toNioPath().toFile())
         val process = builder.start()
         val reader = BufferedReader(InputStreamReader(process.inputStream))
