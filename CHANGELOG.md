@@ -4,6 +4,14 @@
 
 ## Unreleased
 
+## 0.6.18 - 2025-07-14
+
+### Fixed
+
+- Compatible with JetBrains IDE 2025.2
+- Add `[metadata]` and `[parallel]` support
+- Add `dotenv-override` setting
+
 ## 0.6.17 - 2025-06-15
 
 ### Fixed
