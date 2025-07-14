@@ -11,6 +11,7 @@
 - Compatible with JetBrains IDE 2025.2
 - Add `[metadata]` and `[parallel]` support
 - Add `dotenv-override` setting
+- Add `\"` escape support for String
 
 ## 0.6.17 - 2025-06-15
 
