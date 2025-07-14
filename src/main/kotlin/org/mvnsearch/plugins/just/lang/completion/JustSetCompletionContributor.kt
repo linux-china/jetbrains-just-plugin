@@ -28,6 +28,7 @@ class JustSetCompletionContributor : CompletionContributor() {
                         result.addElement(LookupElementBuilder.create("dotenv-load := true").withPresentableText("dotenv-load"))
                         result.addElement(LookupElementBuilder.create("dotenv-required"))
                         result.addElement(LookupElementBuilder.create("dotenv-filename := \"\""))
+                        result.addElement(LookupElementBuilder.create("dotenv-override := true"))
                         result.addElement(LookupElementBuilder.create("dotenv-path := \"\""))
                         result.addElement(LookupElementBuilder.create("ignore-comments"))
                         result.addElement(LookupElementBuilder.create("export"))
