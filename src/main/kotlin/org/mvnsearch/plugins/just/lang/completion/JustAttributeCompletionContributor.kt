@@ -2,7 +2,6 @@ package org.mvnsearch.plugins.just.lang.completion
 
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElementBuilder
-import com.intellij.icons.AllIcons
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.elementType
@@ -40,6 +39,8 @@ class JustAttributeCompletionContributor : CompletionContributor() {
                         result.addElement(LookupElementBuilder.create("positional-arguments"))
                         result.addElement(LookupElementBuilder.create("script"))
                         result.addElement(LookupElementBuilder.create("extension"))
+                        result.addElement(LookupElementBuilder.create("metadata"))
+                        result.addElement(LookupElementBuilder.create("parallel"))
                     }
                 }
             }
