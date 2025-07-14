@@ -4,6 +4,13 @@
 
 ## Unreleased
 
+## 0.6.17 - 2025-06-15
+
+### Fixed
+
+- add `--unsorted` for available recipes
+- Compatible with JetBrains IDE 2025.1
+
 ## 0.6.16 - 2025-04-17
 
 ### Fixed
