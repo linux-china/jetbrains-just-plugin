@@ -266,6 +266,8 @@ KEYWORD_ELSE_IF=("else if")
   {STRING}                    {  yybegin(PARAMS); return STRING; }
   {X_INDICATOR}/ {STRING_STARTER}  {  yybegin(PARAMS); return X_INDICATOR; }
   {RAW_STRING}                {  yybegin(PARAMS); return RAW_STRING; }
+  {PLUS}                       {  yybegin(PARAMS); return PLUS; }
+  {SLASH}                       {  yybegin(PARAMS); return SLASH; }
   {BACKTICK}                  {  yybegin(PARAMS); return BACKTICK; }
   {ID_LITERAL} / {OPEN_PAREN}   {  yybegin(PARAM_WITH_VALUE_FUNCTION_CALL); return ID_LITERAL; }
   {ID_LITERAL}                  {  yybegin(PARAMS); return ID_LITERAL; }
@@ -313,14 +315,14 @@ KEYWORD_ELSE_IF=("else if")
  {STRING}                                {  yybegin(DEPENDENCY_CALL_PARAMS); return STRING; }
  {RAW_STRING}                            {  yybegin(DEPENDENCY_CALL_PARAMS); return RAW_STRING; }
  {BACKTICK}                              {  yybegin(DEPENDENCY_CALL_PARAMS); return BACKTICK; }
- {PLUS}                          {  yybegin(DEPENDENCY_WITH_PARAMS); return PLUS; }
- {SLASH}                          {  yybegin(DEPENDENCY_WITH_PARAMS); return SLASH; }
- {OR}                          {  yybegin(DEPENDENCY_WITH_PARAMS); return OR; }
- {AND}                          {  yybegin(DEPENDENCY_WITH_PARAMS); return AND; }
- {OPEN_PAREN}                          {  yybegin(DEPENDENCY_WITH_PARAMS); return OPEN_PAREN; }
- {COMMA}                          {  yybegin(DEPENDENCY_WITH_PARAMS); return COMMA; }
- {ID_LITERAL}                              {  yybegin(DEPENDENCY_CALL_PARAMS); return ID_LITERAL; }
- {X_INDICATOR}/ {STRING_STARTER}        {  yybegin(DEPENDENCY_CALL_PARAMS); return X_INDICATOR; }
+ {PLUS}                                  {  yybegin(DEPENDENCY_WITH_PARAMS); return PLUS; }
+ {SLASH}                                 {  yybegin(DEPENDENCY_WITH_PARAMS); return SLASH; }
+ {OR}                                    {  yybegin(DEPENDENCY_WITH_PARAMS); return OR; }
+ {AND}                                   {  yybegin(DEPENDENCY_WITH_PARAMS); return AND; }
+ {OPEN_PAREN}                            {  yybegin(DEPENDENCY_WITH_PARAMS); return OPEN_PAREN; }
+ {COMMA}                                 {  yybegin(DEPENDENCY_WITH_PARAMS); return COMMA; }
+ {ID_LITERAL}                            {  yybegin(DEPENDENCY_CALL_PARAMS); return ID_LITERAL; }
+ {X_INDICATOR}/ {STRING_STARTER}         {  yybegin(DEPENDENCY_CALL_PARAMS); return X_INDICATOR; }
  {CLOSE_PAREN}                           {  yybegin(DEPENDENCIES); return CLOSE_PAREN; }
 }
 
