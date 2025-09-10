@@ -20,7 +20,7 @@ class JustAttributeCompletionContributor : CompletionContributor() {
                     result: CompletionResultSet
                 ) {
                     val element = parameters.originalPosition
-                    if (element.elementType == JustTypes.ATTRIBUTE) {
+                    if (element.elementType == JustTypes.ATTRIBUTE_NAME || element.elementType == JustTypes.CLOSE_BRACKET) {
                         result.addElement(LookupElementBuilder.create("linux"))
                         result.addElement(LookupElementBuilder.create("macos"))
                         result.addElement(LookupElementBuilder.create("unix"))
@@ -41,6 +41,7 @@ class JustAttributeCompletionContributor : CompletionContributor() {
                         result.addElement(LookupElementBuilder.create("extension"))
                         result.addElement(LookupElementBuilder.create("metadata"))
                         result.addElement(LookupElementBuilder.create("parallel"))
+                        result.addElement(LookupElementBuilder.create("default"))
                     }
                 }
             }
