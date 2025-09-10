@@ -4,12 +4,14 @@
 
 ## Unreleased
 
-## 0.6.19 - 2025-09-10
+## 0.6.20 - 2025-09-10
 
 ### Added
 
 - Add `JUST_EXECUTABLE` env variable and `JUST_EXECUTABLE` path variable to locate `just` binary
 - Fix path concatenation in a code block #61
+- Fix attribute completion
+- Add `default` attribute
 
 ## 0.6.18 - 2025-07-14
 
