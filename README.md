@@ -46,6 +46,7 @@ If param as command name, such as `{{MVN}} --version`, please use `exec '{{MVN}}
 # References
 
 * justfile grammar: https://github.com/casey/just/blob/master/GRAMMAR.md
+* justfile on GitHub: https://github.com/search?q=path%3A**%2Fjustfile&type=code
 * just VS Code extension: https://marketplace.visualstudio.com/items?itemName=skellock.just
 * Justfile cheat sheet: https://cheatography.com/linux-china/cheat-sheets/justfile/
 * Grammar-Kit: https://github.com/JetBrains/Grammar-Kit
