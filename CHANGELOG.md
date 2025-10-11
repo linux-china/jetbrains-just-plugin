@@ -4,6 +4,19 @@
 
 ## Unreleased
 
+## 0.6.22 - 2025-09-16
+
+### Added
+
+- Fix `Read access is allowed from inside read-action only`
+- Make "set" completion distinguish shell vs. windows-shell
+
+## 0.6.21 - 2025-09-16
+
+### Added
+
+- Compatible with JetBrains Platform 202.3
+
 ## 0.6.20 - 2025-09-10
 
 ### Added
