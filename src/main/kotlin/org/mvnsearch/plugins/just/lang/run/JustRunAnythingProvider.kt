@@ -12,10 +12,11 @@ import com.intellij.ide.actions.runAnything.items.RunAnythingItem
 import com.intellij.ide.actions.runAnything.items.RunAnythingItemBase
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.ui.Messages
-import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.util.registry.Registry
+import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.util.execution.ParametersListUtil
 import org.mvnsearch.plugins.just.Just
@@ -61,7 +62,7 @@ class JustRunAnythingProvider : RunAnythingCommandLineProvider() {
         val workDirectory = project.guessProjectDir()!!
         val commandString = Just.getJustCmdAbsolutionPath(project) + " " + commandLine.command
         val commandDataContext = RunAnythingCommandCustomizer.customizeContext(dataContext)
-        var justColor = "auto"
+        val justColor = "auto"
         val initialCommandLine = GeneralCommandLine(ParametersListUtil.parse(commandString, false, true))
             .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
             .withEnvironment("JUST_COLOR", justColor)
@@ -94,7 +95,9 @@ class JustRunAnythingProvider : RunAnythingCommandLineProvider() {
             justfile = projectDir?.findChild("Justfile")
         }
         if (justfile != null) {
-            val psiFile = PsiManager.getInstance(project!!).findFile(justfile) as JustFile
+            val psiFile = ReadAction.compute<PsiFile, Throwable> {
+                PsiManager.getInstance(project!!).findFile(justfile)
+            } as JustFile
             return psiFile.findAllRecipes().asSequence()
 
         }
