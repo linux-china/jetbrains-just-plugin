@@ -4,6 +4,14 @@
 
 ## Unreleased
 
+## 0.6.23 - 2025-10-28
+
+### Added
+
+- Use `Justfile` instead of `justfile` because some LLMs use `Justfile` by default.
+- Add name and path navigation for `mod` to
+  fix [Go to definition for modules](https://github.com/linux-china/jetbrains-just-plugin/issues/67)
+
 ## 0.6.22 - 2025-09-16
 
 ### Added
