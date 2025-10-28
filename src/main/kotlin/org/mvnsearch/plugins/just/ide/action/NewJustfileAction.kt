@@ -166,11 +166,11 @@ class NewJustfileAction : AnAction() {
             } else {
                 psiElement as PsiDirectory
             }
-            val justFile = psiDirectory.findFile("justfile")
+            val justFile = psiDirectory.findFile("Justfile")
             if (justFile == null) {
                 val destDir = psiDirectory.virtualFile
                 ApplicationManager.getApplication().runWriteAction {
-                    val newJustfile = destDir.createChildData(psiElement, "justfile")
+                    val newJustfile = destDir.createChildData(psiElement, "Justfile")
                     newJustfile.getOutputStream(psiElement).use {
                         it.write(content.toByteArray())
                         it.flush()
