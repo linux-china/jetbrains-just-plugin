@@ -2,6 +2,7 @@ package org.mvnsearch.plugins.just.ide.icons
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.util.IconLoader
+import javax.swing.Icon
 
 object JustIcons {
     val JUST_FILE = IconLoader.findIcon("/icons/just-16x16.svg", JustIcons::class.java.classLoader)!!
@@ -12,4 +13,6 @@ object JustIcons {
     val MOD_ICON = AllIcons.Nodes.Module
     var EXPORT_ICON = AllIcons.Nodes.Gvariable
     var IMPORT_ICON = AllIcons.ToolbarDecorator.Import
+    var Python: Icon = IconLoader.findIcon("/icons/python.svg", JustIcons::class.java.classLoader)!!
+    var Ruby: Icon = IconLoader.findIcon("/icons/ruby.svg", JustIcons::class.java.classLoader)!!
 }
