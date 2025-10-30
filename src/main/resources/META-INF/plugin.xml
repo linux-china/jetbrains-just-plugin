@@ -14,8 +14,8 @@
                   language="Just" fileNames="justfile;Justfile;.justfile,.Justfile"/>
         <codeInsight.lineMarkerProvider language="Just"
                                         implementationClass="org.mvnsearch.plugins.just.lang.run.JustRunLineMarkerContributor"/>
-<!--        <codeInsight.lineMarkerProvider language="Just"-->
-<!--                                        implementationClass="org.mvnsearch.plugins.just.lang.marker.CommandLineMarkerProvider"/>-->
+        <codeInsight.lineMarkerProvider language="Just"
+                                        implementationClass="org.mvnsearch.plugins.just.lang.marker.ShebangMarkerProvider"/>
 
         <codeInsight.parameterNameHints
                 language="Just"
