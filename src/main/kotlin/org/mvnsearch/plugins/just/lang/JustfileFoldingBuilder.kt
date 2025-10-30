@@ -3,10 +3,9 @@ package org.mvnsearch.plugins.just.lang
 import com.intellij.lang.ASTNode
 import com.intellij.lang.folding.FoldingBuilderEx
 import com.intellij.lang.folding.FoldingDescriptor
-import com.intellij.lang.folding.FoldingDescriptor.EMPTY
+import com.intellij.lang.folding.FoldingDescriptor.EMPTY_ARRAY
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.project.DumbAware
-import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import org.mvnsearch.plugins.just.lang.psi.JustFile
@@ -20,7 +19,7 @@ class JustfileFoldingBuilder : FoldingBuilderEx(), DumbAware {
 
     override fun buildFoldRegions(root: PsiElement, document: Document, quick: Boolean): Array<FoldingDescriptor> {
         if (root !is JustFile) {
-            return EMPTY
+            return EMPTY_ARRAY
         }
         return PsiTreeUtil.findChildrenOfAnyType(
             root,
