@@ -3,7 +3,6 @@ package org.mvnsearch.plugins.just.lang.marker
 import com.intellij.codeInsight.daemon.GutterName
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor
-import com.intellij.icons.AllIcons
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
@@ -12,7 +11,7 @@ import org.mvnsearch.plugins.just.ide.icons.JustIcons
 import org.mvnsearch.plugins.just.lang.psi.JustTypes
 
 
-class CommandLineMarkerProvider : LineMarkerProviderDescriptor() {
+class ShebangMarkerProvider : LineMarkerProviderDescriptor() {
     override fun getName(): @GutterName String {
         return "Shebang"
     }
@@ -23,14 +22,20 @@ class CommandLineMarkerProvider : LineMarkerProviderDescriptor() {
             val lines = elementText.trim().lines()
             val firstLine = lines.first().trim()
             if (firstLine.startsWith("#!")) {
-                var icon = AllIcons.Nodes.Console
-                var hint = "Bash"
+                var icon = JustIcons.Bash
+                var hint = "Shell"
                 if (firstLine.contains("python") || firstLine.contains(" uv")) {
                     icon = JustIcons.Python
                     hint = "Python"
                 } else if (firstLine.contains("ruby")) {
                     icon = JustIcons.Ruby
                     hint = "Ruby"
+                } else if (firstLine.contains("bun")) {
+                    icon = JustIcons.Bun
+                    hint = "Bun"
+                } else if (firstLine.contains("nu")) {
+                    icon = JustIcons.Nushell
+                    hint = "Nushell"
                 }
                 val offset = elementText.indexOf(firstLine)
                 val elementStartOffset = psiElement.textRange.startOffset
