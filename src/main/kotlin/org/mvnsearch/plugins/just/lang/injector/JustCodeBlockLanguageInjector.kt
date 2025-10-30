@@ -16,9 +16,11 @@ import org.mvnsearch.plugins.just.lang.psi.JustRecipeStatement
 
 class JustCodeBlockLanguageInjector : MultiHostInjector {
     private var shellLanguage: Language? = null
+    private var sqlLanguage: Language? = null
 
     init {
-        shellLanguage = Language.findLanguageByID("Shell Script");
+        sqlLanguage = Language.findLanguageByID("SQL")
+        shellLanguage = Language.findLanguageByID("Shell Script")
         if (shellLanguage == null) {
             shellLanguage = Language.findLanguageByID("BashPro Shell Script")
         }
@@ -27,9 +29,9 @@ class JustCodeBlockLanguageInjector : MultiHostInjector {
 
     override fun getLanguagesToInject(registrar: MultiHostRegistrar, context: PsiElement) {
         if (shellLanguage != null) {
-            val text = context.text
             val justFile = context.containingFile as JustFile
             if (justFile.isBashAlike()) { // validate global shell setting
+                val text = context.text
                 if (isShellCode(text.trim())) {
                     var injectionScript = justFile.getExportedVariables().joinToString(separator = "") { "$it=''\n" }
                     val recipeStatement = context.parentOfType<JustRecipeStatement>()
@@ -63,6 +65,20 @@ class JustCodeBlockLanguageInjector : MultiHostInjector {
                             registrar.doneInjecting()
                         }
                     }
+                }
+            } else if (sqlLanguage != null && justFile.isSQLAlike()) {
+                val text = context.text
+                val offset = text.indexOfFirst { !INDENT_CHARS.contains(it) }
+                if (offset > 0) {
+                    val injectionTextRange = TextRange(offset, context.textLength)
+                    registrar.startInjecting(sqlLanguage!!)
+                    registrar.addPlace(
+                        null,
+                        null,
+                        context as PsiLanguageInjectionHost,
+                        injectionTextRange
+                    )
+                    registrar.doneInjecting()
                 }
             }
         }
