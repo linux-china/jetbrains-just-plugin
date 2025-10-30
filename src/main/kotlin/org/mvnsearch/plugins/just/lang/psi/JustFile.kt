@@ -55,6 +55,14 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
         return shellItem?.text?.contains("sh\"") ?: true
     }
 
+    fun isSQLAlike(): Boolean {
+        val shellItem = this.children
+            .filterIsInstance<JustSetStatement>().firstOrNull() {
+                it.setting.text == "shell"
+            }
+        return shellItem?.text?.contains("duckdb") ?: true
+    }
+
     fun getExportedVariables(): List<String> {
         return this.children
             .filterIsInstance<JustExportStatement>()
