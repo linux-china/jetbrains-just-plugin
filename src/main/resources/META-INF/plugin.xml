@@ -11,7 +11,7 @@
                   implementationClass="org.mvnsearch.plugins.just.lang.psi.JustFileType"
                   fieldName="INSTANCE" fileNamesCaseInsensitive="false"
                   extensions="just"
-                  language="Just" fileNames="justfile;Justfile;.justfile"/>
+                  language="Just" fileNames="justfile;Justfile;.justfile,.Justfile"/>
         <codeInsight.lineMarkerProvider language="Just"
                                         implementationClass="org.mvnsearch.plugins.just.lang.run.JustRunLineMarkerContributor"/>
         <codeInsight.parameterNameHints
