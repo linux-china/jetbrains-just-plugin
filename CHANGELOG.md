@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.6.24 - 2025-10-28
+
+### Fixed
+
+- Fix mod file resolve problem: support `foo.just`, `foo/mod.just`, `foo/Justfile` etc.
+
 ## 0.6.23 - 2025-10-28
 
 ### Added
