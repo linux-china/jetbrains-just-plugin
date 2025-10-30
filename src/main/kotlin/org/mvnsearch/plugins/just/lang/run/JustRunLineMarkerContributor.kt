@@ -3,7 +3,6 @@ package org.mvnsearch.plugins.just.lang.run
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.configurations.GeneralCommandLine
-import com.intellij.execution.configurations.PathEnvironmentVariableUtil
 import com.intellij.execution.configurations.PtyCommandLine
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.lineMarker.RunLineMarkerProvider
@@ -13,11 +12,9 @@ import com.intellij.ide.actions.runAnything.commands.RunAnythingCommandCustomize
 import com.intellij.ide.actions.runAnything.execution.RunAnythingRunProfile
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext
-import com.intellij.openapi.application.PathMacros
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
-import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
@@ -26,6 +23,7 @@ import com.intellij.util.execution.ParametersListUtil
 import org.mvnsearch.plugins.just.Just
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
 import org.mvnsearch.plugins.just.ide.icons.JustIcons.JUST_FILE
+import org.mvnsearch.plugins.just.lang.psi.JustRecipeStatement
 import org.mvnsearch.plugins.just.lang.psi.JustTypes
 import org.mvnsearch.plugins.just.lang.run.JustRunConfiguration.Companion.adjustCommandLinePath
 import org.mvnsearch.plugins.just.parseRecipeName
@@ -46,10 +44,23 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
         if (elementType == JustTypes.RECIPE_STATEMENT) {
             val text = psiElement.text
             val recipeName = parseRecipeName(text)
+            var runIcon = JustIcons.RUN_ICON
+            if (recipeName == "default") {
+                runIcon = JustIcons.DEFAULT_RUN_ICON
+            } else {
+                val recipeStatement = psiElement as JustRecipeStatement
+                recipeStatement.prevSibling?.prevSibling?.let {
+                    if (it.elementType == JustTypes.ATTRIBUTE) {
+                        if (it.text == "[default]") {
+                            runIcon = JustIcons.DEFAULT_RUN_ICON
+                        }
+                    }
+                }
+            }
             return LineMarkerInfo(
                 psiElement,
                 psiElement.textRange,
-                icon,
+                runIcon,
                 {
                     "Run just recipe: $recipeName"
                 },
