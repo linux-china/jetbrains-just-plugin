@@ -4,6 +4,13 @@
 
 ## Unreleased
 
+## 0.6.25 - 2025-10-31
+
+### Added
+
+- Add icon for shebang
+- Add `SQL` injection for DuckDB: `set shell := ['duckdb', '-c']`
+
 ## 0.6.24 - 2025-10-28
 
 ### Fixed
