@@ -8,7 +8,7 @@ import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.elementType
-import com.intellij.psi.util.startOffset
+import org.mvnsearch.plugins.just.ide.icons.JustIcons
 import org.mvnsearch.plugins.just.lang.psi.JustTypes
 
 
@@ -26,14 +26,14 @@ class CommandLineMarkerProvider : LineMarkerProviderDescriptor() {
                 var icon = AllIcons.Nodes.Console
                 var hint = "Bash"
                 if (firstLine.contains("python") || firstLine.contains(" uv")) {
-                    icon = AllIcons.Language.Python
+                    icon = JustIcons.Python
                     hint = "Python"
                 } else if (firstLine.contains("ruby")) {
-                    icon = AllIcons.Language.Ruby
+                    icon = JustIcons.Ruby
                     hint = "Ruby"
                 }
                 val offset = elementText.indexOf(firstLine)
-                val elementStartOffset = psiElement.startOffset
+                val elementStartOffset = psiElement.textRange.startOffset
                 val textRange =
                     TextRange(elementStartOffset + offset + 1, elementStartOffset + offset + firstLine.length - 1)
                 return LineMarkerInfo(
