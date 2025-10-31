@@ -16,6 +16,8 @@ Plugin features:
 * Navigation for dependency name
 * Language injection for legal Shell script
 * Justfile structure view
+* Sub modules/import resolver
+* Interesting miscellaneous: DuckDB, Bun, Nushell etc.
 
 How to use?
 
@@ -37,8 +39,8 @@ click [Justfile cheat sheet](https://cheatography.com/linux-china/cheat-sheets/j
 
 **Attention**: keywords could not be recipe names, such as `import`, `export`, `alias` etc.
 
-**Tips**: Please put just parameter in quotation mark, such as `echo "{{NAME}}"` or `echo '{{NAME}}'`, 
-and `echo {{NAME}}` is not legal script and will not be highlighted. 
+**Tips**: Please put just parameter in quotation mark, such as `echo "{{NAME}}"` or `echo '{{NAME}}'`,
+and `echo {{NAME}}` is not legal script and will not be highlighted.
 If param as command name, such as `{{MVN}} --version`, please use `exec '{{MVN}}' --version` instead.
 
 <!-- Plugin description end -->
