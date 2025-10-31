@@ -21,7 +21,7 @@ class ShebangMarkerProvider : LineMarkerProviderDescriptor() {
         if (psiElement.elementType == JustTypes.CODE_BLOCK) {
             val elementText = psiElement.text
             val lines = elementText.trim().lines()
-            val firstLine = lines.first().trim()
+            val firstLine = lines.first()
             if (firstLine.startsWith("#!")) {
                 var icon = JustIcons.Bash
                 var hint = "Shell"
