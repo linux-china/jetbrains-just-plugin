@@ -16,7 +16,9 @@ object JustIcons {
     var IMPORT_ICON = AllIcons.ToolbarDecorator.Import
     var Bash: Icon = IconLoader.findIcon("/icons/bash.png", JustIcons::class.java.classLoader)!!
     var Nushell: Icon = IconLoader.findIcon("/icons/nushell.png", JustIcons::class.java.classLoader)!!
+    var PowerShell: Icon = IconLoader.findIcon("/icons/powershell.png", JustIcons::class.java.classLoader)!!
     var Python: Icon = IconLoader.findIcon("/icons/python.svg", JustIcons::class.java.classLoader)!!
     var Ruby: Icon = IconLoader.findIcon("/icons/ruby.svg", JustIcons::class.java.classLoader)!!
     var Bun: Icon = IconLoader.findIcon("/icons/bun.svg", JustIcons::class.java.classLoader)!!
+    var DuckDB: Icon = IconLoader.findIcon("/icons/duckdb.png", JustIcons::class.java.classLoader)!!
 }
