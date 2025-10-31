@@ -17,10 +17,12 @@ import org.mvnsearch.plugins.just.lang.psi.JustRecipeStatement
 class JustCodeBlockLanguageInjector : MultiHostInjector {
     private var shellLanguage: Language? = null
     private var sqlLanguage: Language? = null
+    private var tsLanguage: Language? = null
 
     init {
         sqlLanguage = Language.findLanguageByID("SQL")
         shellLanguage = Language.findLanguageByID("Shell Script")
+        tsLanguage = Language.findLanguageByID("TypeScript")
         if (shellLanguage == null) {
             shellLanguage = Language.findLanguageByID("BashPro Shell Script")
         }
@@ -28,50 +30,61 @@ class JustCodeBlockLanguageInjector : MultiHostInjector {
 
 
     override fun getLanguagesToInject(registrar: MultiHostRegistrar, context: PsiElement) {
-        if (shellLanguage != null) {
-            val justFile = context.containingFile as JustFile
-            if (justFile.isBashAlike()) { // validate global shell setting
-                val text = context.text
-                if (isShellCode(text.trim())) {
-                    var injectionScript = justFile.getExportedVariables().joinToString(separator = "") { "$it=''\n" }
-                    val recipeStatement = context.parentOfType<JustRecipeStatement>()
-                    if (recipeStatement != null) {
-                        recipeStatement.params?.recipeParamList?.forEach {
-                            it.recipeParamName.text?.let { name ->
-                                if (name.startsWith("$")) {
-                                    val shellVariableName = name.substring(1)
-                                    injectionScript += "$shellVariableName=''\n"
-                                }
-                            }
-                        }
-                    }
-                    val offset = text.indexOfFirst { !INDENT_CHARS.contains(it) && !PARAM_PREFIX_LIST.contains(it) }
-                    if (offset > 0) {
-                        var trailLength = text.toCharArray().reversedArray().indexOfFirst { !INDENT_CHARS.contains(it) }
-                        if (trailLength < 0) {
-                            trailLength = 0
-                        }
-                        val endOffset = context.textLength - trailLength
-                        if (endOffset > offset) {
-                            val injectionTextRange = TextRange(offset, context.textLength - trailLength)
-                            registrar.startInjecting(shellLanguage!!)
-                            // add prefix to declare variables
-                            registrar.addPlace(
-                                injectionScript,
-                                null,
-                                context as PsiLanguageInjectionHost,
-                                injectionTextRange
-                            )
-                            registrar.doneInjecting()
+        val justFile = context.containingFile as JustFile
+        val text = context.text
+        if (shellLanguage != null && justFile.isBashAlike() && isShellCode(text.trim())) {
+            var injectionScript = justFile.getExportedVariables().joinToString(separator = "") { "$it=''\n" }
+            val recipeStatement = context.parentOfType<JustRecipeStatement>()
+            if (recipeStatement != null) {
+                recipeStatement.params?.recipeParamList?.forEach {
+                    it.recipeParamName.text?.let { name ->
+                        if (name.startsWith("$")) {
+                            val shellVariableName = name.substring(1)
+                            injectionScript += "$shellVariableName=''\n"
                         }
                     }
                 }
-            } else if (sqlLanguage != null && justFile.isSQLAlike()) {
-                val text = context.text
+            }
+            val offset = text.indexOfFirst { !INDENT_CHARS.contains(it) && !PARAM_PREFIX_LIST.contains(it) }
+            if (offset > 0) {
+                var trailLength = text.toCharArray().reversedArray().indexOfFirst { !INDENT_CHARS.contains(it) }
+                if (trailLength < 0) {
+                    trailLength = 0
+                }
+                val endOffset = context.textLength - trailLength
+                if (endOffset > offset) {
+                    val injectionTextRange = TextRange(offset, context.textLength - trailLength)
+                    registrar.startInjecting(shellLanguage!!)
+                    // add prefix to declare variables
+                    registrar.addPlace(
+                        injectionScript,
+                        null,
+                        context as PsiLanguageInjectionHost,
+                        injectionTextRange
+                    )
+                    registrar.doneInjecting()
+                }
+            }
+        } else if (sqlLanguage != null && justFile.isSQLAlike()) {
+            val offset = text.indexOfFirst { !INDENT_CHARS.contains(it) }
+            if (offset > 0) {
+                val injectionTextRange = TextRange(offset, context.textLength)
+                registrar.startInjecting(sqlLanguage!!)
+                registrar.addPlace(
+                    null,
+                    null,
+                    context as PsiLanguageInjectionHost,
+                    injectionTextRange
+                )
+                registrar.doneInjecting()
+            }
+        } else if (tsLanguage != null) {
+            val firstLine = text.trim().substringBefore('\n')
+            if (firstLine.startsWith("#!") && firstLine.contains("bun")) {
                 val offset = text.indexOfFirst { !INDENT_CHARS.contains(it) }
                 if (offset > 0) {
                     val injectionTextRange = TextRange(offset, context.textLength)
-                    registrar.startInjecting(sqlLanguage!!)
+                    registrar.startInjecting(tsLanguage!!)
                     registrar.addPlace(
                         null,
                         null,
