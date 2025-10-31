@@ -8,8 +8,9 @@
 
 ### Added
 
-- Add icon for shebang
-- Add `SQL` injection for DuckDB: `set shell := ['duckdb', '-c']`
+- Add icon for shell `set shell := ["nu", "-c"]`: Shell, Python, Ruby, Bun, Nushell etc.
+- Add icon for shebang `#!/usr/bin/env python3`: Shell, Python, Ruby, Bun, Nushell etc.
+- Add `SQL` injection for DuckDB: `set shell := ['duckdb', 'demo.db', '-c']`
 
 ## 0.6.24 - 2025-10-28
 
