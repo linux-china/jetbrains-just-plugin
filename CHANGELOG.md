@@ -8,6 +8,7 @@
 
 ### Added
 
+- Change run icon for default recipe: easy to recognize
 - Add icon for shell `set shell := ["nu", "-c"]`: Shell, Python, Ruby, Bun, Nushell etc.
 - Add icon for shebang `#!/usr/bin/env python3`: Shell, Python, Ruby, Bun, Nushell etc.
 - Add `SQL` injection for DuckDB: `set shell := ['duckdb', 'demo.db', '-c']`
