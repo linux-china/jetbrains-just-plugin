@@ -52,7 +52,11 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
             .filterIsInstance<JustSetStatement>().firstOrNull() {
                 it.setting.text == "shell" || it.setting.text == "windows-shell"
             }
-        return shellItem?.text?.contains("sh\"") ?: true
+        return if (shellItem == null) {
+            true
+        } else {
+            shellItem.text.contains("sh\"")
+        }
     }
 
     fun isSQLAlike(): Boolean {
