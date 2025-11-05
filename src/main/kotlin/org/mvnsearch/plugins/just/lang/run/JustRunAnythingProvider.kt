@@ -16,7 +16,6 @@ import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.registry.Registry
-import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.util.execution.ParametersListUtil
 import org.mvnsearch.plugins.just.Just
@@ -95,11 +94,10 @@ class JustRunAnythingProvider : RunAnythingCommandLineProvider() {
             justfile = projectDir?.findChild("Justfile")
         }
         if (justfile != null) {
-            val psiFile = ReadAction.compute<PsiFile, Throwable> {
-                PsiManager.getInstance(project!!).findFile(justfile)
-            } as JustFile
-            return psiFile.findAllRecipes().asSequence()
-
+            return ReadAction.compute<Sequence<String>, Throwable> {
+                val psiFile = PsiManager.getInstance(project!!).findFile(justfile) as JustFile
+                psiFile.findAllRecipes().asSequence()
+            }
         }
         return emptySequence()
     }
