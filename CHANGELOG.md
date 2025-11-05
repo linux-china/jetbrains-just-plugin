@@ -4,6 +4,16 @@
 
 ## Unreleased
 
+## 0.6.26 - 2025-11-05
+
+### Added
+
+- Add deno icon for shebang
+
+### Fixed
+
+- RuntimeExceptionWithAttachments: Read access is allowed from inside read-action only #66
+
 ## 0.6.25 - 2025-10-31
 
 ### Added
