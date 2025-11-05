@@ -20,5 +20,6 @@ object JustIcons {
     var Python: Icon = IconLoader.findIcon("/icons/python.svg", JustIcons::class.java.classLoader)!!
     var Ruby: Icon = IconLoader.findIcon("/icons/ruby.svg", JustIcons::class.java.classLoader)!!
     var Bun: Icon = IconLoader.findIcon("/icons/bun.svg", JustIcons::class.java.classLoader)!!
+    var Deno: Icon = IconLoader.findIcon("/icons/deno.svg", JustIcons::class.java.classLoader)!!
     var DuckDB: Icon = IconLoader.findIcon("/icons/duckdb.png", JustIcons::class.java.classLoader)!!
 }
