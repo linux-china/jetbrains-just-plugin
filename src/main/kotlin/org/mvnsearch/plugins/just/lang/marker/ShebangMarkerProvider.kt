@@ -33,6 +33,9 @@ class ShebangMarkerProvider : LineMarkerProviderDescriptor() {
                 } else if (firstLine.contains("bun")) {
                     icon = JustIcons.Bun
                     hint = "Bun"
+                } else if (firstLine.contains("deno")) {
+                    icon = JustIcons.Deno
+                    hint = "Deno"
                 } else if (firstLine.contains("nu")) {
                     icon = JustIcons.Nushell
                     hint = "Nushell"
