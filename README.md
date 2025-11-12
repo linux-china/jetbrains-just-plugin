@@ -1,5 +1,12 @@
 JetBrains Just plugin
 ========================
+                  
+### Sponsor
+
+Qoder is an agentic coding platform designed for real software development.
+
+<a href="https://plugins.jetbrains.com/plugin/28926-qoder--think-deeper-build-better-" rel="Qoder">![Qoder](./qoder-banner.png)</a>
+
 
 <!-- Plugin description -->
 **JetBrains Just Command Runner Plugin** is a plugin to integrate [just commander](https://github.com/casey/just) in
