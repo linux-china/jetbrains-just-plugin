@@ -8,7 +8,7 @@ import com.intellij.util.ProcessingContext
 import com.intellij.patterns.PlatformPatterns.psiElement
 import org.mvnsearch.plugins.just.lang.psi.JustTypes.RECIPE_STATEMENT
 
-class JustRecipeRenameInputValidator: RenameInputValidator {
+class JustRecipeRenameInputValidator : RenameInputValidator {
     override fun getPattern(): ElementPattern<out PsiElement?> {
         return psiElement(RECIPE_STATEMENT)
     }
