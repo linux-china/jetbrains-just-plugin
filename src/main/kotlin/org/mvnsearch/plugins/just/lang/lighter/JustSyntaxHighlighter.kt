@@ -19,7 +19,7 @@ class JustSyntaxHighlighter : SyntaxHighlighterBase() {
             RECIPE_NAME, DEPENDENCY_NAME -> DefaultLanguageHighlighterColors.STATIC_METHOD
             EXPORT_NAME, RECIPE_PARAM_NAME -> DefaultLanguageHighlighterColors.STATIC_FIELD
             KEYWORD_MOD, KEYWORD_ALIAS, KEYWORD_SET, KEYWORD_EXPORT,
-            KEYWORD_IF, KEYWORD_ELSE, KEYWORD_ELSE_IF, KEYWORD_EXPORT,
+            KEYWORD_IF, KEYWORD_ELSE, KEYWORD_ELSE_IF,
             KEYWORD_IMPORT -> DefaultLanguageHighlighterColors.KEYWORD
 
             VARIABLE -> DefaultLanguageHighlighterColors.STATIC_FIELD
