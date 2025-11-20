@@ -15,7 +15,7 @@ plugins {
     id("org.jetbrains.changelog") version "2.2.0"
     // Gradle Qodana Plugin
     id("org.jetbrains.qodana") version "2023.2.1"
-    
+
     id("org.jetbrains.grammarkit") version "2022.3.2.2"
 }
 
@@ -30,8 +30,8 @@ repositories {
 // Configure Gradle IntelliJ Plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
 intellij {
     pluginName.set(properties("pluginName"))
-    version.set(properties("platformVersion"))
-    //localPath.set("/Users/linux_china/Applications/IntelliJ IDEA Ultimate.app/Contents")
+    //version.set(properties("platformVersion"))
+    localPath.set("/Users/linux_china/tools/ideaIU-2024.2")
     type.set(properties("platformType"))
 
     // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.

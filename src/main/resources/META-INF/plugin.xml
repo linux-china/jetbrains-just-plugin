@@ -59,7 +59,6 @@
         <!-- run configuration -->
         <configurationType implementation="org.mvnsearch.plugins.just.lang.run.JustConfigurationType"/>
         <runConfigurationProducer implementation="org.mvnsearch.plugins.just.lang.run.JustRunConfigurationProducer"/>
-        <renameInputValidator implementation="org.mvnsearch.plugins.just.lang.refactor.JustRecipeNamesValidator"/>
     </extensions>
 
     <actions>

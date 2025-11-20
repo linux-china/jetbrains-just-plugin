@@ -4,6 +4,13 @@
 
 ## Unreleased
 
+## 0.6.27 - 2025-11-20
+
+### Fixed
+
+- Wrong SQL language injection for code block
+- Fix rename input validation for recipe name
+
 ## 0.6.26 - 2025-11-05
 
 ### Added
