@@ -64,7 +64,7 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
             .filterIsInstance<JustSetStatement>().firstOrNull() {
                 it.setting.text == "shell"
             }
-        return shellItem?.text?.contains("duckdb") ?: true
+        return shellItem?.text?.contains("duckdb") ?: false
     }
 
     fun getExportedVariables(): List<String> {
