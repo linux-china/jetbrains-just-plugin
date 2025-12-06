@@ -6,10 +6,10 @@
 
 ## 0.6.28 - 2025-12-06
 
-### Fixed
+### Added
 
-- Add Format strings support: `message := f'Hello, {name}!'`
-
+- Add format strings support: `message := f'Hello, {name}!'`
+- Highlight variables in format string
 
 ## 0.6.27 - 2025-11-20
 
