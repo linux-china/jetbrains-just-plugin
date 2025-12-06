@@ -4,6 +4,13 @@
 
 ## Unreleased
 
+## 0.6.28 - 2025-12-06
+
+### Fixed
+
+- Add Format strings support: `message := f'Hello, {name}!'`
+
+
 ## 0.6.27 - 2025-11-20
 
 ### Fixed
