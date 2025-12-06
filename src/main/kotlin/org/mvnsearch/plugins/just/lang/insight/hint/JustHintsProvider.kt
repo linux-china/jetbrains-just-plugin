@@ -8,7 +8,7 @@ import org.mvnsearch.plugins.just.lang.psi.JustTypes
 
 
 @Suppress("UnstableApiUsage")
-class RecipeParameterHintsProvider : InlayParameterHintsProvider {
+class JustHintsProvider : InlayParameterHintsProvider {
     override fun getParameterHints(element: PsiElement): List<InlayInfo?> {
         val elementType = element.elementType
         if (elementType == JustTypes.RECIPE_PARAM_NAME) {

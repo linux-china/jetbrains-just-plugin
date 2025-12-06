@@ -19,7 +19,7 @@
 
         <codeInsight.parameterNameHints
                 language="Just"
-                implementationClass="org.mvnsearch.plugins.just.lang.insight.hint.RecipeParameterHintsProvider"/>
+                implementationClass="org.mvnsearch.plugins.just.lang.insight.hint.JustHintsProvider"/>
         <lang.parserDefinition language="Just"
                                implementationClass="org.mvnsearch.plugins.just.lang.parser.JustParserDefinition"/>
         <lang.psiStructureViewFactory language="Just"
