@@ -49,6 +49,7 @@ BACKTICK=`[^`]*`
 BOOL_LITERAL=(true) | (false)
 NUMBER_LITERAL=[+-]?([0-9]*[.])?[0-9]+
 X_INDICATOR=("x")
+F_INDICATOR=("f")
 STRING_STARTER=[\"'`]
 INDENTED_BACKTICK=(```)([`]{0,2}([^`]))*(```)
 RAW_STRING=('[^']*')
@@ -96,6 +97,7 @@ KEYWORD_ELSE_IF=("else if")
   {STRING}           {  yybegin(MOD); return STRING; }
   {RAW_STRING}       {  yybegin(MOD); return RAW_STRING; }
   {X_INDICATOR}/ {STRING_STARTER}  {  yybegin(MOD); return X_INDICATOR; }
+  {F_INDICATOR}/ {STRING_STARTER}  {  yybegin(MOD); return F_INDICATOR; }
   {COMMENT}         {  yybegin(MOD); return JustTypes.COMMENT; }
   {NEW_LINE}         {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
 }
@@ -106,6 +108,7 @@ KEYWORD_ELSE_IF=("else if")
   {STRING}      {  yybegin(IMPORT); return STRING; }
   {RAW_STRING}      {  yybegin(IMPORT); return RAW_STRING; }
   {X_INDICATOR}/ {STRING_STARTER}  {  yybegin(IMPORT); return X_INDICATOR; }
+  {F_INDICATOR}/ {STRING_STARTER}  {  yybegin(IMPORT); return F_INDICATOR; }
   {COMMENT}         {  yybegin(IMPORT); return JustTypes.COMMENT; }
   {NEW_LINE}         {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
 }
@@ -128,6 +131,7 @@ KEYWORD_ELSE_IF=("else if")
    {WHITE_SPACE}+     {  yybegin(EXPORT_VALUE); return TokenType.WHITE_SPACE; }
    {ASSIGN}           {  yybegin(EXPORT_VALUE); return ASSIGN; }
    {X_INDICATOR}/ {STRING_STARTER}  {  yybegin(EXPORT_VALUE); return X_INDICATOR; }
+   {F_INDICATOR}/ {STRING_STARTER}  {  yybegin(EXPORT_VALUE); return F_INDICATOR; }
    {PLUS}           {  yybegin(EXPORT_VALUE); return PLUS; }
    {SLASH}           {  yybegin(EXPORT_VALUE); return SLASH; }
    {OR}           {  yybegin(EXPORT_VALUE); return OR; }
@@ -155,6 +159,7 @@ KEYWORD_ELSE_IF=("else if")
    {BOOL_LITERAL}      {  yybegin(SET_VALUE); return BOOL_LITERAL; }
    {NUMBER_LITERAL}    {  yybegin(SET_VALUE); return NUMBER_LITERAL; }
    {X_INDICATOR}/ {STRING_STARTER}   {  yybegin(SET_VALUE); return X_INDICATOR; }
+   {F_INDICATOR}/ {STRING_STARTER}   {  yybegin(SET_VALUE); return F_INDICATOR; }
    {STRING}            {  yybegin(SET_VALUE); return STRING; }
    {RAW_STRING}        {  yybegin(SET_VALUE); return RAW_STRING; }
    {ID_LITERAL}           {  yybegin(SET_VALUE); return ID_LITERAL; }
@@ -174,6 +179,7 @@ KEYWORD_ELSE_IF=("else if")
   {INDENTED_STRING}            {  yybegin(VARIABLE); return INDENTED_STRING; }
   {STRING}                     {  yybegin(VARIABLE); return STRING; }
   {X_INDICATOR}/ {STRING_STARTER}           {  yybegin(VARIABLE); return X_INDICATOR; }
+  {F_INDICATOR}/ {STRING_STARTER}           {  yybegin(VARIABLE); return F_INDICATOR; }
   {RAW_STRING}                 {  yybegin(VARIABLE); return RAW_STRING; }
   {BACKTICK}                   {  yybegin(VARIABLE); return BACKTICK; }
   {ID_LITERAL}                    {  yybegin(VARIABLE); return ID_LITERAL; }
@@ -203,6 +209,7 @@ KEYWORD_ELSE_IF=("else if")
   {INDENTED_STRING}            {  yybegin(CONDITIONAL); return INDENTED_STRING; }
   {STRING}                     {  yybegin(CONDITIONAL); return STRING; }
   {X_INDICATOR}/ {STRING_STARTER}            {  yybegin(CONDITIONAL); return X_INDICATOR; }
+  {F_INDICATOR}/ {STRING_STARTER}            {  yybegin(CONDITIONAL); return F_INDICATOR; }
   {RAW_STRING}                 {  yybegin(CONDITIONAL); return RAW_STRING; }
   {BACKTICK}                   {  yybegin(CONDITIONAL); return BACKTICK; }
   {ID_LITERAL}                    {  yybegin(CONDITIONAL); return ID_LITERAL; }
@@ -224,6 +231,7 @@ KEYWORD_ELSE_IF=("else if")
     {INDENTED_STRING}            {  yybegin(CONDITIONAL_BLOCK_BODY); return INDENTED_STRING; }
     {STRING}                     {  yybegin(CONDITIONAL_BLOCK_BODY); return STRING; }
     {X_INDICATOR}/ {STRING_STARTER}   {  yybegin(CONDITIONAL_BLOCK_BODY); return X_INDICATOR; }
+    {F_INDICATOR}/ {STRING_STARTER}   {  yybegin(CONDITIONAL_BLOCK_BODY); return F_INDICATOR; }
     {RAW_STRING}                 {  yybegin(CONDITIONAL_BLOCK_BODY); return RAW_STRING; }
     {BACKTICK}                   {  yybegin(CONDITIONAL_BLOCK_BODY); return BACKTICK; }
     {ID_LITERAL}                 {  yybegin(CONDITIONAL_BLOCK_BODY); return ID_LITERAL; }
@@ -244,6 +252,7 @@ KEYWORD_ELSE_IF=("else if")
    {INDENTED_STRING}            {  yybegin(CONDITIONAL_END); return INDENTED_STRING; }
    {STRING}                     {  yybegin(CONDITIONAL_END); return STRING; }
    {X_INDICATOR}/ {STRING_STARTER}   {  yybegin(CONDITIONAL_END); return X_INDICATOR; }
+   {F_INDICATOR}/ {STRING_STARTER}   {  yybegin(CONDITIONAL_END); return F_INDICATOR; }
    {RAW_STRING}                 {  yybegin(CONDITIONAL_END); return RAW_STRING; }
    {BACKTICK}                   {  yybegin(CONDITIONAL_END); return BACKTICK; }
    {ID_LITERAL}                 {  yybegin(CONDITIONAL_END); return ID_LITERAL; }
@@ -265,6 +274,7 @@ KEYWORD_ELSE_IF=("else if")
   {EQUAL}                     {  yybegin(PARAM_WITH_VALUE); return EQUAL; }
   {STRING}                    {  yybegin(PARAMS); return STRING; }
   {X_INDICATOR}/ {STRING_STARTER}  {  yybegin(PARAMS); return X_INDICATOR; }
+  {F_INDICATOR}/ {STRING_STARTER}  {  yybegin(PARAMS); return F_INDICATOR; }
   {RAW_STRING}                {  yybegin(PARAMS); return RAW_STRING; }
   {PLUS}                       {  yybegin(PARAMS); return PLUS; }
   {SLASH}                       {  yybegin(PARAMS); return SLASH; }
@@ -281,6 +291,7 @@ KEYWORD_ELSE_IF=("else if")
     {WHITE_SPACE}+              {  yybegin(PARAM_WITH_VALUE_FUNCTION_CALL); return TokenType.WHITE_SPACE; }
     {STRING}                    {  yybegin(PARAM_WITH_VALUE_FUNCTION_CALL); return STRING; }
     {X_INDICATOR}/ {STRING_STARTER}  {  yybegin(PARAM_WITH_VALUE_FUNCTION_CALL); return X_INDICATOR; }
+    {F_INDICATOR}/ {STRING_STARTER}  {  yybegin(PARAM_WITH_VALUE_FUNCTION_CALL); return F_INDICATOR; }
     {RAW_STRING}                {  yybegin(PARAM_WITH_VALUE_FUNCTION_CALL); return RAW_STRING; }
     {BACKTICK}                  {  yybegin(PARAM_WITH_VALUE_FUNCTION_CALL); return BACKTICK; }
     {ID_LITERAL}                {  yybegin(PARAM_WITH_VALUE_FUNCTION_CALL); return ID_LITERAL; }
@@ -323,6 +334,7 @@ KEYWORD_ELSE_IF=("else if")
  {COMMA}                                 {  yybegin(DEPENDENCY_WITH_PARAMS); return COMMA; }
  {ID_LITERAL}                            {  yybegin(DEPENDENCY_CALL_PARAMS); return ID_LITERAL; }
  {X_INDICATOR}/ {STRING_STARTER}         {  yybegin(DEPENDENCY_CALL_PARAMS); return X_INDICATOR; }
+ {F_INDICATOR}/ {STRING_STARTER}         {  yybegin(DEPENDENCY_CALL_PARAMS); return F_INDICATOR; }
  {CLOSE_PAREN}                           {  yybegin(DEPENDENCIES); return CLOSE_PAREN; }
 }
 
@@ -333,6 +345,7 @@ KEYWORD_ELSE_IF=("else if")
  {COMMA}                               {  yybegin(ATTRIBUTE); return COMMA; }
  {OPEN_PAREN}                           {  yybegin(ATTRIBUTE); return OPEN_PAREN; }
  {X_INDICATOR}/ {STRING_STARTER}        {  yybegin(ATTRIBUTE); return X_INDICATOR; }
+ {F_INDICATOR}/ {STRING_STARTER}        {  yybegin(ATTRIBUTE); return F_INDICATOR; }
  {STRING}                                {  yybegin(ATTRIBUTE); return STRING; }
  {RAW_STRING}                            {  yybegin(ATTRIBUTE); return RAW_STRING; }
  {CLOSE_PAREN}                           {  yybegin(ATTRIBUTE); return CLOSE_PAREN; }
