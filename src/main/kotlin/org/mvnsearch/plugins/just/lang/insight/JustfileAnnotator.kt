@@ -23,6 +23,10 @@ class JustfileAnnotator : Annotator {
                 highLightVariablesInCodeBlock(element, holder)
             }
 
+            JustTypes.F_STRING -> {  // high light variable
+                highLightVariablesInFormatString(element, holder)
+            }
+
             JustTypes.X_STRING, JustTypes.X_RAW_STRING,
             JustTypes.X_INDENTED_STRING, JustTypes.X_INDENTED_RAW_STRING -> {  // high light variable
                 highLightEnvVariablesInXString(element, holder)
@@ -41,6 +45,26 @@ class JustfileAnnotator : Annotator {
                 holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(range)
                     .textAttributes(DefaultLanguageHighlighterColors.STATIC_FIELD).create()
                 offset = text.indexOf("{{", endOffset + 2)
+            } else {
+                offset = -1
+            }
+        }
+    }
+
+    private fun highLightVariablesInFormatString(element: PsiElement, holder: AnnotationHolder) {
+        val rangeOffset = element.textRange.startOffset
+        val text = element.text
+        var offset = text.indexOf("{")
+        while (offset > 0) {
+            val endOffset = text.indexOf("}", offset + 1)
+            if (endOffset > offset) {
+                if (text[offset + 1] == '{') {
+                    offset += 1
+                }
+                val range = TextRange(rangeOffset + offset, rangeOffset + endOffset + 1)
+                holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(range)
+                    .textAttributes(DefaultLanguageHighlighterColors.STATIC_FIELD).create()
+                offset = text.indexOf("{", endOffset + 1)
             } else {
                 offset = -1
             }
@@ -68,20 +92,20 @@ class JustfileAnnotator : Annotator {
     }
 
     private fun highLightEnvVariablesInXString(element: PsiElement, holder: AnnotationHolder) {
-            val rangeOffset = element.textRange.startOffset
-            val text = element.text
-            var offset = text.indexOf("\${")
-            while (offset > 0) {
-                val endOffset = text.indexOf("}", offset + 2)
-                if (endOffset > offset) {
-                    val range = TextRange(rangeOffset + offset, rangeOffset + endOffset + 1)
-                    holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(range)
-                        .textAttributes(DefaultLanguageHighlighterColors.STATIC_FIELD).create()
-                    offset = text.indexOf("\${", endOffset + 2)
-                } else {
-                    offset = -1
-                }
+        val rangeOffset = element.textRange.startOffset
+        val text = element.text
+        var offset = text.indexOf("\${")
+        while (offset > 0) {
+            val endOffset = text.indexOf("}", offset + 2)
+            if (endOffset > offset) {
+                val range = TextRange(rangeOffset + offset, rangeOffset + endOffset + 1)
+                holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(range)
+                    .textAttributes(DefaultLanguageHighlighterColors.STATIC_FIELD).create()
+                offset = text.indexOf("\${", endOffset + 2)
+            } else {
+                offset = -1
             }
         }
+    }
 
 }
