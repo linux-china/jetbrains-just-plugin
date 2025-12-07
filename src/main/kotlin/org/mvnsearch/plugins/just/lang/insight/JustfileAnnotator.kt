@@ -54,17 +54,14 @@ class JustfileAnnotator : Annotator {
     private fun highLightVariablesInFormatString(element: PsiElement, holder: AnnotationHolder) {
         val rangeOffset = element.textRange.startOffset
         val text = element.text
-        var offset = text.indexOf("{")
+        var offset = text.indexOf("{{")
         while (offset > 0) {
-            val endOffset = text.indexOf("}", offset + 1)
+            val endOffset = text.indexOf("}}", offset + 2)
             if (endOffset > offset) {
-                if (text[offset + 1] == '{') {
-                    offset += 1
-                }
-                val range = TextRange(rangeOffset + offset, rangeOffset + endOffset + 1)
+                val range = TextRange(rangeOffset + offset, rangeOffset + endOffset + 2)
                 holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(range)
                     .textAttributes(DefaultLanguageHighlighterColors.STATIC_FIELD).create()
-                offset = text.indexOf("{", endOffset + 1)
+                offset = text.indexOf("{{", endOffset + 2)
             } else {
                 offset = -1
             }
