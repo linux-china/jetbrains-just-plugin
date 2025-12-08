@@ -10,6 +10,7 @@
 
 - Fix script with params: `[script('foo', 'bar')]`
 - Fix bash injection with SQL: code started with `select`, `update`, `insert`, `delete`.
+- Language injection enhancement for code block
 
 ## 0.6.29 - 2025-12-07
 
