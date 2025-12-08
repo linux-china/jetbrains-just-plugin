@@ -32,7 +32,8 @@ class JustCodeBlockLanguageInjector : MultiHostInjector {
     override fun getLanguagesToInject(registrar: MultiHostRegistrar, context: PsiElement) {
         val justFile = context.containingFile as JustFile
         val text = context.text
-        if (shellLanguage != null && justFile.isBashAlike() && isShellCode(text.trim())) {
+        val trimmedText = text.trim()
+        if (shellLanguage != null && justFile.isBashAlike() && isShellCode(trimmedText)) {
             var injectionScript = justFile.getExportedVariables().joinToString(separator = "") { "$it=''\n" }
             val recipeStatement = context.parentOfType<JustRecipeStatement>()
             if (recipeStatement != null) {
@@ -65,7 +66,7 @@ class JustCodeBlockLanguageInjector : MultiHostInjector {
                     registrar.doneInjecting()
                 }
             }
-        } else if (sqlLanguage != null && justFile.isSQLAlike()) {
+        } else if (sqlLanguage != null && (justFile.isSQLAlike() || isSQLCode(trimmedText))) {
             val offset = text.indexOfFirst { !INDENT_CHARS.contains(it) }
             if (offset > 0) {
                 val injectionTextRange = TextRange(offset, context.textLength)
@@ -79,7 +80,7 @@ class JustCodeBlockLanguageInjector : MultiHostInjector {
                 registrar.doneInjecting()
             }
         } else if (tsLanguage != null) {
-            val firstLine = text.trim().substringBefore('\n')
+            val firstLine = trimmedText.substringBefore('\n')
             if (firstLine.startsWith("#!") && firstLine.contains("bun")) {
                 val offset = text.indexOfFirst { !INDENT_CHARS.contains(it) }
                 if (offset > 0) {
@@ -101,21 +102,26 @@ class JustCodeBlockLanguageInjector : MultiHostInjector {
         return mutableListOf(JustCodeBlock::class.java)
     }
 
-    private fun isShellCode(code: String): Boolean {
-        val firstWord = code.trim().substringBefore(' ').lowercase()
+    private fun isShellCode(trimmedCode: String): Boolean {
+        val firstWord = trimmedCode.substringBefore(' ').lowercase()
         if (firstWord in arrayOf("select", "update", "delete", "insert")) { //SQL style
             return false
         }
-        if (code.contains("{{") || code.contains("}}")) {
+        if (trimmedCode.contains("{{") || trimmedCode.contains("}}")) {
             // enable highlight for parameter in string
-            return (code.contains("\"{{") || code.contains("'{{")) && !code.contains(" {{")
+            return (trimmedCode.contains("\"{{") || trimmedCode.contains("'{{")) && !trimmedCode.contains(" {{")
         }
         // check shell shebang
-        return !code.startsWith("#!")
-                || code.startsWith("#!/usr/bin/env sh")
-                || code.startsWith("#!/usr/bin/env bash")
-                || code.startsWith("#!/usr/bin/env zsh")
-                || code.startsWith("#!/usr/bin/env fish")
+        return !trimmedCode.startsWith("#!")
+                || trimmedCode.startsWith("#!/usr/bin/env sh")
+                || trimmedCode.startsWith("#!/usr/bin/env bash")
+                || trimmedCode.startsWith("#!/usr/bin/env zsh")
+                || trimmedCode.startsWith("#!/usr/bin/env fish")
+    }
+
+    private fun isSQLCode(trimmedCode: String): Boolean {
+        val firstWord = trimmedCode.substringBefore(' ').lowercase()
+        return firstWord in arrayOf("select", "update", "delete", "insert") //SQL style
     }
 
 }
