@@ -8,7 +8,7 @@
 
 ### Fixed
 
-- Fix script with params: `[script('foo', 'bar')]`
+- Fix script with params: such as `[script('duckdb', '-f')]`
 - Fix bash injection with SQL: code started with `select`, `update`, `insert`, `delete`.
 - Language injection enhancement for code block
 
