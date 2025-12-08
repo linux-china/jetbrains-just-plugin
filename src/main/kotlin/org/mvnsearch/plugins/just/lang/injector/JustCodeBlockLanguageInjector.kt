@@ -102,6 +102,10 @@ class JustCodeBlockLanguageInjector : MultiHostInjector {
     }
 
     private fun isShellCode(code: String): Boolean {
+        val firstWord = code.trim().substringBefore(' ').lowercase()
+        if (firstWord in arrayOf("select", "update", "delete", "insert")) { //SQL style
+            return false
+        }
         if (code.contains("{{") || code.contains("}}")) {
             // enable highlight for parameter in string
             return (code.contains("\"{{") || code.contains("'{{")) && !code.contains(" {{")
