@@ -67,9 +67,13 @@ class JustCodeBlockLanguageInjector : MultiHostInjector {
                 }
             }
         } else if (sqlLanguage != null && (justFile.isSQLAlike() || isSQLCode(trimmedText))) {
+            var textLength = context.textLength
+            if (text.endsWith("\n")) {
+                textLength -= (textLength - (text.trimEnd().length))
+            }
             val offset = text.indexOfFirst { !INDENT_CHARS.contains(it) }
             if (offset > 0) {
-                val injectionTextRange = TextRange(offset, context.textLength)
+                val injectionTextRange = TextRange(offset, textLength)
                 registrar.startInjecting(sqlLanguage!!)
                 registrar.addPlace(
                     null,
