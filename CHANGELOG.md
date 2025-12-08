@@ -4,6 +4,13 @@
 
 ## Unreleased
 
+## 0.6.30 - 2025-12-08
+
+### Fixed
+
+- Fix script with params: `[script('foo', 'bar')]`
+- Fix bash injection with SQL: code started with `select`, `update`, `insert`, `delete`.
+
 ## 0.6.29 - 2025-12-07
 
 ### Fixed
