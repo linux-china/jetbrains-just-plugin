@@ -27,6 +27,7 @@ class JustAttributeCompletionContributor : CompletionContributor() {
                         result.addElement(LookupElementBuilder.create("windows"))
                         result.addElement(LookupElementBuilder.create("openbsd"))
                         result.addElement(LookupElementBuilder.create("private"))
+                        result.addElement(LookupElementBuilder.create("arg"))
                         result.addElement(LookupElementBuilder.create("no-cd"))
                         result.addElement(LookupElementBuilder.create("working-directory"))
                         result.addElement(LookupElementBuilder.create("doc"))
