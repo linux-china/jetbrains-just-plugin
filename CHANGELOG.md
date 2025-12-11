@@ -4,6 +4,13 @@
 
 ## Unreleased
 
+## 0.6.31 - 2025-12-11
+
+### Added
+
+- `[arg('n', pattern='\d+')]` attribute support
+- Adjust attribute name parser and add highlight for attribute name
+
 ## 0.6.30 - 2025-12-08
 
 ### Fixed
