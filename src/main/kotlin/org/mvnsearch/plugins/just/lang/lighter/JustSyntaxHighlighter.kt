@@ -27,7 +27,7 @@ class JustSyntaxHighlighter : SyntaxHighlighterBase() {
             OPEN_PAREN, CLOSE_PAREN -> DefaultLanguageHighlighterColors.PARENTHESES
             OPEN_BRACKET, CLOSE_BRACKET -> DefaultLanguageHighlighterColors.BRACES
             COMMENT -> DefaultLanguageHighlighterColors.LINE_COMMENT
-            ATTRIBUTE -> DefaultLanguageHighlighterColors.METADATA
+            ATTRIBUTE_NAME -> DefaultLanguageHighlighterColors.METADATA
             SETTING -> DefaultLanguageHighlighterColors.MARKUP_ENTITY
             FUNCTION_NAME -> DefaultLanguageHighlighterColors.FUNCTION_CALL
             X_INDICATOR -> DefaultLanguageHighlighterColors.KEYWORD
