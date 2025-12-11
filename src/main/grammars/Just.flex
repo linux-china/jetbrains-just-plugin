@@ -57,7 +57,8 @@ INDENTED_RAW_STRING=(''')([']{0,2}([^']))*(''')
 STRING=(\"((\\\")|[^\"])*\")
 INDENTED_STRING=(\"\"\")([\"]{0,2}([^\"]))*(\"\"\")
 EXPORT_NAME=[a-zA-Z_][a-zA-Z0-9_\-]*
-ATTRIBUTE_NAME=([a-zA-Z0-9_\-]+)
+//ATTRIBUTE_NAME=([a-zA-Z0-9_\-]+)
+ATTRIBUTE_NAME= arg | confirm | default | doc | extension | group | linux | macos | metadata | ("no-cd") | ("no-exit-message") | ("no-quieet") | openbsd | ("positional-arguments") | private | parallel | script | unix | windows | ("working-directory")
 ID_LITERAL=[a-zA-Z_][a-zA-Z0-9_\-]*
 SETTING=[a-zA-Z_][a-zA-Z0-9_\-]*
 MOD_NAME=[a-zA-Z_][a-zA-Z0-9_\-]*
@@ -340,9 +341,11 @@ KEYWORD_ELSE_IF=("else if")
 
 <ATTRIBUTE> {
  {ATTRIBUTE_NAME}                       {  yybegin(ATTRIBUTE); return ATTRIBUTE_NAME; }
+ {ID_LITERAL}                  {  yybegin(ATTRIBUTE); return ID_LITERAL; }
  {WHITE_SPACE}+                          {  yybegin(ATTRIBUTE); return TokenType.WHITE_SPACE; }
  {SEPERATOR}                           {  yybegin(ATTRIBUTE); return SEPERATOR; }
  {COMMA}                               {  yybegin(ATTRIBUTE); return COMMA; }
+ {EQUAL}                               {  yybegin(ATTRIBUTE); return EQUAL; }
  {OPEN_PAREN}                           {  yybegin(ATTRIBUTE); return OPEN_PAREN; }
  {X_INDICATOR}/ {STRING_STARTER}        {  yybegin(ATTRIBUTE); return X_INDICATOR; }
  {F_INDICATOR}/ {STRING_STARTER}        {  yybegin(ATTRIBUTE); return F_INDICATOR; }
