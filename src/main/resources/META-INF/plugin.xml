@@ -8,10 +8,11 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <fileType name="justfile"
-                  implementationClass="org.mvnsearch.plugins.just.lang.psi.JustFileType"
-                  fieldName="INSTANCE" fileNamesCaseInsensitive="false"
-                  extensions="just"
-                  language="Just" fileNames="justfile;Justfile;.justfile,.Justfile"/>
+            implementationClass="org.mvnsearch.plugins.just.lang.psi.JustFileType"
+            fieldName="INSTANCE"
+            extensions="just;Justfile;justfile"
+            language="Just"
+            fileNames="justfile" />
         <codeInsight.lineMarkerProvider language="Just"
                                         implementationClass="org.mvnsearch.plugins.just.lang.run.JustRunLineMarkerContributor"/>
         <codeInsight.lineMarkerProvider language="Just"
