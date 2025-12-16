@@ -8,11 +8,11 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <fileType name="justfile"
-            implementationClass="org.mvnsearch.plugins.just.lang.psi.JustFileType"
-            fieldName="INSTANCE"
-            extensions="just;Justfile;justfile"
-            language="Just"
-            fileNames="justfile" />
+                  implementationClass="org.mvnsearch.plugins.just.lang.psi.JustFileType"
+                  fieldName="INSTANCE"
+                  extensions="just;Justfile;justfile"
+                  language="Just"
+                  fileNames="justfile;Justfile"/>
         <codeInsight.lineMarkerProvider language="Just"
                                         implementationClass="org.mvnsearch.plugins.just.lang.run.JustRunLineMarkerContributor"/>
         <codeInsight.lineMarkerProvider language="Just"
@@ -35,7 +35,7 @@
         <lang.foldingBuilder language="Just"
                              implementationClass="org.mvnsearch.plugins.just.lang.JustfileFoldingBuilder"/>
         <lang.foldingBuilder language="Just"
-                                     implementationClass="org.mvnsearch.plugins.just.lang.JustfileRegionFoldingBuilder"/>
+                             implementationClass="org.mvnsearch.plugins.just.lang.JustfileRegionFoldingBuilder"/>
         <notificationGroup id="just fmt" displayType="BALLOON" isLogByDefault="false"/>
         <formattingService implementation="org.mvnsearch.plugins.just.lang.format.JustExternalFormatter"/>
         <completion.contributor language="Just"
@@ -55,12 +55,14 @@
         <defaultLiveTemplates file="/liveTemplates/Just.xml"/>
         <!--suppress PluginXmlValidity -->
         <lang.directNavigationProvider implementation="org.mvnsearch.plugins.just.lang.navigation.RecipeRefNavigation"/>
-        <lang.directNavigationProvider implementation="org.mvnsearch.plugins.just.lang.navigation.ModeNameAndPathRefNavigation"/>
+        <lang.directNavigationProvider
+                implementation="org.mvnsearch.plugins.just.lang.navigation.ModeNameAndPathRefNavigation"/>
         <runAnything.executionProvider implementation="org.mvnsearch.plugins.just.lang.run.JustRunAnythingProvider"/>
         <!-- run configuration -->
         <configurationType implementation="org.mvnsearch.plugins.just.lang.run.JustConfigurationType"/>
         <runConfigurationProducer implementation="org.mvnsearch.plugins.just.lang.run.JustRunConfigurationProducer"/>
-        <renameInputValidator implementation="org.mvnsearch.plugins.just.lang.resolve.JustRecipeRenameInputValidator" order="first"/>
+        <renameInputValidator implementation="org.mvnsearch.plugins.just.lang.resolve.JustRecipeRenameInputValidator"
+                              order="first"/>
     </extensions>
 
     <actions>
