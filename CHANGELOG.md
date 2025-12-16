@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.6.32 - 2025-12-16
+
+### Added
+
+- Add `PROJECT_DIR` env variable to project's base dir(IDE only): `echo ${PROJECT_DIR}` or `set working-directory :=  x'${PROJECT_DIR}'`
+
 ## 0.6.31 - 2025-12-11
 
 ### Added
