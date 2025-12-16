@@ -14,6 +14,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.openapi.vfs.VirtualFile
@@ -105,10 +106,12 @@ fun runJustCommand(
     dataContext: DataContext
 ) {
     var commandDataContext = dataContext
+    val projectDir = project.guessProjectDir()!!.path
     commandDataContext = RunAnythingCommandCustomizer.customizeContext(commandDataContext)
     val initialCommandLine = GeneralCommandLine(ParametersListUtil.parse(commandString, false, true))
         .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
         .withEnvironment("JUST_UNSTABLE", "1")
+        .withEnvironment("PROJECT_DIR", projectDir)
         .withWorkDirectory(workDirectory.toNioPath().toFile())
     // adjust PATH
     adjustCommandLinePath(project, initialCommandLine)
