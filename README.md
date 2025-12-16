@@ -25,6 +25,7 @@ Plugin features:
 * Justfile structure view
 * Sub modules/import resolver
 * Interesting miscellaneous: DuckDB, Bun, Nushell etc.
+* Justfile as scratch file: `PROJECT_DIR` environment variable
 
 How to use?
 
