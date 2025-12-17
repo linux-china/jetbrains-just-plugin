@@ -324,12 +324,14 @@ KEYWORD_ELSE_IF=("else if")
 
 <DEPENDENCY_WITH_PARAMS> {
  {WHITE_SPACE}+                          {  yybegin(DEPENDENCY_WITH_PARAMS); return TokenType.WHITE_SPACE; }
+ {NEW_LINE}                              {  yybegin(DEPENDENCY_WITH_PARAMS); return JustTypes.NEW_LINE; }
  {DEPENDENCY_NAME} / {WHITE_SPACE}       {  yybegin(DEPENDENCY_CALL_PARAMS); return DEPENDENCY_NAME; }
  {CLOSE_PAREN}                           {  yybegin(DEPENDENCIES); return CLOSE_PAREN; }
 }
 
 <DEPENDENCY_CALL_PARAMS> {
  {WHITE_SPACE}+                          {  yybegin(DEPENDENCY_CALL_PARAMS); return TokenType.WHITE_SPACE; }
+ {NEW_LINE}                              {  yybegin(DEPENDENCY_CALL_PARAMS); return JustTypes.NEW_LINE; }
  {STRING}                                {  yybegin(DEPENDENCY_CALL_PARAMS); return STRING; }
  {RAW_STRING}                            {  yybegin(DEPENDENCY_CALL_PARAMS); return RAW_STRING; }
  {BACKTICK}                              {  yybegin(DEPENDENCY_CALL_PARAMS); return BACKTICK; }
