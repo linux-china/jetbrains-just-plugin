@@ -66,6 +66,7 @@
       KEYWORD_IMPORT='regexp:(import)[?]?'
       KEYWORD_ALIAS='regexp:(alias)'
       KEYWORD_EXPORT='regexp:(export)'
+      KEYWORD_UNEXPORT='regexp:(unexport)'
       KEYWORD_SET='regexp:(set)'
       KEYWORD_IF='regexp:(if)'
       KEYWORD_ELSE='regexp:(else)'
@@ -76,7 +77,7 @@
 
 justfile ::= any*
 
-private stmt ::= (SHEBANG_STATEMENT|COMMENT|MOD_STATEMENT|IMPORT_STATEMENT | ALIAS_STATEMENT|EXPORT_STATEMENT|SET_STATEMENT|ATTRIBUTE|VARIABLE_STATEMENT|RECIPE_STATEMENT|NEW_LINE)
+private stmt ::= (SHEBANG_STATEMENT|COMMENT|MOD_STATEMENT|IMPORT_STATEMENT | ALIAS_STATEMENT|UNEXPORT_STATEMENT|EXPORT_STATEMENT|SET_STATEMENT|ATTRIBUTE|VARIABLE_STATEMENT|RECIPE_STATEMENT|NEW_LINE)
 private recover ::= !(any)
 private any ::= !<<eof>> stmt {pin=1 recoverWhile=recover}
 
@@ -106,6 +107,8 @@ MOD_PATH ::= TEXT_ITEM
 IMPORT_STATEMENT ::= KEYWORD_IMPORT QUESTION_MARK? JUSTFILE_PATH
 JUSTFILE_PATH ::= IMPORT_PATH { mixin="org.mvnsearch.plugins.just.lang.psi.impl.JustfileFilenameMixin" }
 IMPORT_PATH ::=  TEXT_ITEM
+// unexport statement
+UNEXPORT_STATEMENT ::= KEYWORD_UNEXPORT EXPORT_NAME
 // export statement
 EXPORT_STATEMENT ::= KEYWORD_EXPORT EXPORT_NAME ASSIGN (EXPRESSION | ID_LITERAL)+
 // alias statement

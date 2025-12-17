@@ -80,6 +80,7 @@ CODE=((\n[ \t]+[^\n]*)|(\n[ \t]*))*
 
 KEYWORD_ALIAS=(alias)
 KEYWORD_EXPORT=(export)
+KEYWORD_UNEXPORT=(unexport)
 KEYWORD_SET=(set)
 KEYWORD_MOD=(mod)
 KEYWORD_IMPORT=(import)
@@ -87,7 +88,7 @@ KEYWORD_IF=(if)
 KEYWORD_ELSE=(else)
 KEYWORD_ELSE_IF=("else if")
 
-%state MOD IMPORT ALIAS VARIABLE CONDITIONAL CONDITIONAL_BLOCK_BODY CONDITIONAL_END EXPORT EXPORT_VALUE SET SET_VALUE ATTRIBUTE RECIPE PARAMS PARAM_WITH_VALUE PARAM_WITH_VALUE_FUNCTION_CALL DEPENDENCIES DEPENDENCY_WITH_PARAMS DEPENDENCY_CALL_PARAMS
+%state MOD IMPORT ALIAS VARIABLE CONDITIONAL CONDITIONAL_BLOCK_BODY CONDITIONAL_END UNEXPORT EXPORT EXPORT_VALUE SET SET_VALUE ATTRIBUTE RECIPE PARAMS PARAM_WITH_VALUE PARAM_WITH_VALUE_FUNCTION_CALL DEPENDENCIES DEPENDENCY_WITH_PARAMS DEPENDENCY_CALL_PARAMS
 
 %%
 
@@ -121,6 +122,11 @@ KEYWORD_ELSE_IF=("else if")
   {DUOBLE_COLON}      {  yybegin(ALIAS); return DUOBLE_COLON; }
   {COMMENT}         {  yybegin(ALIAS); return JustTypes.COMMENT; }
   {NEW_LINE}         {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
+}
+
+<UNEXPORT> {
+  {WHITE_SPACE}+     {  yybegin(EXPORT); return TokenType.WHITE_SPACE; }
+  {EXPORT_NAME}      {  yybegin(YYINITIAL); return EXPORT_NAME; }
 }
 
 <EXPORT> {
@@ -369,6 +375,7 @@ KEYWORD_ELSE_IF=("else if")
   {KEYWORD_IMPORT}/ ([\?]?)([\s]*)(x?)([\"\'])                   { yybegin(IMPORT); return JustTypes.KEYWORD_IMPORT; }
   {KEYWORD_ALIAS}                      { yybegin(ALIAS); return JustTypes.KEYWORD_ALIAS; }
   {KEYWORD_EXPORT} / (\s*)([a-zA-Z_][a-zA-Z0-9_\-]*)(\s*)(":=")  { yybegin(EXPORT); return JustTypes.KEYWORD_EXPORT; }
+  {KEYWORD_UNEXPORT} / (\s*)([a-zA-Z_][a-zA-Z0-9_\-]*)(\s*)  { yybegin(UNEXPORT); return JustTypes.KEYWORD_UNEXPORT; }
   {KEYWORD_SET}                        { yybegin(SET); return JustTypes.KEYWORD_SET; }
   {OPEN_BRACKET}                       { yybegin(ATTRIBUTE); return JustTypes.OPEN_BRACKET; }
 
