@@ -4,11 +4,20 @@
 
 ## Unreleased
 
+## 0.6.33 - 2025-12-17
+
+### Added
+
+- Add `unexport` statement support
+- [Parenthesized expressions(multiple lines)](https://just.systems/man/en/multi-line-constructs.html#outside-recipe-bodies)
+  support
+
 ## 0.6.32 - 2025-12-16
 
 ### Added
 
-- Add `PROJECT_DIR` env variable to project's base dir(IDE only): `echo ${PROJECT_DIR}` or `set working-directory :=  x'${PROJECT_DIR}'`
+- Add `PROJECT_DIR` env variable to project's base dir(IDE only): `echo ${PROJECT_DIR}` or
+  `set working-directory :=  x'${PROJECT_DIR}'`
 
 ## 0.6.31 - 2025-12-11
 
