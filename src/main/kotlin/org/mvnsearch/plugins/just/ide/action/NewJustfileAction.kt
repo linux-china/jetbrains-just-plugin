@@ -131,11 +131,7 @@ class NewJustfileAction : AnAction() {
         super.update(e)
         val p: Presentation = e.presentation
         val myPlace = e.place
-        if (myPlace == ActionPlaces.PROJECT_VIEW_POPUP) {
-            p.isVisible = true
-        } else {
-            p.isVisible = false
-        }
+        p.isEnabledAndVisible = myPlace == ActionPlaces.PROJECT_VIEW_POPUP
     }
 
     override fun actionPerformed(e: AnActionEvent) {
