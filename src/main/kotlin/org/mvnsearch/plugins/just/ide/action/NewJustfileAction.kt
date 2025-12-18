@@ -129,9 +129,7 @@ class NewJustfileAction : AnAction() {
 
     override fun update(e: AnActionEvent) {
         super.update(e)
-        val p: Presentation = e.presentation
-        val myPlace = e.place
-        p.isEnabledAndVisible = myPlace == ActionPlaces.PROJECT_VIEW_POPUP
+        e.presentation.isEnabledAndVisible = e.place == ActionPlaces.PROJECT_VIEW_POPUP
     }
 
     override fun actionPerformed(e: AnActionEvent) {
