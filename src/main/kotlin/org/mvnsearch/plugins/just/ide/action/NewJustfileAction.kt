@@ -1,8 +1,6 @@
 package org.mvnsearch.plugins.just.ide.action
 
-import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.guessProjectDir
@@ -129,6 +127,17 @@ class NewJustfileAction : AnAction() {
         """.trimIndent()
     }
 
+    override fun update(e: AnActionEvent) {
+        super.update(e)
+        val p: Presentation = e.presentation
+        val myPlace = e.place
+        if (myPlace == ActionPlaces.PROJECT_VIEW_POPUP) {
+            p.isVisible = true
+        } else {
+            p.isVisible = false
+        }
+    }
+
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.getData(CommonDataKeys.PROJECT)!!
         val projectDir = project.guessProjectDir()!!
@@ -185,6 +194,10 @@ class NewJustfileAction : AnAction() {
                 FileEditorManager.getInstance(project).openFile(justFile.virtualFile, true)
             }
         }
+    }
+
+    override fun getActionUpdateThread(): ActionUpdateThread {
+        return ActionUpdateThread.BGT
     }
 
 }
