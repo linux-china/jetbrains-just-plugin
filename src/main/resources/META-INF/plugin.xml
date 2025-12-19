@@ -47,6 +47,7 @@
         <completion.contributor language="Just"
                                 implementationClass="org.mvnsearch.plugins.just.lang.completion.JustAttributeCompletionContributor"/>
         <multiHostInjector implementation="org.mvnsearch.plugins.just.lang.injector.JustCodeBlockLanguageInjector"/>
+        <multiHostInjector implementation="org.mvnsearch.plugins.just.lang.injector.JustCodeFenceBlockLanguageInjector"/>
         <gotoSymbolContributor
                 implementation="org.mvnsearch.plugins.just.lang.navigation.JustChooseByRecipeNameContributor"/>
         <!-- live templates-->
