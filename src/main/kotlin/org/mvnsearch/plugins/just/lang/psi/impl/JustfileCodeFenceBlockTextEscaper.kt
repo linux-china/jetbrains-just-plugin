@@ -7,7 +7,7 @@ import org.mvnsearch.plugins.just.lang.psi.JustCodeFenceBlock
 
 class JustfileCodeFenceBlockTextEscaper(private val codeFenceBlock: JustCodeFenceBlock) : LiteralTextEscaper<JustCodeFenceBlock>(codeFenceBlock) {
     override fun isOneLine(): Boolean {
-        return codeFenceBlock.text.lastIndexOf('\n') == 0
+        return false
     }
 
     override fun getOffsetInHost(offsetInDecoded: Int, rangeInsideHost: TextRange): Int {
