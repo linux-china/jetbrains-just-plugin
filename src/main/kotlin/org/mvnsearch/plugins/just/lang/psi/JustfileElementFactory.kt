@@ -14,9 +14,9 @@ object JustfileElementFactory {
         return recipeStatement.dependenciesWithCode?.codeBlock!!
     }
 
-    fun createCodeFenceBlock(project: Project, codeBlock: String): JustCodeBlock {
+    fun createCodeFenceBlock(project: Project, codeBlock: String): JustCodeFenceBlock {
         val recipeStatement = createFile(project, "name:\n```\n$codeBlock\n```").firstChild as JustRecipeStatement
-        return recipeStatement.dependenciesWithCode?.codeBlock!!
+        return recipeStatement.dependenciesWithCode?.codeFenceBlock!!
     }
 
     fun createRecipe(project: Project, recipeName: String): JustRecipeStatement {
