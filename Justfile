@@ -20,6 +20,10 @@ generate:
 build-plugin: clean generate
   ./gradlew patchPluginXml buildPlugin
 
+# verify
+verify:
+   jbang org.jetbrains.intellij.plugins:verifier-cli:1.398:all check-plugin "build/distributions/Just JetBrains plugin-0.6.33.zip" "$HOME/Applications/IntelliJ IDEA 2025.3.1 Release Candidate.app/Contents"
+
 # clean
 clean:
   rm -rf build/distributions
