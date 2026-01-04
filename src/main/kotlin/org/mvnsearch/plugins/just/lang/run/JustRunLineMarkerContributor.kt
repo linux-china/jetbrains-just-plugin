@@ -119,7 +119,7 @@ fun runJustCommand(
         RunAnythingCommandCustomizer.customizeCommandLine(commandDataContext, workDirectory, initialCommandLine)
     try {
         val generalCommandLine =
-            if (Registry.`is`("run.anything.use.pty", false)) PtyCommandLine(commandLine) else commandLine
+            if (Registry.`is`("run.anything.use.pty", true)) PtyCommandLine(commandLine) else commandLine
         val runAnythingRunProfile = RunJustProfile(generalCommandLine, commandString)
         ExecutionEnvironmentBuilder.create(project, DefaultRunExecutor.getRunExecutorInstance(), runAnythingRunProfile)
             .dataContext(commandDataContext)
