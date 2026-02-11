@@ -4,6 +4,19 @@
 
 ## Unreleased
 
+## 0.6.35 - 2026-02-11
+
+### Added
+
+- Add env attribute support: set environment variables for recipe by `[env(ENV_VAR, VALUE)]`
+
+
+## 0.6.34 - 2025-12-21
+
+### Added
+
+- Compatible with JetBrains 2026.1
+
 ## 0.6.33 - 2025-12-17
 
 ### Added
