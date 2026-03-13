@@ -43,6 +43,7 @@ class JustAttributeCompletionContributor : CompletionContributor() {
                         result.addElement(LookupElementBuilder.create("metadata"))
                         result.addElement(LookupElementBuilder.create("parallel"))
                         result.addElement(LookupElementBuilder.create("default"))
+                        result.addElement(LookupElementBuilder.create("guards"))
                     }
                 }
             }
