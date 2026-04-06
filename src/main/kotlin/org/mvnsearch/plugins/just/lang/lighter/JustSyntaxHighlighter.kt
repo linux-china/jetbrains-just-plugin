@@ -22,7 +22,7 @@ class JustSyntaxHighlighter : SyntaxHighlighterBase() {
             KEYWORD_IF, KEYWORD_ELSE, KEYWORD_ELSE_IF,
             KEYWORD_IMPORT -> DefaultLanguageHighlighterColors.KEYWORD
 
-            VARIABLE -> DefaultLanguageHighlighterColors.STATIC_FIELD
+            VARIABLE, FUNCTION_DECL_NAME -> DefaultLanguageHighlighterColors.STATIC_FIELD
             ASSIGN, PLUS, SLASH, EQEQ, NOEQ, REEQ -> DefaultLanguageHighlighterColors.OPERATION_SIGN
             OPEN_PAREN, CLOSE_PAREN -> DefaultLanguageHighlighterColors.PARENTHESES
             OPEN_BRACKET, CLOSE_BRACKET -> DefaultLanguageHighlighterColors.BRACES
