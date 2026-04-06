@@ -4,11 +4,12 @@
 
 ## Unreleased
 
-## 0.6.36 - 2026-04-06
+## 0.6.37 - 2026-04-06
 
 ### Added
-
-- Add User-defined functions support: `hello(name) := f"Hello, {{ name }}!"`
+           
+- Fix function name completion in code block
+- Add User-defined function support: `hello(name) := f"Hello, {{ name }}!"`
 
 ```
 set unstable
@@ -18,6 +19,13 @@ hello(name) := f"Hello, {{ name }}!"
 foo:
   echo '{{ hello("World") }}'
 ```
+
+## 0.6.36 - 2026-03-13
+
+### Added
+
+- Add sub module dependency support: `baz: foo::bar`
+- Add guards setting support: `set guards`
 
 ## 0.6.35 - 2026-02-11
 
