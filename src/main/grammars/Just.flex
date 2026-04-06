@@ -68,6 +68,7 @@ SHEBANG=("#!")[^\n]*
 COMMENT=("#")[^\n]*
 DOUBLE_AND=("&&")
 VARIABLE=([a-zA-Z_][a-zA-Z0-9_-]*)
+FUNCTION_DECL_NAME=([a-zA-Z_][a-zA-Z0-9_-]*)
 VARIABLE_DECLARE=([a-zA-Z_][a-zA-Z0-9_-]*)(\s*)(":=")
 RECIPE_PARAMS=([^:\n]*)
 RECIPE_PARAM_NAME=[*+]?[$]?[a-zA-Z_][a-zA-Z0-9_\-]*
@@ -89,7 +90,7 @@ KEYWORD_IF=(if)
 KEYWORD_ELSE=(else)
 KEYWORD_ELSE_IF=("else if")
 
-%state MOD IMPORT ALIAS VARIABLE_PAREN VARIABLE_PAREN_FUNCTION_CALL VARIABLE CONDITIONAL CONDITIONAL_BLOCK_BODY CONDITIONAL_END UNEXPORT EXPORT EXPORT_VALUE SET SET_VALUE ATTRIBUTE RECIPE PARAMS PARAM_WITH_VALUE PARAM_WITH_VALUE_FUNCTION_CALL DEPENDENCIES DEPENDENCY_WITH_PARAMS DEPENDENCY_CALL_PARAMS
+%state MOD IMPORT ALIAS VARIABLE_PAREN VARIABLE_PAREN_FUNCTION_CALL VARIABLE FUNCTION_DECL FUNCTION_BODY CONDITIONAL CONDITIONAL_BLOCK_BODY CONDITIONAL_END UNEXPORT EXPORT EXPORT_VALUE SET SET_VALUE ATTRIBUTE RECIPE PARAMS PARAM_WITH_VALUE PARAM_WITH_VALUE_FUNCTION_CALL DEPENDENCIES DEPENDENCY_WITH_PARAMS DEPENDENCY_CALL_PARAMS
 
 %%
 
@@ -176,6 +177,39 @@ KEYWORD_ELSE_IF=("else if")
    {COMMA}              {  yybegin(SET_VALUE); return COMMA; }
    {COMMENT}          {  yybegin(SET_VALUE); return JustTypes.COMMENT; }
    {NEW_LINE}          {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
+}
+
+<FUNCTION_DECL> {
+  {WHITE_SPACE}+               {  yybegin(FUNCTION_DECL); return TokenType.WHITE_SPACE; }
+  {WHITE_SPACE}+               {  yybegin(FUNCTION_DECL); return TokenType.WHITE_SPACE; }
+  {ASSIGN}                     {  yybegin(FUNCTION_BODY); return ASSIGN; }
+  {OPEN_PAREN}                 {  yybegin(FUNCTION_DECL); return OPEN_PAREN; }
+  {ID_LITERAL}                 {  yybegin(FUNCTION_DECL); return ID_LITERAL; }
+  {COMMA}                      {  yybegin(FUNCTION_DECL); return COMMA; }
+  {CLOSE_PAREN}                {  yybegin(FUNCTION_DECL); return CLOSE_PAREN; }
+}
+
+<FUNCTION_BODY> {
+   {WHITE_SPACE}+               {  yybegin(FUNCTION_BODY); return TokenType.WHITE_SPACE; }
+   {KEYWORD_IF} / {WHITE_SPACE} {  yybegin(CONDITIONAL); return KEYWORD_IF; }
+   {INDENTED_BACKTICK}          {  yybegin(FUNCTION_BODY); return INDENTED_BACKTICK; }
+   {INDENTED_RAW_STRING}        {  yybegin(FUNCTION_BODY); return INDENTED_RAW_STRING; }
+   {INDENTED_STRING}            {  yybegin(FUNCTION_BODY); return INDENTED_STRING; }
+   {STRING}                     {  yybegin(FUNCTION_BODY); return STRING; }
+   {X_INDICATOR}/ {STRING_STARTER}           {  yybegin(FUNCTION_BODY); return X_INDICATOR; }
+   {F_INDICATOR}/ {STRING_STARTER}           {  yybegin(FUNCTION_BODY); return F_INDICATOR; }
+   {RAW_STRING}                 {  yybegin(FUNCTION_BODY); return RAW_STRING; }
+   {BACKTICK}                   {  yybegin(FUNCTION_BODY); return BACKTICK; }
+   {ID_LITERAL}                    {  yybegin(FUNCTION_BODY); return ID_LITERAL; }
+   {PLUS}                      {  yybegin(FUNCTION_BODY); return PLUS; }
+   {SLASH}                      {  yybegin(FUNCTION_BODY); return SLASH; }
+   {OR}                        {  yybegin(FUNCTION_BODY); return OR; }
+   {AND}                      {  yybegin(FUNCTION_BODY); return AND; }
+   {OPEN_PAREN}               {  yybegin(FUNCTION_BODY); return OPEN_PAREN; }
+   {CLOSE_PAREN}               {  yybegin(FUNCTION_BODY); return CLOSE_PAREN; }
+   {COMMA}                     {  yybegin(FUNCTION_BODY); return COMMA; }
+   {COMMENT}                   {  yybegin(FUNCTION_BODY); return JustTypes.COMMENT; }
+   {NEW_LINE}                   {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
 }
 
 <VARIABLE> {
@@ -428,6 +462,7 @@ KEYWORD_ELSE_IF=("else if")
   // Flex: Lookahead predicate
   {VARIABLE} / (\s*)(":=")(\s*){OPEN_PAREN}  { yybegin(VARIABLE_PAREN); return JustTypes.VARIABLE; }
   {VARIABLE} / (\s*)(":=")             { yybegin(VARIABLE); return JustTypes.VARIABLE; }
+  {FUNCTION_DECL_NAME} / (\(([a-zA-Z_][a-zA-Z0-9,_\-]*)*\))(\s*)(":=")             { yybegin(FUNCTION_DECL); return JustTypes.FUNCTION_DECL_NAME; }
   @?{RECIPE_NAME}                      { yybegin(RECIPE); return JustTypes.RECIPE_NAME; }
 }
 
