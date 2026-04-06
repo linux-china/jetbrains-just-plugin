@@ -74,6 +74,13 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
             .toList()
     }
 
+    fun getUserDefinedFunctions(): List<String> {
+        return this.children
+            .filterIsInstance<JustFunctionStatement>()
+            .map { it.functionDeclName.text }
+            .toList()
+    }
+
     fun parseMetadata(loadDotenv: Boolean): JustfileMetadata {
         val justfileMetadata = JustfileMetadata()
         text.lines().forEach { line ->
@@ -91,9 +98,14 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
                     val aliasRecipeName = line.substring(6, line.indexOf(":=")).trim()
                     justfileMetadata.recipes.add(aliasRecipeName)
                 } else if (!(line.startsWith(" ") || line.startsWith("\t")) && line.contains(":")) { //recipe or variable
-                    if (line.contains(":=")) { // variable
+                    if (line.contains(":=")) { // variable or function
                         val variable = line.substring(0, line.indexOf(":=")).trim()
-                        justfileMetadata.variables.add(variable)
+                        if(variable.contains("(")) {
+                            val functionName = variable.substring(0, variable.indexOf("(")).trim()
+                            justfileMetadata.userDefinedFunctions.add(functionName)
+                        } else {
+                            justfileMetadata.variables.add(variable)
+                        }
                     } else { // recipe
                         justfileMetadata.recipes.add(parseRecipeName(line))
                     }
@@ -162,6 +174,7 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
 class JustfileMetadata {
     val recipes = mutableListOf<String>()
     val variables = mutableListOf<String>()
+    val userDefinedFunctions = mutableListOf<String>()
     val envVariables = mutableListOf<String>()
     val imports = mutableListOf<JustFile>()
     var dotenvLoad = false
