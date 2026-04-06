@@ -61,6 +61,7 @@ class JustCodeCompletionContributor : CompletionContributor() {
 
                         val caret = parameters.editor.caretModel.currentCaret
                         val lineOffset = caret.visualLineStart
+                        val lineEndOffset = caret.visualLineEnd
                         val prefixText = parameters.editor.document.getText(TextRange(lineOffset, caret.offset))
                         if (prefixText.endsWith("$")) {
                             val prefixMatcher = result.withPrefixMatcher("$")
@@ -88,8 +89,9 @@ class JustCodeCompletionContributor : CompletionContributor() {
                                         .withIcon(AllIcons.Nodes.Variable)
                                 )
                             }
-                        } else if (prefixText.endsWith("{{")) {
-                            val prefixMatcher = result.withPrefixMatcher("{{")
+                        } else if (prefixText.trim().endsWith("{{")) {
+                            val prefix = prefixText.substring(prefixText.lastIndexOf("{{"))
+                            val prefixMatcher = result.withPrefixMatcher(prefix)
                             var suffix = ""
                             if (prefixText.length > 3) {
                                 val character = prefixText[prefixText.length - 3]
@@ -118,10 +120,33 @@ class JustCodeCompletionContributor : CompletionContributor() {
                                     )
                                 )
                             }
+                            // suffix for functions
+                            suffix = if (prefix.endsWith(" ")) {
+                                " }}"
+                            } else {
+                                "}}"
+                            }
+                            val suffixText = parameters.editor.document.getText(TextRange(caret.offset, lineEndOffset))
+                            if (suffixText.contains("}}")) {
+                                suffix = if (prefix.endsWith(" ") && !suffixText.startsWith(" ")) {
+                                    " "
+                                } else {
+                                    ""
+                                }
+                            }
+                            justfileMetadata.userDefinedFunctions.forEach {
+                                prefixMatcher.addElement(
+                                    priority(
+                                        LookupElementBuilder.create("${prefix}$it()${suffix}")
+                                            .withPresentableText("$it()")
+                                            .withIcon(AllIcons.Nodes.Function), 0.0
+                                    )
+                                )
+                            }
                             JUST_FUNCTIONS.forEach {
                                 prefixMatcher.addElement(
                                     priority(
-                                        LookupElementBuilder.create("{{$it}}${suffix}").withPresentableText(it)
+                                        LookupElementBuilder.create("${prefix}$it${suffix}").withPresentableText(it)
                                             .withIcon(AllIcons.Nodes.Function), 0.0
                                     )
                                 )
