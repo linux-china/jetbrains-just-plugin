@@ -4,6 +4,21 @@
 
 ## Unreleased
 
+## 0.6.36 - 2026-04-06
+
+### Added
+
+- Add User-defined functions support: `hello(name) := f"Hello, {{ name }}!"`
+
+```
+set unstable
+
+hello(name) := f"Hello, {{ name }}!"
+
+foo:
+  echo '{{ hello("World") }}'
+```
+
 ## 0.6.35 - 2026-02-11
 
 ### Added
