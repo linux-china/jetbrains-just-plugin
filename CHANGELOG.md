@@ -4,10 +4,16 @@
 
 ## Unreleased
 
+## 0.6.38 - 2026-04-08
+
+### Added
+
+- Add icon for user defined functions
+
 ## 0.6.37 - 2026-04-06
 
 ### Added
-           
+
 - Fix function name completion in code block
 - Add User-defined function support: `hello(name) := f"Hello, {{ name }}!"`
 
@@ -32,7 +38,6 @@ foo:
 ### Added
 
 - Add env attribute support: set environment variables for recipe by `[env(ENV_VAR, VALUE)]`
-
 
 ## 0.6.34 - 2025-12-21
 
