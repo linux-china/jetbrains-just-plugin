@@ -17,6 +17,8 @@
                                         implementationClass="org.mvnsearch.plugins.just.lang.run.JustRunLineMarkerContributor"/>
         <codeInsight.lineMarkerProvider language="Just"
                                         implementationClass="org.mvnsearch.plugins.just.lang.marker.ShebangMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="Just"
+                                        implementationClass="org.mvnsearch.plugins.just.lang.marker.UserDefinedFunctionMarkerProvider"/>
 
         <codeInsight.parameterNameHints
                 language="Just"
@@ -47,7 +49,8 @@
         <completion.contributor language="Just"
                                 implementationClass="org.mvnsearch.plugins.just.lang.completion.JustAttributeCompletionContributor"/>
         <multiHostInjector implementation="org.mvnsearch.plugins.just.lang.injector.JustCodeBlockLanguageInjector"/>
-        <multiHostInjector implementation="org.mvnsearch.plugins.just.lang.injector.JustCodeFenceBlockLanguageInjector"/>
+        <multiHostInjector
+                implementation="org.mvnsearch.plugins.just.lang.injector.JustCodeFenceBlockLanguageInjector"/>
         <gotoSymbolContributor
                 implementation="org.mvnsearch.plugins.just.lang.navigation.JustChooseByRecipeNameContributor"/>
         <!-- live templates-->
