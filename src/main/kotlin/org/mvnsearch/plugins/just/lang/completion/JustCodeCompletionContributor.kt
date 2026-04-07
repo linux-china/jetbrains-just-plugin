@@ -17,33 +17,32 @@ import org.mvnsearch.plugins.just.lang.psi.JustRecipeStatement
 import org.mvnsearch.plugins.just.lang.psi.JustTypes
 import org.mvnsearch.plugins.just.removeVariablePrefix
 
+val JUST_FUNCTIONS = listOf(
+    "home_dir()",
+    "invocation_dir()",
+    "justfile_dir()",
+    "path_exists()",
+    "absolute_path()",
+    "file_name()",
+    "extension()",
+    "parent_directory()",
+    "canonicalize()",
+    "clean()",
+    "join()",
+    "sha256_file()",
+    "error()",
+    "shell()",
+    "env()",
+    "uuid()",
+    "datetime()"
+)
+
 /**
  * code completion for Code block, such as variables
  *
  * @author linux_china
  */
 class JustCodeCompletionContributor : CompletionContributor() {
-    companion object {
-        val JUST_FUNCTIONS = listOf(
-            "home_dir()",
-            "invocation_dir()",
-            "justfile_dir()",
-            "path_exists()",
-            "absolute_path()",
-            "file_name()",
-            "extension()",
-            "parent_directory()",
-            "canonicalize()",
-            "clean()",
-            "join()",
-            "sha256_file()",
-            "error()",
-            "shell()",
-            "env()",
-            "uuid()",
-            "datetime()"
-        )
-    }
 
     init {
         extend(
