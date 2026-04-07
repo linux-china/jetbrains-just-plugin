@@ -9,6 +9,7 @@
 ### Added
 
 - Add icon for user defined functions
+- Code completion for shell raw string: `'{{ <caret> }}'`
 
 ## 0.6.37 - 2026-04-06
 
