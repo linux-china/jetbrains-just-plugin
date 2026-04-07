@@ -1,0 +1,9 @@
+<idea-plugin>
+    <depends>com.jetbrains.sh</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <completion.contributor language="Shell Script"
+                                implementationClass="org.mvnsearch.plugins.just.lang.completion.JustVariableFunctionCompletionContributor"/>
+    </extensions>
+
+</idea-plugin>
