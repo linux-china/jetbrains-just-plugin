@@ -5,6 +5,8 @@
     <vendor email="libing.chen@gmail.com">linux_china</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends optional="true" config-file="just-sh.xml">com.jetbrains.sh</depends>
+
 
     <extensions defaultExtensionNs="com.intellij">
         <fileType name="justfile"
