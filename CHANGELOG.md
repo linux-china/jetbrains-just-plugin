@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.6.39 - 2026-04-22
+
+### Added
+
+- Add attributes: `[netbsd]` and `[android]`
+
 ## 0.6.38 - 2026-04-08
 
 ### Added
