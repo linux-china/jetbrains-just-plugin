@@ -26,6 +26,8 @@ class JustAttributeCompletionContributor : CompletionContributor() {
                         result.addElement(LookupElementBuilder.create("unix"))
                         result.addElement(LookupElementBuilder.create("windows"))
                         result.addElement(LookupElementBuilder.create("openbsd"))
+                        result.addElement(LookupElementBuilder.create("dragonfly"))
+                        result.addElement(LookupElementBuilder.create("netbsd"))
                         result.addElement(LookupElementBuilder.create("private"))
                         result.addElement(LookupElementBuilder.create("arg"))
                         result.addElement(LookupElementBuilder.create("no-cd"))
@@ -42,6 +44,7 @@ class JustAttributeCompletionContributor : CompletionContributor() {
                         result.addElement(LookupElementBuilder.create("extension"))
                         result.addElement(LookupElementBuilder.create("metadata"))
                         result.addElement(LookupElementBuilder.create("parallel"))
+                        result.addElement(LookupElementBuilder.create("android"))
                         result.addElement(LookupElementBuilder.create("default"))
                     }
                 }
