@@ -181,7 +181,6 @@ KEYWORD_ELSE_IF=("else if")
 
 <FUNCTION_DECL> {
   {WHITE_SPACE}+               {  yybegin(FUNCTION_DECL); return TokenType.WHITE_SPACE; }
-  {WHITE_SPACE}+               {  yybegin(FUNCTION_DECL); return TokenType.WHITE_SPACE; }
   {ASSIGN}                     {  yybegin(FUNCTION_BODY); return ASSIGN; }
   {OPEN_PAREN}                 {  yybegin(FUNCTION_DECL); return OPEN_PAREN; }
   {ID_LITERAL}                 {  yybegin(FUNCTION_DECL); return ID_LITERAL; }
@@ -462,7 +461,7 @@ KEYWORD_ELSE_IF=("else if")
   // Flex: Lookahead predicate
   {VARIABLE} / (\s*)(":=")(\s*){OPEN_PAREN}  { yybegin(VARIABLE_PAREN); return JustTypes.VARIABLE; }
   {VARIABLE} / (\s*)(":=")             { yybegin(VARIABLE); return JustTypes.VARIABLE; }
-  {FUNCTION_DECL_NAME} / (\(([a-zA-Z_][a-zA-Z0-9,_\-]*)*\))(\s*)(":=")             { yybegin(FUNCTION_DECL); return JustTypes.FUNCTION_DECL_NAME; }
+  {FUNCTION_DECL_NAME} / (\(([a-zA-Z_][a-zA-Z0-9,_\-\s]*)*\))(\s*)(":=")             { yybegin(FUNCTION_DECL); return JustTypes.FUNCTION_DECL_NAME; }
   @?{RECIPE_NAME}                      { yybegin(RECIPE); return JustTypes.RECIPE_NAME; }
 }
 
