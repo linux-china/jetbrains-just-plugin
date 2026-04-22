@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.6.40 - 2026-04-22
+
+### Fixed
+
+- Fixed function declaration with spaces in params: [#76](https://github.com/linux-china/jetbrains-just-plugin/issues/76)
+
 ## 0.6.39 - 2026-04-22
 
 ### Added
