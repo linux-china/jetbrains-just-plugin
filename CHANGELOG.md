@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.6.41 - 2026-05-02
+
+### Add
+
+- Add `set no-cd` setting
+
 ## 0.6.40 - 2026-04-22
 
 ### Fixed
