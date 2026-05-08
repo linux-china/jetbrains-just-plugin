@@ -79,6 +79,7 @@ RECIPE_PAIR_PARARM2=[$*+]?[a-zA-Z_][a-zA-Z0-9_\-]*=`[^`:]*`
 RECIPE_PAIR_PARARM3=[$*+]?[a-zA-Z_][a-zA-Z0-9_\-]*=\([^:\(]*\)
 CODE=((\n[ \t]+[^\n]*)|(\n[ \t]*))+
 CODE_FENCE=\n```([a-zA-Z0-9_+-]*)\n([\s\S]*?)\n```
+EXPRESSION_FENCE=\{\{([^\n]*)\}\}
 
 KEYWORD_ALIAS=(alias)
 KEYWORD_EXPORT=(export)
@@ -436,6 +437,7 @@ KEYWORD_ELSE_IF=("else if")
  {F_INDICATOR}/ {STRING_STARTER}        {  yybegin(ATTRIBUTE); return F_INDICATOR; }
  {STRING}                                {  yybegin(ATTRIBUTE); return STRING; }
  {RAW_STRING}                            {  yybegin(ATTRIBUTE); return RAW_STRING; }
+ {EXPRESSION_FENCE}                      {  yybegin(ATTRIBUTE); return EXPRESSION_FENCE; }
  {CLOSE_PAREN}                           {  yybegin(ATTRIBUTE); return CLOSE_PAREN; }
  {CLOSE_BRACKET}                           {  yybegin(YYINITIAL); return CLOSE_BRACKET; }
 }
