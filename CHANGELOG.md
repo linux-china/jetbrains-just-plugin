@@ -4,6 +4,14 @@
 
 ## Unreleased
 
+## 0.6.42 - 2026-05-08
+
+### Add
+
+- Allow attribute to take expression: `[env("VAR_NAME", "{{var_value}}")]` or `[working-directory("{{path_value}}")]` 
+- High lighting for expression in attribute
+- Compatible with JetBrains 2026.2
+
 ## 0.6.41 - 2026-05-02
 
 ### Add
