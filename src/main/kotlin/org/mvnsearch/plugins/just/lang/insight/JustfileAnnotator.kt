@@ -23,7 +23,7 @@ class JustfileAnnotator : Annotator {
                 highLightVariablesInCodeBlock(element, holder)
             }
 
-            JustTypes.F_STRING -> {  // high light variable
+            JustTypes.F_STRING , JustTypes.ATTRIBUTE_FUNCTION_PARAM_VALUE -> {  // high light variable
                 highLightVariablesInFormatString(element, holder)
             }
 
@@ -55,7 +55,7 @@ class JustfileAnnotator : Annotator {
         val rangeOffset = element.textRange.startOffset
         val text = element.text
         var offset = text.indexOf("{{")
-        while (offset > 0) {
+        while (offset >= 0) {
             val endOffset = text.indexOf("}}", offset + 2)
             if (endOffset > offset) {
                 val range = TextRange(rangeOffset + offset, rangeOffset + endOffset + 2)
