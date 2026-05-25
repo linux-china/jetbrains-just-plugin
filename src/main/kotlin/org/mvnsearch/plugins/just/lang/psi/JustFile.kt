@@ -50,13 +50,20 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
     fun isBashAlike(): Boolean {
         val shellItem = this.children
             .filterIsInstance<JustSetStatement>().firstOrNull() {
-                it.setting.text == "shell" || it.setting.text == "windows-shell"
+                it.setting.text == "shell" || it.setting.text == "windows-shell" || it.setting.text == "script-interpreter"
             }
         return if (shellItem == null) {
             true
         } else {
             shellItem.text.contains("sh\"")
         }
+    }
+
+    fun hasShellConfig(): Boolean {
+        return this.children
+            .filterIsInstance<JustSetStatement>().any {
+                it.setting.text == "shell" || it.setting.text == "windows-shell" || it.setting.text == "script-interpreter"
+            }
     }
 
     fun isSQLAlike(): Boolean {
