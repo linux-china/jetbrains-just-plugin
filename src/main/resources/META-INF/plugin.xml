@@ -41,6 +41,7 @@
         <lang.foldingBuilder language="Just"
                              implementationClass="org.mvnsearch.plugins.just.lang.JustfileRegionFoldingBuilder"/>
         <notificationGroup id="just fmt" displayType="BALLOON" isLogByDefault="false"/>
+
         <formattingService implementation="org.mvnsearch.plugins.just.lang.format.JustExternalFormatter"/>
         <completion.contributor language="Just"
                                 implementationClass="org.mvnsearch.plugins.just.lang.completion.JustCodeCompletionContributor"/>
@@ -69,7 +70,23 @@
         <runConfigurationProducer implementation="org.mvnsearch.plugins.just.lang.run.JustRunConfigurationProducer"/>
         <renameInputValidator implementation="org.mvnsearch.plugins.just.lang.resolve.JustRecipeRenameInputValidator"
                               order="first"/>
+
+        <toolWindow
+                id="Just"
+                anchor="right"
+                factoryClass="org.mvnsearch.plugins.just.ide.toolwindow.JustToolWindowFactory"
+                icon="/icons/just-16x16.svg"/>
+
+        <notificationGroup
+                id="just toolwindow"
+                displayType="BALLOON"
+                isLogByDefault="true"/>
     </extensions>
+
+    <extensionPoints>
+        <extensionPoint qualifiedName="org.mvnsearch.just.toolWindowStripeController"
+                        interface="org.mvnsearch.plugins.just.ide.toolwindow.JustfileToolWindowStripeController" dynamic="true"/>
+    </extensionPoints>
 
     <actions>
         <action class="org.mvnsearch.plugins.just.ide.action.NewJustfileAction"
