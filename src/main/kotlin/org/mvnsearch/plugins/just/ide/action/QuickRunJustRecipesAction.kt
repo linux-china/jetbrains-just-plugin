@@ -6,6 +6,7 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.ui.popup.JBPopupFactory.ActionSelectionAid
+import com.intellij.openapi.vfs.VirtualFile
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
 
 
@@ -20,25 +21,21 @@ class QuickRunJustRecipesAction : QuickSwitchSchemeAction(), DumbAware {
         p.icon = JustIcons.JUST_FILE
     }
 
-    private fun findJustfile(currentProject: Project): String? {
-        val projectDir = currentProject.guessProjectDir()
-        if (projectDir != null) {
-            if (projectDir.findChild("justfile") != null) {
-                return "justfile"
-            } else if (projectDir.findChild("Justfile") != null) {
-                return "Justfile"
-            } else if (projectDir.findChild(".justfile") != null) {
-                return ".justfile"
-            }
+    private fun findJustfile(currentProject: Project): VirtualFile? {
+        val projectDir = currentProject.guessProjectDir() ?: return null
+
+        setOf("justfile", "Justfile", ".justfile").forEach { child ->
+            return projectDir.findChild(child)
         }
+
         return null
     }
 
 
     override fun fillActions(currentProject: Project, group: DefaultActionGroup, dataContext: DataContext) {
-        val justfileName = findJustfile(currentProject)
-        if (justfileName != null) {
-            val actions = JustRecipesActionGroup(justfileName).getActions(dataContext, currentProject)
+        val justfile = findJustfile(currentProject)
+        if (justfile != null) {
+            val actions = JustRecipesActionGroup(justfile).getActions(dataContext, currentProject)
             actions.forEachIndexed { index, action ->
                 if (index > 0) {
                     group.add(Separator())
