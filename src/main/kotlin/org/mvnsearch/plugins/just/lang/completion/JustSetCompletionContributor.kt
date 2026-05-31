@@ -31,6 +31,7 @@ class JustSetCompletionContributor : CompletionContributor() {
                         result.addElement(LookupElementBuilder.create("dotenv-override := true"))
                         result.addElement(LookupElementBuilder.create("dotenv-path := \"\""))
                         result.addElement(LookupElementBuilder.create("ignore-comments"))
+                        result.addElement(LookupElementBuilder.create("default-list := true"))
                         result.addElement(LookupElementBuilder.create("export"))
                         result.addElement(LookupElementBuilder.create("guards"))
                         result.addElement(LookupElementBuilder.create("quiet"))
