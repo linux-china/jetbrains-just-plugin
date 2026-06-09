@@ -5,7 +5,6 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.configurations.PtyCommandLine
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.runners.ExecutionEnvironmentBuilder
-import com.intellij.ide.IdeBundle
 import com.intellij.ide.actions.runAnything.activity.RunAnythingCommandLineProvider
 import com.intellij.ide.actions.runAnything.commands.RunAnythingCommandCustomizer
 import com.intellij.ide.actions.runAnything.items.RunAnythingItem
@@ -19,6 +18,7 @@ import com.intellij.openapi.util.registry.Registry
 import com.intellij.psi.PsiManager
 import com.intellij.util.execution.ParametersListUtil
 import org.mvnsearch.plugins.just.Just
+import org.mvnsearch.plugins.just.JustBundle
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
 import org.mvnsearch.plugins.just.lang.psi.JustFile
 import org.mvnsearch.plugins.just.lang.run.JustRunConfiguration.Companion.adjustCommandLinePath
@@ -81,7 +81,7 @@ class JustRunAnythingProvider : RunAnythingCommandLineProvider() {
                 .dataContext(commandDataContext)
                 .buildAndExecute()
         } catch (e: ExecutionException) {
-            Messages.showInfoMessage(project, e.message, IdeBundle.message("run.anything.console.error.title"))
+            Messages.showInfoMessage(project, e.message, JustBundle.message("run.anything.console.error.title"))
         }
         return true
     }

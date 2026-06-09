@@ -7,7 +7,6 @@ import com.intellij.execution.configurations.PtyCommandLine
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.lineMarker.RunLineMarkerProvider
 import com.intellij.execution.runners.ExecutionEnvironmentBuilder
-import com.intellij.ide.IdeBundle
 import com.intellij.ide.actions.runAnything.commands.RunAnythingCommandCustomizer
 import com.intellij.ide.actions.runAnything.execution.RunAnythingRunProfile
 import com.intellij.openapi.actionSystem.DataContext
@@ -22,6 +21,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.elementType
 import com.intellij.util.execution.ParametersListUtil
 import org.mvnsearch.plugins.just.Just
+import org.mvnsearch.plugins.just.JustBundle
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
 import org.mvnsearch.plugins.just.ide.icons.JustIcons.JUST_FILE
 import org.mvnsearch.plugins.just.lang.psi.JustRecipeStatement
@@ -125,7 +125,7 @@ fun runJustCommand(
             .dataContext(commandDataContext)
             .buildAndExecute()
     } catch (e: ExecutionException) {
-        Messages.showInfoMessage(project, e.message, IdeBundle.message("run.anything.console.error.title"))
+        Messages.showInfoMessage(project, e.message, JustBundle.message("run.anything.console.error.title"))
     }
 }
 
