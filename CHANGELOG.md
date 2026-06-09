@@ -4,6 +4,13 @@
 
 ## Unreleased
 
+## 0.6.45 - 2026-06-00
+
+### Added
+
+- Add `[shell]` attribute
+- Add `set default-script := true`
+
 ## 0.6.44 - 2026-05-31
 
 ### Added
