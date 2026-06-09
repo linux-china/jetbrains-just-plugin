@@ -4,18 +4,13 @@
 
 ## Unreleased
 
-## 0.6.45 - 2026-06-00
+## 0.6.44 - 2026-06-08
 
 ### Added
 
 - Add `[shell]` attribute
 - Add `set default-script := true`
-
-## 0.6.44 - 2026-05-31
-
-### Added
-
-- Add `set default-list := true` 
+- Add `set default-list := true`
 
 ## 0.6.43 - 2026-05-25
 
