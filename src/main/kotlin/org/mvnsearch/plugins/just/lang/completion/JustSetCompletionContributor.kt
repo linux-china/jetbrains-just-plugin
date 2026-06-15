@@ -34,6 +34,7 @@ class JustSetCompletionContributor : CompletionContributor() {
                         result.addElement(LookupElementBuilder.create("default-list := true"))
                         result.addElement(LookupElementBuilder.create("export"))
                         result.addElement(LookupElementBuilder.create("guards"))
+                        result.addElement(LookupElementBuilder.create("lists"))
                         result.addElement(LookupElementBuilder.create("quiet"))
                         result.addElement(LookupElementBuilder.create("unstable"))
                         result.addElement(LookupElementBuilder.create("fallback"))
