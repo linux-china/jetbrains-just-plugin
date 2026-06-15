@@ -4,6 +4,13 @@
 
 ## Unreleased
 
+## 0.6.45 - 2026-06-08
+
+### Added
+
+- Add `set lists` setting
+- Add list literals `[env("ADMIN", ["Libing", "Chen"])]` in attribute
+
 ## 0.6.44 - 2026-06-08
 
 ### Added
