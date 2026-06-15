@@ -91,7 +91,7 @@ KEYWORD_IF=(if)
 KEYWORD_ELSE=(else)
 KEYWORD_ELSE_IF=("else if")
 
-%state MOD IMPORT ALIAS VARIABLE_PAREN VARIABLE_PAREN_FUNCTION_CALL VARIABLE FUNCTION_DECL FUNCTION_BODY CONDITIONAL CONDITIONAL_BLOCK_BODY CONDITIONAL_END UNEXPORT EXPORT EXPORT_VALUE SET SET_VALUE ATTRIBUTE RECIPE PARAMS PARAM_WITH_VALUE PARAM_WITH_VALUE_FUNCTION_CALL DEPENDENCIES DEPENDENCY_WITH_PARAMS DEPENDENCY_CALL_PARAMS
+%state MOD IMPORT ALIAS VARIABLE_PAREN VARIABLE_PAREN_FUNCTION_CALL VARIABLE FUNCTION_DECL FUNCTION_BODY CONDITIONAL CONDITIONAL_BLOCK_BODY CONDITIONAL_END UNEXPORT EXPORT EXPORT_VALUE SET SET_VALUE ATTRIBUTE ATTRIBUTE_LIST_VALUE RECIPE PARAMS PARAM_WITH_VALUE PARAM_WITH_VALUE_FUNCTION_CALL DEPENDENCIES DEPENDENCY_WITH_PARAMS DEPENDENCY_CALL_PARAMS
 
 %%
 
@@ -427,7 +427,7 @@ KEYWORD_ELSE_IF=("else if")
 
 <ATTRIBUTE> {
  {ATTRIBUTE_NAME}                       {  yybegin(ATTRIBUTE); return ATTRIBUTE_NAME; }
- {ID_LITERAL}                  {  yybegin(ATTRIBUTE); return ID_LITERAL; }
+ {ID_LITERAL}                           {  yybegin(ATTRIBUTE); return ID_LITERAL; }
  {WHITE_SPACE}+                          {  yybegin(ATTRIBUTE); return TokenType.WHITE_SPACE; }
  {SEPERATOR}                           {  yybegin(ATTRIBUTE); return SEPERATOR; }
  {COMMA}                               {  yybegin(ATTRIBUTE); return COMMA; }
@@ -438,8 +438,21 @@ KEYWORD_ELSE_IF=("else if")
  {STRING}                                {  yybegin(ATTRIBUTE); return STRING; }
  {RAW_STRING}                            {  yybegin(ATTRIBUTE); return RAW_STRING; }
  {EXPRESSION_FENCE}                      {  yybegin(ATTRIBUTE); return EXPRESSION_FENCE; }
+ {OPEN_BRACKET}                           {  yybegin(ATTRIBUTE_LIST_VALUE); return OPEN_BRACKET; }
  {CLOSE_PAREN}                           {  yybegin(ATTRIBUTE); return CLOSE_PAREN; }
  {CLOSE_BRACKET}                           {  yybegin(YYINITIAL); return CLOSE_BRACKET; }
+}
+
+<ATTRIBUTE_LIST_VALUE> {
+ {WHITE_SPACE}+                          {  yybegin(ATTRIBUTE_LIST_VALUE); return TokenType.WHITE_SPACE; }
+ {COMMA}                                 {  yybegin(ATTRIBUTE_LIST_VALUE); return COMMA; }
+ {ID_LITERAL}                           {  yybegin(ATTRIBUTE_LIST_VALUE); return ID_LITERAL; }
+ {X_INDICATOR}/ {STRING_STARTER}        {  yybegin(ATTRIBUTE_LIST_VALUE); return X_INDICATOR; }
+ {F_INDICATOR}/ {STRING_STARTER}        {  yybegin(ATTRIBUTE_LIST_VALUE); return F_INDICATOR; }
+ {STRING}                                {  yybegin(ATTRIBUTE_LIST_VALUE); return STRING; }
+ {RAW_STRING}                            {  yybegin(ATTRIBUTE_LIST_VALUE); return RAW_STRING; }
+ {EXPRESSION_FENCE}                      {  yybegin(ATTRIBUTE_LIST_VALUE); return EXPRESSION_FENCE; }
+ {CLOSE_BRACKET}                         {  yybegin(ATTRIBUTE); return CLOSE_BRACKET; }
 }
 
 <RECIPE> {
