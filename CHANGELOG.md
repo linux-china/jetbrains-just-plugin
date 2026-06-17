@@ -4,6 +4,13 @@
 
 ## Unreleased
 
+## 0.6.46 - 2026-06-16
+
+### Added
+
+- Add mapped dependency support: `build target *platform: *(compile target *platform)`
+- Markdown justfile support: you can run recipe from Markdown file now.
+
 ## 0.6.45 - 2026-06-08
 
 ### Added
@@ -22,14 +29,14 @@
 ## 0.6.43 - 2026-05-25
 
 ### Added
-   
+
 - Making shell code checks more robust for syntax highlighting
 
 ## 0.6.42 - 2026-05-08
 
 ### Added
 
-- Allow attribute to take expression: `[env("VAR_NAME", "{{var_value}}")]` or `[working-directory("{{path_value}}")]` 
+- Allow attribute to take expression: `[env("VAR_NAME", "{{var_value}}")]` or `[working-directory("{{path_value}}")]`
 - High lighting for expression in attribute
 - Compatible with JetBrains 2026.2
 
@@ -43,7 +50,8 @@
 
 ### Fixed
 
-- Fixed function declaration with spaces in params: [#76](https://github.com/linux-china/jetbrains-just-plugin/issues/76)
+- Fixed function declaration with spaces in
+  params: [#76](https://github.com/linux-china/jetbrains-just-plugin/issues/76)
 
 ## 0.6.39 - 2026-04-22
 
