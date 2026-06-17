@@ -9,6 +9,7 @@ import com.intellij.execution.lineMarker.RunLineMarkerProvider
 import com.intellij.execution.runners.ExecutionEnvironmentBuilder
 import com.intellij.ide.actions.runAnything.commands.RunAnythingCommandCustomizer
 import com.intellij.ide.actions.runAnything.execution.RunAnythingRunProfile
+import com.intellij.injected.editor.VirtualFileWindow
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext
 import com.intellij.openapi.editor.markup.GutterIconRenderer
@@ -86,9 +87,14 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
         } else {
             "$justCmdPath -f ${justfile.name} $taskName"
         }
+        val workDirectory = if (justfile is VirtualFileWindow) {
+            justfile.delegate.parent
+        } else {
+            justfile.parent
+        }
         runJustCommand(
             project,
-            justfile.parent,
+            workDirectory,
             justfile,
             commandString,
             SimpleDataContext.getProjectContext(project)
