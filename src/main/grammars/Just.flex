@@ -45,6 +45,7 @@ CLOSE_BRACE = [}]
 OPEN_BRACKET = ("[")
 CLOSE_BRACKET =  ("]")
 QUESTION_MARK = ("?")
+STAR_MARK = ("*")
 BACKTICK=`[^`]*`
 BOOL_LITERAL=(true) | (false)
 NUMBER_LITERAL=[+-]?([0-9]*[.])?[0-9]+
@@ -393,6 +394,7 @@ KEYWORD_ELSE_IF=("else if")
   {WHITE_SPACE}+           {  yybegin(DEPENDENCIES); return TokenType.WHITE_SPACE; }
   {DOUBLE_AND}             {  yybegin(DEPENDENCIES); return DOUBLE_AND; }
   {DEPENDENCY_NAME}        {  yybegin(DEPENDENCIES); return DEPENDENCY_NAME; }
+  {STAR_MARK}              {  yybegin(DEPENDENCIES); return STAR_MARK; }
   {OPEN_PAREN}             {  yybegin(DEPENDENCY_WITH_PARAMS); return OPEN_PAREN; }
   {COMMENT}                {  yybegin(DEPENDENCIES); return COMMENT; }
   {CODE}                   {  yybegin(YYINITIAL); return CODE; }
@@ -420,6 +422,7 @@ KEYWORD_ELSE_IF=("else if")
  {OPEN_PAREN}                            {  yybegin(DEPENDENCY_WITH_PARAMS); return OPEN_PAREN; }
  {COMMA}                                 {  yybegin(DEPENDENCY_WITH_PARAMS); return COMMA; }
  {ID_LITERAL}                            {  yybegin(DEPENDENCY_CALL_PARAMS); return ID_LITERAL; }
+ {STAR_MARK}                             {  yybegin(DEPENDENCY_CALL_PARAMS); return STAR_MARK; }
  {X_INDICATOR}/ {STRING_STARTER}         {  yybegin(DEPENDENCY_CALL_PARAMS); return X_INDICATOR; }
  {F_INDICATOR}/ {STRING_STARTER}         {  yybegin(DEPENDENCY_CALL_PARAMS); return F_INDICATOR; }
  {CLOSE_PAREN}                           {  yybegin(DEPENDENCIES); return CLOSE_PAREN; }
