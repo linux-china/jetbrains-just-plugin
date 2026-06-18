@@ -9,7 +9,7 @@ import com.intellij.openapi.vfs.VfsUtilCore
 class JustTreeStructure(
     private val project: Project,
 ) : AbstractTreeStructure() {
-    private val service = project.getService(JustToolWindowService::class.java)
+    private val justService = project.getService(JustToolWindowService::class.java)
     private val root = RootNode(project)
 
     override fun getRootElement(): Any = root
@@ -19,7 +19,7 @@ class JustTreeStructure(
             is RootNode -> {
                 val baseDir = project.guessProjectDir()
 
-                service.findJustfiles().map {
+                justService.findJustfiles().map {
                     JustfileNode(project = project, file = it, relativePath = baseDir?.let { base ->
                         VfsUtilCore.getRelativePath(it.parent, base)?.takeIf { relativePath ->
                             relativePath.isNotEmpty()
@@ -28,7 +28,7 @@ class JustTreeStructure(
                 }.sortedBy { it.file.path }.toTypedArray()
             }
 
-            is JustfileNode -> service.loadRecipes(element.file).toTypedArray()
+            is JustfileNode -> justService.loadRecipes(element.file).toTypedArray()
 
             else -> emptyArray()
         }
