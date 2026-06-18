@@ -9,7 +9,7 @@ import com.intellij.openapi.wm.ex.ToolWindowEx
 import com.intellij.openapi.wm.ex.ToolWindowManagerEx
 import com.intellij.ui.content.ContentFactory
 
-private const val TOOLWINDOW_ID = "justfile"
+private const val TOOLWINDOW_ID = "Justfile"
 
 class JustToolWindowFactory : ToolWindowFactory {
     override fun init(toolWindow: ToolWindow) {
