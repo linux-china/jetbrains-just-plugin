@@ -38,7 +38,6 @@ class JustAttributeCompletionContributor : CompletionContributor() {
                         result.addElement(LookupElementBuilder.create("no-exit-message"))
                         result.addElement(LookupElementBuilder.create("confirm"))
                         result.addElement(LookupElementBuilder.create("no-quiet"))
-                        result.addElement(LookupElementBuilder.create("no-exit-message"))
                         result.addElement(LookupElementBuilder.create("positional-arguments"))
                         result.addElement(LookupElementBuilder.create("script"))
                         result.addElement(LookupElementBuilder.create("extension"))
@@ -46,6 +45,7 @@ class JustAttributeCompletionContributor : CompletionContributor() {
                         result.addElement(LookupElementBuilder.create("parallel"))
                         result.addElement(LookupElementBuilder.create("android"))
                         result.addElement(LookupElementBuilder.create("default"))
+                        result.addElement(LookupElementBuilder.create("shell"))
                     }
                 }
             }

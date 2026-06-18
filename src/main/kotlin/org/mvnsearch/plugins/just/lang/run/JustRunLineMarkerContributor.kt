@@ -11,8 +11,9 @@ import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.process.ProcessTerminatedListener
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.runners.ExecutionEnvironmentBuilder
-import com.intellij.ide.IdeBundle
 import com.intellij.ide.actions.runAnything.commands.RunAnythingCommandCustomizer
+import com.intellij.ide.actions.runAnything.execution.RunAnythingRunProfile
+import com.intellij.injected.editor.VirtualFileWindow
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext
 import com.intellij.openapi.editor.markup.GutterIconRenderer
@@ -25,6 +26,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.elementType
 import com.intellij.util.execution.ParametersListUtil
 import org.mvnsearch.plugins.just.Just
+import org.mvnsearch.plugins.just.JustBundle
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
 import org.mvnsearch.plugins.just.ide.icons.JustIcons.JUST_FILE
 import org.mvnsearch.plugins.just.lang.psi.JustRecipeStatement
@@ -89,9 +91,14 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
         } else {
             "$justCmdPath -f ${justfile.name} $taskName"
         }
+        val workDirectory = if (justfile is VirtualFileWindow) {
+            justfile.delegate.parent
+        } else {
+            justfile.parent
+        }
         runJustCommand(
             project,
-            justfile.parent,
+            workDirectory,
             justfile,
             commandString,
             SimpleDataContext.getProjectContext(project)
@@ -128,7 +135,7 @@ fun runJustCommand(
             .dataContext(commandDataContext)
             .buildAndExecute()
     } catch (e: ExecutionException) {
-        Messages.showInfoMessage(project, e.message, IdeBundle.message("run.anything.console.error.title"))
+        Messages.showInfoMessage(project, e.message, JustBundle.message("run.anything.console.error.title"))
     }
 }
 
