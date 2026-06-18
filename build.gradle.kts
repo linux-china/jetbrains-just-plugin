@@ -17,6 +17,8 @@ plugins {
     id("org.jetbrains.qodana") version "2023.2.1"
 
     id("org.jetbrains.grammarkit") version "2022.3.2.2"
+
+    kotlin("plugin.serialization") version "1.9.20"
 }
 
 group = properties("pluginGroup")
@@ -25,6 +27,11 @@ version = properties("pluginVersion")
 // Configure project's dependencies
 repositories {
     mavenCentral()
+}
+
+dependencies {
+    // Kotlin Serialization 1.7+ require Kotlin 2.0+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.+")
 }
 
 // Configure Gradle IntelliJ Plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin

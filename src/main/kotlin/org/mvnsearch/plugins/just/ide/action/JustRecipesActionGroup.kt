@@ -1,9 +1,11 @@
 package org.mvnsearch.plugins.just.ide.action
 
 import com.intellij.openapi.actionSystem.*
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
+import com.intellij.openapi.vfs.VirtualFile
 import org.mvnsearch.plugins.just.Just
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
 import org.mvnsearch.plugins.just.lang.run.runJustCommand
@@ -12,7 +14,7 @@ import java.io.InputStreamReader
 
 
 @SuppressWarnings("ComponentNotRegistered")
-open class JustRecipesActionGroup(private val justfileName: String) : ActionGroup("Just", true), DumbAware {
+open class JustRecipesActionGroup(private val justfile: VirtualFile) : ActionGroup("Just", true), DumbAware {
 
     init {
         templatePresentation.icon = JustIcons.JUST_FILE
@@ -41,9 +43,9 @@ open class JustRecipesActionGroup(private val justfileName: String) : ActionGrou
                 val recipeName = parts[0].trim()
                 if (parts.size >= 2) {
                     val text = "$recipeName # ${parts[1].trim()}"
-                    result.add(RunJustRecipeAction(recipeName, text))
+                    result.add(RunJustRecipeAction(recipeName, text, justfile))
                 } else {
-                    result.add(RunJustRecipeAction(recipeName, recipeName))
+                    result.add(RunJustRecipeAction(recipeName, recipeName, justfile))
                 }
             }
         }
@@ -51,16 +53,23 @@ open class JustRecipesActionGroup(private val justfileName: String) : ActionGrou
     }
 }
 
-class RunJustRecipeAction(private val recipeName: String, private val text: String) : AnAction(text) {
-
+class RunJustRecipeAction(
+    private val recipeName: String,
+    private val text: String,
+    private val virtualJustFile: VirtualFile? = null
+) : AnAction(text) {
     override fun actionPerformed(e: AnActionEvent) {
+        val justfile = virtualJustFile ?: e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
+
         val project = e.project!!
+        val dataContext = e.dataContext
         val justCmdPath = Just.getJustCmdAbsolutionPath(project)
-        val commandString = "$justCmdPath $recipeName"
-        val justfile = e.getData(CommonDataKeys.VIRTUAL_FILE)
-        if (justfile != null) {
-            val workDirectory = project.guessProjectDir()!!
-            runJustCommand(project, workDirectory, justfile, commandString, e.dataContext)
+        val commandString = "$justCmdPath --justfile \"${justfile.path}\" $recipeName"
+
+        ApplicationManager.getApplication().invokeLater {
+            if (!project.isDisposed) {
+                runJustCommand(project, justfile.parent, justfile, commandString, dataContext)
+            }
         }
     }
 

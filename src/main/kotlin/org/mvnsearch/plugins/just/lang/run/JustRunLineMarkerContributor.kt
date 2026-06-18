@@ -2,10 +2,14 @@ package org.mvnsearch.plugins.just.lang.run
 
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.execution.ExecutionException
-import com.intellij.execution.configurations.GeneralCommandLine
-import com.intellij.execution.configurations.PtyCommandLine
+import com.intellij.execution.Executor
+import com.intellij.execution.configurations.*
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.lineMarker.RunLineMarkerProvider
+import com.intellij.execution.process.ColoredProcessHandler
+import com.intellij.execution.process.ProcessHandler
+import com.intellij.execution.process.ProcessTerminatedListener
+import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.runners.ExecutionEnvironmentBuilder
 import com.intellij.ide.actions.runAnything.commands.RunAnythingCommandCustomizer
 import com.intellij.ide.actions.runAnything.execution.RunAnythingRunProfile
@@ -135,8 +139,19 @@ fun runJustCommand(
     }
 }
 
-class RunJustProfile(commandLine: GeneralCommandLine, originalCommand: String) :
-    RunAnythingRunProfile(commandLine, originalCommand) {
+class RunJustProfile(private val commandLine: GeneralCommandLine, private val originalCommand: String) :
+    RunProfile {
+
+    override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState {
+        return object : CommandLineState(environment) {
+            override fun startProcess(): ProcessHandler {
+                val handler = ColoredProcessHandler(commandLine)
+                ProcessTerminatedListener.attach(handler)
+                return handler
+            }
+        }
+    }
+
     override fun getIcon(): Icon {
         return JUST_FILE
     }
