@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.6.47 - 2026-06-18
+
+### Fixed
+
+- Fix `[arg('bar', long)]`
+
 ## 0.6.46 - 2026-06-16
 
 ### Added
