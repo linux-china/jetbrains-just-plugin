@@ -83,11 +83,6 @@
                 isLogByDefault="true"/>
     </extensions>
 
-    <extensionPoints>
-        <extensionPoint qualifiedName="org.mvnsearch.just.toolWindowStripeController"
-                        interface="org.mvnsearch.plugins.just.ide.toolwindow.JustfileToolWindowStripeController" dynamic="true"/>
-    </extensionPoints>
-
     <actions>
         <action class="org.mvnsearch.plugins.just.ide.action.NewJustfileAction"
                 id="NewJustfileAction"
