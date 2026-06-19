@@ -14,7 +14,7 @@ import org.mvnsearch.plugins.just.Just
 import java.util.concurrent.ConcurrentHashMap
 
 @Service(Service.Level.PROJECT)
-class JustToolWindowService(
+class JustfileService(
     private val project: Project,
 ) {
 
@@ -57,34 +57,34 @@ class JustToolWindowService(
         return result
     }
 
-    fun loadRecipes(file: VirtualFile): List<RecipeNode> {
-        return recipeCache.computeIfAbsent(file.path) {
-            loadRecipesInternal(file)
+    fun loadRecipes(justVirtualFile: VirtualFile): List<RecipeNode> {
+        return recipeCache.computeIfAbsent(justVirtualFile.path) {
+            loadRecipesInternal(justVirtualFile)
         }
     }
 
-    private fun loadRecipesInternal(file: VirtualFile): List<RecipeNode> {
+    private fun loadRecipesInternal(justVirtualFile: VirtualFile): List<RecipeNode> {
         val process = ProcessBuilder(
             Just.getJustCmdAbsolutionPath(project),
             "--dump",
             "--dump-format",
             "json",
             "--justfile",
-            file.path,
-        ).directory(file.parent.toNioPath().toFile()).start()
+            justVirtualFile.path,
+        ).directory(justVirtualFile.parent.toNioPath().toFile()).start()
 
         val output = process.inputStream.bufferedReader().readText()
         val errorOutput = process.errorStream.bufferedReader().readText()
 
         if (process.waitFor() != 0 || output.isBlank()) {
-            notifyJustDumpFailed(file, errorOutput.ifBlank { output })
+            notifyJustDumpFailed(justVirtualFile, errorOutput.ifBlank { output })
             return emptyList()
         }
 
         val root = try {
             json.parseToJsonElement(output).jsonObject
         } catch (e: Exception) {
-            notifyJustDumpFailed(file, e.message ?: "Failed to parse just dump JSON")
+            notifyJustDumpFailed(justVirtualFile, e.message ?: "Failed to parse just dump JSON")
             return emptyList()
         }
 
@@ -95,7 +95,7 @@ class JustToolWindowService(
 
             RecipeNode(
                 project = project,
-                file = file,
+                file = justVirtualFile,
                 recipe = name,
                 description = description,
             )
