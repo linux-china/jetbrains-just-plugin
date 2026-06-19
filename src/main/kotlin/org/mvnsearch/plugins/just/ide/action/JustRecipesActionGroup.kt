@@ -5,11 +5,13 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VirtualFile
 import org.mvnsearch.plugins.just.Just
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
 import org.mvnsearch.plugins.just.lang.run.runJustCommand
 import java.io.BufferedReader
+import java.io.File
 import java.io.InputStreamReader
 
 
@@ -43,9 +45,9 @@ open class JustRecipesActionGroup(private val justfile: VirtualFile) : ActionGro
                 val recipeName = parts[0].trim()
                 if (parts.size >= 2) {
                     val text = "$recipeName # ${parts[1].trim()}"
-                    result.add(RunJustRecipeAction(recipeName, text, justfile))
+                    result.add(RunJustRecipeAction(project, recipeName, text, justfile))
                 } else {
-                    result.add(RunJustRecipeAction(recipeName, recipeName, justfile))
+                    result.add(RunJustRecipeAction(project, recipeName, recipeName, justfile))
                 }
             }
         }
@@ -54,6 +56,7 @@ open class JustRecipesActionGroup(private val justfile: VirtualFile) : ActionGro
 }
 
 class RunJustRecipeAction(
+    private val project: Project,
     private val recipeName: String,
     private val text: String,
     private val virtualJustFile: VirtualFile? = null
@@ -64,11 +67,12 @@ class RunJustRecipeAction(
         val project = e.project!!
         val dataContext = e.dataContext
         val justCmdPath = Just.getJustCmdAbsolutionPath(project)
-        val commandString = "$justCmdPath --justfile \"${justfile.path}\" $recipeName"
+        val workingDirectory = justfile.parent
+        val commandString = "$justCmdPath --justfile \"${justfile.name}\" $recipeName"
 
         ApplicationManager.getApplication().invokeLater {
             if (!project.isDisposed) {
-                runJustCommand(project, justfile.parent, justfile, commandString, dataContext)
+                runJustCommand(project, workingDirectory, justfile, commandString, dataContext)
             }
         }
     }
