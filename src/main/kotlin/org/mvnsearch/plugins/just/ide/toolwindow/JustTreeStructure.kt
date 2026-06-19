@@ -9,7 +9,7 @@ import com.intellij.openapi.vfs.VfsUtilCore
 class JustTreeStructure(
     private val project: Project,
 ) : AbstractTreeStructure() {
-    private val justService = project.getService(JustToolWindowService::class.java)
+    private val justService = project.getService(JustfileService::class.java)
     private val root = RootNode(project)
 
     override fun getRootElement(): Any = root
