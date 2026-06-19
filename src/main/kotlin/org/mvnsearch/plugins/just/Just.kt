@@ -4,9 +4,13 @@ import com.intellij.openapi.application.PathMacros
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.util.SystemInfo
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.readText
 import com.intellij.util.EnvironmentUtil
 import java.io.File
 import kotlin.io.path.Path
+
+val JUSTFILES_MARKDOWN = listOf("README.md", "AGENTS.md", "CLAUDE.md")
 
 object Just {
     fun getJustCmdAbsolutionPath(project: Project): String {
@@ -47,5 +51,10 @@ object Just {
 
     fun isJustfile(justfileName: String): Boolean {
         return isDefaultJustfile(justfileName) || justfileName.endsWith(".just")
+    }
+
+    fun isJustfileMarkdown(justVirtualFile: VirtualFile): Boolean {
+        val fileName = justVirtualFile.name
+        return (JUSTFILES_MARKDOWN.contains(fileName)) && justVirtualFile.readText().contains("```just\n")
     }
 }
