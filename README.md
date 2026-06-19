@@ -24,6 +24,7 @@ Plugin features:
 * Navigation for dependency name
 * Language injection for legal Shell script
 * Justfile structure view
+* Justfile tool Window: load Justfiles into task tree, and support Markdown files(README.md, AGENTS.md, CLAUDE.md).
 * Sub modules/import resolver
 * Interesting miscellaneous: DuckDB, Bun, Nushell etc.
 * Justfile as scratch file: `PROJECT_DIR` environment variable
