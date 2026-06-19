@@ -6,8 +6,9 @@
 
 ## 0.6.47 - 2026-06-18
 
-### Fixed
+### Added
 
+- Add Justfile tool Window support: load Justfiles into task tree, and support Markdown files(README.md, AGENTS.md, CLAUDE.md).
 - Fix `[arg('bar', long)]`
 
 ## 0.6.46 - 2026-06-16
