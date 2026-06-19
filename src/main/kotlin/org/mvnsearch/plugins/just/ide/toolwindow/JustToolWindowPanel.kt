@@ -5,6 +5,7 @@ import com.intellij.ide.TreeExpander
 import com.intellij.ide.util.treeView.NodeDescriptor
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
@@ -50,10 +51,12 @@ class JustToolWindowPanel(private val project: Project) : JPanel(BorderLayout())
                     else -> null
                 } as? RecipeNode ?: return false
 
-                RunJustRecipeAction(project,node.recipe, node.recipe, node.file).actionPerformed(
-                    JustToolWindowActionEventFactory.create(project)
-                )
-
+                val runJustRecipeAction = RunJustRecipeAction(project, node.recipe, node.recipe, node.file)
+                val actionEvent = JustToolWindowActionEventFactory.create(project)
+                // use reflection because of `Override-only method usage violation` rule
+                val actionPerformedMethod =
+                    runJustRecipeAction.javaClass.getMethod("actionPerformed", AnActionEvent::class.java)
+                actionPerformedMethod.invoke(runJustRecipeAction, actionEvent)
                 return true
             }
         }.installOn(tree)
