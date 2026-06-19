@@ -22,10 +22,10 @@ import javax.swing.JPanel
 import javax.swing.tree.DefaultMutableTreeNode
 
 class JustToolWindowPanel(private val project: Project) : JPanel(BorderLayout()), Disposable {
-    private val structure = JustTreeStructure(project)
-    private val structureModel = StructureTreeModel(structure, this)
-    private val asyncModel = AsyncTreeModel(structureModel, this)
-    private val tree = Tree(asyncModel)
+    private val treeStructure = JustTreeStructure(project)
+    private val structureTreeModel = StructureTreeModel(treeStructure, this)
+    private val asyncTreeModel = AsyncTreeModel(structureTreeModel, this)
+    private val tree = Tree(asyncTreeModel)
 
     init {
         tree.isRootVisible = false
@@ -50,7 +50,7 @@ class JustToolWindowPanel(private val project: Project) : JPanel(BorderLayout())
                     else -> null
                 } as? RecipeNode ?: return false
 
-                RunJustRecipeAction(node.recipe, node.recipe, node.file).actionPerformed(
+                RunJustRecipeAction(project,node.recipe, node.recipe, node.file).actionPerformed(
                     JustToolWindowActionEventFactory.create(project)
                 )
 
@@ -83,14 +83,18 @@ class JustToolWindowPanel(private val project: Project) : JPanel(BorderLayout())
         add(ScrollPaneFactory.createScrollPane(tree), BorderLayout.CENTER)
         add(toolbar.component, BorderLayout.NORTH)
 
+        // subscribe VFS changes and watch Justfile changes
         JustToolWindowRefreshListener(project, ::refresh)
     }
 
-    fun refresh(file: VirtualFile? = null) {
-        project.getService(JustToolWindowService::class.java).invalidate(file)
+    /**
+     * refresh tree if justfile changed
+     */
+    fun refresh(justVirtualFile: VirtualFile? = null) {
+        project.getService(JustfileService::class.java).invalidate(justVirtualFile)
 
         ApplicationManager.getApplication().invokeLater {
-            structureModel.invalidateAsync()
+            structureTreeModel.invalidateAsync()
             tree.repaint()
         }
     }
