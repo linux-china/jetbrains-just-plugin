@@ -45,8 +45,12 @@ class JustfileService(
         val result = mutableListOf<VirtualFile>()
 
         VfsUtilCore.iterateChildrenRecursively(root, null) {
-            if (!it.isDirectory && Just.isJustfile(it.name)) {
-                result += it
+            if (!it.isDirectory) {
+                if (Just.isJustfile(it.name)) {
+                    result += it
+                } else if (Just.isJustfileMarkdown(it)) {
+                    result += it
+                }
             }
 
             true

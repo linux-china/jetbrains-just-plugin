@@ -12,7 +12,8 @@ class JustToolWindowRefreshListener(project: Project, private val refresh: (Virt
     init {
         project.messageBus.connect(this).subscribe(VirtualFileManager.VFS_CHANGES, object : BulkFileListener {
             override fun after(events: List<VFileEvent>) {
-                events.mapNotNull { it.file }.filter { !it.isDirectory && Just.isJustfile(it.name) }
+                events.mapNotNull { it.file }
+                    .filter { !it.isDirectory && (Just.isJustfile(it.name) || Just.isJustfileMarkdown(it)) }
                     .distinctBy { it.path }.forEach { refresh(it) }
             }
         })
