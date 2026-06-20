@@ -18,9 +18,9 @@ import org.mvnsearch.plugins.just.lang.psi.JustTypes
 import org.mvnsearch.plugins.just.removeVariablePrefix
 
 val JUST_FUNCTIONS = listOf(
-    "home_dir()",
-    "invocation_dir()",
-    "justfile_dir()",
+    "home_directory()",
+    "invocation_directory()",
+    "justfile_directory()",
     "path_exists()",
     "absolute_path()",
     "file_name()",
