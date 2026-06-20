@@ -5,13 +5,15 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
-import com.intellij.openapi.util.io.FileUtil
+import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiManager
 import org.mvnsearch.plugins.just.Just
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
+import org.mvnsearch.plugins.just.lang.psi.JustFile
+import org.mvnsearch.plugins.just.lang.run.adjustCommandLine
 import org.mvnsearch.plugins.just.lang.run.runJustCommand
 import java.io.BufferedReader
-import java.io.File
 import java.io.InputStreamReader
 
 
@@ -62,17 +64,22 @@ class RunJustRecipeAction(
     private val virtualJustFile: VirtualFile? = null
 ) : AnAction(text) {
     override fun actionPerformed(e: AnActionEvent) {
-        val justfile = virtualJustFile ?: e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
+        val justVirtualFile = virtualJustFile ?: e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
 
         val project = e.project!!
         val dataContext = e.dataContext
         val justCmdPath = Just.getJustCmdAbsolutionPath(project)
-        val workingDirectory = justfile.parent
-        val commandString = "$justCmdPath --justfile \"${justfile.name}\" $recipeName"
-
+        val workingDirectory = justVirtualFile.parent
+        var commandString = "$justCmdPath --justfile \"${justVirtualFile.name}\" $recipeName"
+        // pop dialog to ask input param value, and append it to commandString
+        if (!justVirtualFile.name.endsWith(".md")) {
+            val justPsiFile = PsiManager.getInstance(project).findFile(justVirtualFile) as JustFile
+            val recipeStatement = justPsiFile.findRecipeElement(recipeName) ?: return
+            commandString = adjustCommandLine(project, recipeStatement, commandString)
+        }
         ApplicationManager.getApplication().invokeLater {
             if (!project.isDisposed) {
-                runJustCommand(project, workingDirectory, justfile, commandString, dataContext)
+                runJustCommand(project, workingDirectory, justVirtualFile, commandString, dataContext)
             }
         }
     }

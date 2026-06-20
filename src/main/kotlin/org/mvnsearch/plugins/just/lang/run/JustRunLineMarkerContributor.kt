@@ -94,23 +94,8 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
             "$justCmdPath -f ${justfile.name} $taskName"
         }
         val recipeStatement = justPsiFile.findRecipeElement(taskName) ?: return
-        val recipeParamNames = recipeStatement.params?.recipeParamList?.map { it.recipeParamName.text }?.toList()
         // pop dialog to ask input param value, and append it to commandString
-        if (!recipeParamNames.isNullOrEmpty()) {
-            for (paramName in recipeParamNames) {
-                val value = Messages.showInputDialog(
-                    project,
-                    "Please enter value for '$paramName':",
-                    "Recipe Parameter: $paramName",
-                    null
-                ) ?: return // user cancelled
-                if (paramName.startsWith('*') || paramName.startsWith('+')) {
-                    commandString += " $value"
-                } else {
-                    commandString += " \"$value\""
-                }
-            }
-        }
+        commandString = adjustCommandLine(project, recipeStatement, commandString)
         val workDirectory = if (justfile is VirtualFileWindow) {
             justfile.delegate.parent
         } else {
@@ -126,6 +111,28 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
     }
 
 
+}
+
+fun adjustCommandLine(project: Project, recipeStatement: JustRecipeStatement, commandLine: String) : String {
+    var newCommandLine = commandLine;
+    val recipeParamNames = recipeStatement.params?.recipeParamList?.map { it.recipeParamName.text }?.toList()
+    // pop dialog to ask input param value, and append it to commandString
+    if (!recipeParamNames.isNullOrEmpty()) {
+        for (paramName in recipeParamNames) {
+            val value = Messages.showInputDialog(
+                project,
+                "Please enter value for '$paramName':",
+                "Recipe Parameter: $paramName",
+                null
+            ) ?: return commandLine // user cancelled
+            if (paramName.startsWith('*') || paramName.startsWith('+')) {
+                newCommandLine += " $value"
+            } else {
+                newCommandLine += " \"$value\""
+            }
+        }
+    }
+    return newCommandLine
 }
 
 fun runJustCommand(
