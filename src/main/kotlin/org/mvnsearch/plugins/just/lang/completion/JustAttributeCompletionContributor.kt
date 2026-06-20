@@ -1,6 +1,7 @@
 package org.mvnsearch.plugins.just.lang.completion
 
 import com.intellij.codeInsight.completion.*
+import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.PsiElement
@@ -21,34 +22,53 @@ class JustAttributeCompletionContributor : CompletionContributor() {
                 ) {
                     val element = parameters.originalPosition
                     if (element.elementType == JustTypes.ATTRIBUTE_NAME || element.elementType == JustTypes.CLOSE_BRACKET) {
-                        result.addElement(LookupElementBuilder.create("linux"))
-                        result.addElement(LookupElementBuilder.create("macos"))
-                        result.addElement(LookupElementBuilder.create("unix"))
-                        result.addElement(LookupElementBuilder.create("windows"))
-                        result.addElement(LookupElementBuilder.create("openbsd"))
-                        result.addElement(LookupElementBuilder.create("dragonfly"))
-                        result.addElement(LookupElementBuilder.create("netbsd"))
-                        result.addElement(LookupElementBuilder.create("private"))
-                        result.addElement(LookupElementBuilder.create("arg"))
-                        result.addElement(LookupElementBuilder.create("no-cd"))
-                        result.addElement(LookupElementBuilder.create("working-directory"))
-                        result.addElement(LookupElementBuilder.create("doc"))
-                        result.addElement(LookupElementBuilder.create("group"))
-                        result.addElement(LookupElementBuilder.create("exit-message"))
-                        result.addElement(LookupElementBuilder.create("no-exit-message"))
-                        result.addElement(LookupElementBuilder.create("confirm"))
-                        result.addElement(LookupElementBuilder.create("no-quiet"))
-                        result.addElement(LookupElementBuilder.create("positional-arguments"))
-                        result.addElement(LookupElementBuilder.create("script"))
-                        result.addElement(LookupElementBuilder.create("extension"))
-                        result.addElement(LookupElementBuilder.create("metadata"))
-                        result.addElement(LookupElementBuilder.create("parallel"))
-                        result.addElement(LookupElementBuilder.create("android"))
-                        result.addElement(LookupElementBuilder.create("default"))
-                        result.addElement(LookupElementBuilder.create("shell"))
+                        // boolean / target attributes without arguments
+                        for (name in PLAIN_ATTRIBUTES) {
+                            result.addElement(LookupElementBuilder.create(name))
+                        }
+                        // attributes taking a single quoted-string argument: insert `name("")` with caret inside the quotes
+                        for (name in SINGLE_STRING_ATTRIBUTES) {
+                            result.addElement(
+                                LookupElementBuilder.create(name)
+                                    .withTailText("(\"\")", true)
+                                    .withInsertHandler(SINGLE_STRING_INSERT_HANDLER)
+                            )
+                        }
+                        // [env("NAME", "VALUE")]: insert with caret inside the first string
+                        result.addElement(
+                            LookupElementBuilder.create("env")
+                                .withTailText("(\"\", \"\")", true)
+                                .withInsertHandler(ENV_INSERT_HANDLER)
+                        )
                     }
                 }
             }
         )
+    }
+
+    companion object {
+        private val PLAIN_ATTRIBUTES = listOf(
+            "linux", "macos", "unix", "windows", "openbsd", "dragonfly", "netbsd", "freebsd", "android",
+            "private", "no-cd", "no-exit-message", "exit-message", "no-quiet", "positional-arguments",
+            "parallel", "default", "shell"
+        )
+
+        private val SINGLE_STRING_ATTRIBUTES = listOf(
+            "confirm", "group", "doc", "working-directory", "extension", "script", "metadata", "arg"
+        )
+
+        /** Inserts `("")` after the attribute name and puts the caret between the quotes: `[doc("<caret>")]`. */
+        private val SINGLE_STRING_INSERT_HANDLER = InsertHandler<LookupElement> { context, _ ->
+            val offset = context.tailOffset
+            context.document.insertString(offset, "(\"\")")
+            context.editor.caretModel.moveToOffset(offset + 2)
+        }
+
+        /** Inserts `("", "")` after `env` and puts the caret inside the first string: `[env("<caret>", "")]`. */
+        private val ENV_INSERT_HANDLER = InsertHandler<LookupElement> { context, _ ->
+            val offset = context.tailOffset
+            context.document.insertString(offset, "(\"\", \"\")")
+            context.editor.caretModel.moveToOffset(offset + 2)
+        }
     }
 }
