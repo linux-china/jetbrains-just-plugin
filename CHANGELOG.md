@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.6.49 - 2026-06-22
+
+### Added
+
+- Fix error of `just fmt does not respond after 30 seconds`
+
 ## 0.6.48 - 2026-06-20
 
 ### Added
