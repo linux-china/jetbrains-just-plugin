@@ -29,6 +29,7 @@ import org.mvnsearch.plugins.just.Just
 import org.mvnsearch.plugins.just.JustBundle
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
 import org.mvnsearch.plugins.just.ide.icons.JustIcons.JUST_FILE
+import org.mvnsearch.plugins.just.lang.psi.JustFile
 import org.mvnsearch.plugins.just.lang.psi.JustRecipeStatement
 import org.mvnsearch.plugins.just.lang.psi.JustTypes
 import org.mvnsearch.plugins.just.lang.run.JustRunConfiguration.Companion.adjustCommandLinePath
@@ -84,12 +85,31 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
 
 
     private fun runJustRecipeByRunAnything(project: Project, psiElement: PsiElement, taskName: String) {
-        val justfile = psiElement.containingFile.virtualFile
+        val justPsiFile = psiElement.containingFile as JustFile
+        val justfile = justPsiFile.virtualFile
         val justCmdPath = Just.getJustCmdAbsolutionPath(project)
-        val commandString = if (Just.isDefaultJustfile(justfile.name)) {
+        var commandString = if (Just.isDefaultJustfile(justfile.name)) {
             "$justCmdPath $taskName"
         } else {
             "$justCmdPath -f ${justfile.name} $taskName"
+        }
+        val recipeStatement = justPsiFile.findRecipeElement(taskName) ?: return
+        val recipeParamNames = recipeStatement.params?.recipeParamList?.map { it.recipeParamName.text }?.toList()
+        // pop dialog to ask input param value, and append it to commandString
+        if (!recipeParamNames.isNullOrEmpty()) {
+            for (paramName in recipeParamNames) {
+                val value = Messages.showInputDialog(
+                    project,
+                    "Please enter value for '$paramName':",
+                    "Recipe Parameter: $paramName",
+                    null
+                ) ?: return // user cancelled
+                if (name.startsWith('*') || name.startsWith('+')) {
+                    commandString += " $value"
+                } else {
+                    commandString += " \"$value\""
+                }
+            }
         }
         val workDirectory = if (justfile is VirtualFileWindow) {
             justfile.delegate.parent
