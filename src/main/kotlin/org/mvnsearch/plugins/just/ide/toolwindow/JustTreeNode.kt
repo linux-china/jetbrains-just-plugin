@@ -36,7 +36,8 @@ data class RecipeNode(
     val recipe: String,
     val description: String?,
     override val id: String = "${file.url}::$recipe",
-) : JustTreeNode(project, id) {
+    val params: List<String> = emptyList(),
+    ) : JustTreeNode(project, id) {
     override val name = recipe
     override val icon = JustIcons.RUN_ICON
 }
