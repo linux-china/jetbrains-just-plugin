@@ -9,6 +9,7 @@ import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import io.ktor.util.*
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import org.mvnsearch.plugins.just.Just
 import java.util.concurrent.ConcurrentHashMap
@@ -96,12 +97,24 @@ class JustfileService(
 
         return recipes.map { (name, recipeJson) ->
             val description = recipeJson.jsonObject["doc"]?.toString()?.removeSurrounding("\"")?.takeIf { it != "null" }
-
+            val params =
+                recipeJson.jsonObject["parameters"]?.jsonArray?.filter { it.jsonObject["name"] != null }
+                    ?.mapNotNull {
+                        val name = it.jsonObject["name"]?.toString()?.trim('"')
+                        val kind = it.jsonObject["kind"]?.toString()?.trim('"')
+                        when (kind) {
+                            "plus" -> "+${name}"
+                            "star" -> "*${name}"
+                            else -> name
+                        }
+                    }
+                    ?: emptyList()
             RecipeNode(
                 project = project,
                 file = justVirtualFile,
                 recipe = name,
                 description = description,
+                params = params,
             )
         }.sortedBy { it.recipe }
     }

@@ -51,7 +51,7 @@ class JustToolWindowPanel(private val project: Project) : JPanel(BorderLayout())
                     else -> null
                 } as? RecipeNode ?: return false
 
-                val runJustRecipeAction = RunJustRecipeAction(project, node.recipe, node.recipe, node.file)
+                val runJustRecipeAction = RunJustRecipeAction(project, node.recipe, node.recipe, node.file, node.params)
                 val actionEvent = JustToolWindowActionEventFactory.create(project)
                 // use reflection because of `Override-only method usage violation` rule
                 val actionPerformedMethod =

@@ -61,7 +61,8 @@ class RunJustRecipeAction(
     private val project: Project,
     private val recipeName: String,
     private val text: String,
-    private val virtualJustFile: VirtualFile? = null
+    private val virtualJustFile: VirtualFile? = null,
+    private val params: List<String> = emptyList(),
 ) : AnAction(text) {
     override fun actionPerformed(e: AnActionEvent) {
         val justVirtualFile = virtualJustFile ?: e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
@@ -72,10 +73,20 @@ class RunJustRecipeAction(
         val workingDirectory = justVirtualFile.parent
         var commandString = "$justCmdPath --justfile \"${justVirtualFile.name}\" $recipeName"
         // pop dialog to ask input param value, and append it to commandString
-        if (!justVirtualFile.name.endsWith(".md")) {
-            val justPsiFile = PsiManager.getInstance(project).findFile(justVirtualFile) as JustFile
-            val recipeStatement = justPsiFile.findRecipeElement(recipeName) ?: return
-            commandString = adjustCommandLine(project, recipeStatement, commandString)
+        if (params.isNotEmpty()) {
+            for (paramName in params) {
+                val value = Messages.showInputDialog(
+                    project,
+                    "Please enter value for '$paramName':",
+                    "Recipe Parameter: $paramName",
+                    null
+                ) ?: return // user cancelled
+                if (paramName.startsWith('*') || paramName.startsWith('+')) {
+                    commandString += " $value"
+                } else {
+                    commandString += " \"$value\""
+                }
+            }
         }
         ApplicationManager.getApplication().invokeLater {
             if (!project.isDisposed) {
