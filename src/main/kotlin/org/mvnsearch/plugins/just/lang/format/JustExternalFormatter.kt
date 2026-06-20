@@ -36,7 +36,7 @@ class JustExternalFormatter : AsyncDocumentFormattingService() {
             val params: @NonNls MutableList<String?> = SmartList<String?>()
             params.add("--fmt")
             params.add("--justfile")
-            params.add(justFile.getPath())
+            params.add(justFile.path)
 
             try {
                 val commandLine: GeneralCommandLine = GeneralCommandLine()
@@ -50,11 +50,12 @@ class JustExternalFormatter : AsyncDocumentFormattingService() {
                     override fun run() {
                         handler.addProcessListener(object : CapturingProcessAdapter() {
                             override fun processTerminated(event: ProcessEvent) {
-                                val exitCode: Int = event.getExitCode()
+                                val exitCode: Int = event.exitCode
                                 if (exitCode == 0) {
-                                    request.context.virtualFile!!.refresh(false, false)
+                                    val formattedText = justFile.readText(StandardCharsets.UTF_8)
+                                    request.onTextReady(formattedText)
                                 } else {
-                                    request.onError("Justfile format", getOutput().getStderr())
+                                    request.onError("Justfile format", output.stderr)
                                 }
                             }
                         })
