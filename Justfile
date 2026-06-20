@@ -31,3 +31,7 @@ clean:
   rm -rf build/classes
   rm -rf build/instrumented
   rm -rf build/tmp
+
+
+claude:
+  claude --resume 5f18b4aa-7b5f-46d3-bdc4-8397a9bd4f3c
