@@ -16,8 +16,8 @@ JetBrains IDEs.
 Plugin features:
 
 * Just language and file types
-* Syntax highlight for shell script
-* Run recipes by click
+* Syntax highlight for a shell script
+* Run recipes by clicking and with the params input dialog
 * Run configuration support: `Run -> Edit Configurations -> Just` or right click on recipe name
 * New justfile by project type, such as Maven, Gradle, Cargo, uv, zig etc.
 * Code completion: settings names, recipe dependencies, variables with dotenv support
