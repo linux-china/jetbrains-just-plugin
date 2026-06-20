@@ -5,6 +5,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.util.SystemInfo
+import com.intellij.openapi.vfs.readText
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiFile
 import java.io.File
@@ -136,7 +137,7 @@ class NewJustfileAction : AnAction() {
         val project = e.getData(CommonDataKeys.PROJECT)!!
         val projectDir = project.guessProjectDir()!!
         val content = if (projectDir.findChild("pom.xml") != null) {
-            val pomXmlCode = Files.readString(projectDir.findChild("pom.xml")!!.toNioPath())
+            val pomXmlCode = projectDir.findChild("pom.xml")!!.readText()
             if (pomXmlCode.contains("spring-boot-starter")) {
                 JUSTFILE_MAVEN_SB
             } else {
