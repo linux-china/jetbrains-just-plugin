@@ -70,6 +70,8 @@
         <runConfigurationProducer implementation="org.mvnsearch.plugins.just.lang.run.JustRunConfigurationProducer"/>
         <renameInputValidator implementation="org.mvnsearch.plugins.just.lang.resolve.JustRecipeRenameInputValidator"
                               order="first"/>
+        <spellchecker.bundledDictionaryProvider
+                implementation="org.mvnsearch.plugins.just.ide.spellchecker.JustDictionaryProvider"/>
 
         <toolWindow
                 id="Just"
