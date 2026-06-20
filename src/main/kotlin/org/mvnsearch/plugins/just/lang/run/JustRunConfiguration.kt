@@ -67,6 +67,34 @@ class JustRunConfiguration(
         return EnvVariablesTable.parseEnvsFromText(variables)
     }
 
+    fun getOverrideVariables(): String? {
+        return options.getOverrideVariables()
+    }
+
+    fun setOverrideVariables(overrideVariables: String?) {
+        options.setOverrideVariables(overrideVariables)
+    }
+
+    /** Parses the `name=value` pairs (whitespace separated) used for `just --set NAME VALUE`. */
+    fun getOverrideVariablesAsList(): List<Pair<String, String>> {
+        val text = getOverrideVariables()
+        if (text.isNullOrBlank()) {
+            return emptyList()
+        }
+        return text.trim().split(Regex("\\s+")).mapNotNull {
+            val idx = it.indexOf('=')
+            if (idx > 0) it.substring(0, idx) to it.substring(idx + 1) else null
+        }
+    }
+
+    fun getDotenvPath(): String? {
+        return options.getDotenvPath()
+    }
+
+    fun setDotenvPath(dotenvPath: String?) {
+        options.setDotenvPath(dotenvPath)
+    }
+
     override fun getConfigurationEditor(): JustRunSettingsEditor {
         return JustRunSettingsEditor()
     }
@@ -89,6 +117,16 @@ class JustRunConfiguration(
                 if (!fileName.isNullOrEmpty()) {
                     command.add("-f")
                     command.add(fileName)
+                }
+                val dotenvPath = getDotenvPath()
+                if (!dotenvPath.isNullOrEmpty()) {
+                    command.add("--dotenv-path")
+                    command.add(dotenvPath)
+                }
+                getOverrideVariablesAsList().forEach { (name, value) ->
+                    command.add("--set")
+                    command.add(name)
+                    command.add(value)
                 }
                 if (!recipeName.isNullOrEmpty()) {
                     command.add(recipeName)

@@ -8,6 +8,8 @@ class JustRunConfigurationOptions : RunConfigurationOptions() {
     private val justRecipeName: StoredProperty<String?> = string("").provideDelegate(this, "recipeName")
     private val justRecipeArgs: StoredProperty<String?> = string("").provideDelegate(this, "recipeArgs")
     private val justRecipeEnvVariables: StoredProperty<String?> = string("").provideDelegate(this, "envVariables")
+    private val justOverrideVariables: StoredProperty<String?> = string("").provideDelegate(this, "overrideVariables")
+    private val justDotenvPath: StoredProperty<String?> = string("").provideDelegate(this, "dotenvPath")
 
     fun getFileName(): String? {
         return justfileName.getValue(this)
@@ -39,6 +41,22 @@ class JustRunConfigurationOptions : RunConfigurationOptions() {
 
     fun setEnvVariables(envVariables: String?) {
         justRecipeEnvVariables.setValue(this, envVariables ?: "")
+    }
+
+    fun getOverrideVariables(): String? {
+        return justOverrideVariables.getValue(this)
+    }
+
+    fun setOverrideVariables(overrideVariables: String?) {
+        justOverrideVariables.setValue(this, overrideVariables ?: "")
+    }
+
+    fun getDotenvPath(): String? {
+        return justDotenvPath.getValue(this)
+    }
+
+    fun setDotenvPath(dotenvPath: String?) {
+        justDotenvPath.setValue(this, dotenvPath ?: "")
     }
 
 }
