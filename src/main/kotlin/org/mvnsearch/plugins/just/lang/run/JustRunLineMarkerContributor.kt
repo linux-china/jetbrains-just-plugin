@@ -104,7 +104,7 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
                     "Recipe Parameter: $paramName",
                     null
                 ) ?: return // user cancelled
-                if (name.startsWith('*') || name.startsWith('+')) {
+                if (paramName.startsWith('*') || paramName.startsWith('+')) {
                     commandString += " $value"
                 } else {
                     commandString += " \"$value\""
