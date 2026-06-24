@@ -50,7 +50,7 @@ class JustAttributeCompletionContributor : CompletionContributor() {
         private val PLAIN_ATTRIBUTES = listOf(
             "linux", "macos", "unix", "windows", "openbsd", "dragonfly", "netbsd", "freebsd", "android",
             "private", "no-cd", "no-exit-message", "exit-message", "no-quiet", "positional-arguments",
-            "parallel", "default", "shell"
+            "parallel", "default", "shell", "continue"
         )
 
         private val SINGLE_STRING_ATTRIBUTES = listOf(
