@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.6.50 - 2026-06-25
+
+### Added
+
+- Add `set minimum-version := "1.53.0"` setting
+
 ## 0.6.49 - 2026-06-24
 
 ### Added
