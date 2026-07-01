@@ -440,6 +440,7 @@ KEYWORD_ELSE_IF=("else if")
  {F_INDICATOR}/ {STRING_STARTER}        {  yybegin(ATTRIBUTE); return F_INDICATOR; }
  {STRING}                                {  yybegin(ATTRIBUTE); return STRING; }
  {RAW_STRING}                            {  yybegin(ATTRIBUTE); return RAW_STRING; }
+ {BACKTICK}                             {  yybegin(ATTRIBUTE); return BACKTICK; }
  {EXPRESSION_FENCE}                      {  yybegin(ATTRIBUTE); return EXPRESSION_FENCE; }
  {OPEN_BRACKET}                           {  yybegin(ATTRIBUTE_LIST_VALUE); return OPEN_BRACKET; }
  {CLOSE_PAREN}                           {  yybegin(ATTRIBUTE); return CLOSE_PAREN; }
