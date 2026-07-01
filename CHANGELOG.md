@@ -4,6 +4,15 @@
 
 ## Unreleased
 
+## 0.6.51 - 2026-07-01
+
+### Added
+
+- Add gutter icon for attribute: os icons, argument icon
+- Add f-string support for attribute expression
+- Add backtick string for the attribute expression
+- Add code completion for `cache` attribute
+
 ## 0.6.50 - 2026-06-25
 
 ### Added
