@@ -21,6 +21,8 @@
                                         implementationClass="org.mvnsearch.plugins.just.lang.marker.ShebangMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="Just"
                                         implementationClass="org.mvnsearch.plugins.just.lang.marker.UserDefinedFunctionMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="Just"
+                                        implementationClass="org.mvnsearch.plugins.just.lang.marker.AttributeMarkerProvider"/>
 
         <codeInsight.parameterNameHints
                 language="Just"
