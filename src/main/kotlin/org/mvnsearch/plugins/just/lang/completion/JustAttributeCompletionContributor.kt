@@ -40,6 +40,11 @@ class JustAttributeCompletionContributor : CompletionContributor() {
                                 .withTailText("(\"\", \"\")", true)
                                 .withInsertHandler(ENV_INSERT_HANDLER)
                         )
+                        // [cache(inputs = "NAME", outputs = "VALUE")]
+                        result.addElement(
+                            LookupElementBuilder.create("cache")
+                                .withInsertHandler(CACHE_INSERT_HANDLER)
+                        )
                     }
                 }
             }
@@ -69,6 +74,12 @@ class JustAttributeCompletionContributor : CompletionContributor() {
             val offset = context.tailOffset
             context.document.insertString(offset, "(\"\", \"\")")
             context.editor.caretModel.moveToOffset(offset + 2)
+        }
+
+        private val CACHE_INSERT_HANDLER = InsertHandler<LookupElement> { context, _ ->
+            val offset = context.tailOffset
+            context.document.insertString(offset, "(inputs = \"\", outputs = \"\")")
+            context.editor.caretModel.moveToOffset(offset + 11)
         }
     }
 }
