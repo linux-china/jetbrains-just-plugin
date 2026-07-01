@@ -22,4 +22,10 @@ object JustIcons {
     var Bun: Icon = IconLoader.findIcon("/icons/bun.svg", JustIcons::class.java.classLoader)!!
     var Deno: Icon = IconLoader.findIcon("/icons/deno.svg", JustIcons::class.java.classLoader)!!
     var DuckDB: Icon = IconLoader.findIcon("/icons/duckdb.png", JustIcons::class.java.classLoader)!!
+
+    var Windows: Icon = IconLoader.findIcon("/icons/os/windows.png", JustIcons::class.java.classLoader)!!
+    var Linux: Icon = IconLoader.findIcon("/icons/os/linux.png", JustIcons::class.java.classLoader)!!
+    var MacOS: Icon = IconLoader.findIcon("/icons/os/macos.png", JustIcons::class.java.classLoader)!!
+    var Unix: Icon = IconLoader.findIcon("/icons/os/unix.png", JustIcons::class.java.classLoader)!!
+    var Android: Icon = IconLoader.findIcon("/icons/os/android.png", JustIcons::class.java.classLoader)!!
 }
