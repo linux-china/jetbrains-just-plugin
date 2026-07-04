@@ -10,6 +10,7 @@
 
 - Add `indentation` setting: `set indentation :="  "` 
 - Parameter default value as an empty list: `hello: name=[]`
+- List literal support enhancement
 - Fix some bugs for conditional check
 
 ## 0.6.51 - 2026-07-01
