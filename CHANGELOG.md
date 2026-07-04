@@ -8,6 +8,7 @@
 
 ### Added
 
+- Add `indentation` setting: `set indentation :="  "` 
 - Parameter default value as an empty list: `hello: name=[]`
 - Fix some bugs for conditional check
 
