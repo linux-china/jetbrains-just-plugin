@@ -44,6 +44,7 @@ OPEN_BRACE = [{]
 CLOSE_BRACE = [}]
 OPEN_BRACKET = ("[")
 CLOSE_BRACKET =  ("]")
+EMPTY_LIST = ("[]")
 QUESTION_MARK = ("?")
 STAR_MARK = ("*")
 BACKTICK=`[^`]*`
@@ -358,6 +359,7 @@ KEYWORD_ELSE_IF=("else if")
 <PARAM_WITH_VALUE>{
   {EQUAL}                     {  yybegin(PARAM_WITH_VALUE); return EQUAL; }
   {STRING}                    {  yybegin(PARAMS); return STRING; }
+  {EMPTY_LIST}                    {  yybegin(PARAMS); return EMPTY_LIST; }
   {X_INDICATOR}/ {STRING_STARTER}  {  yybegin(PARAMS); return X_INDICATOR; }
   {F_INDICATOR}/ {STRING_STARTER}  {  yybegin(PARAMS); return F_INDICATOR; }
   {RAW_STRING}                {  yybegin(PARAMS); return RAW_STRING; }
