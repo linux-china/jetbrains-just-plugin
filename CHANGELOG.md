@@ -4,6 +4,13 @@
 
 ## Unreleased
 
+## 0.6.52 - 2026-07-04
+
+### Added
+
+- Parameter default value as an empty list: `hello: name=[]`
+- Fix some bugs for conditional check
+
 ## 0.6.51 - 2026-07-01
 
 ### Added
