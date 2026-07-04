@@ -18,22 +18,22 @@ Plugin features:
 * Just language and file types
 * Syntax highlight for a shell script
 * Run recipes by clicking and with the params input dialog
-* Run configuration support: `Run -> Edit Configurations -> Just` or right click on recipe name
-* New justfile by project type, such as Maven, Gradle, Cargo, uv, zig etc.
+* Run configuration support: `Run -> Edit Configurations -> Just` or right-click on recipe name
+* New justfile by project type, such as Maven, Gradle, Cargo, uv, zig, etc.
 * Code completion: settings names, recipe dependencies, variables with dotenv support
 * Navigation for dependency name
-* Language injection for legal Shell script
+* Language injection for a legal Shell script
 * Justfile structure view
-* Justfile tool Window: load Justfiles into task tree, and support Markdown files(README.md, AGENTS.md, CLAUDE.md).
-* Sub modules/import resolver
-* Interesting miscellaneous: DuckDB, Bun, Nushell etc.
-* Justfile as scratch file: `PROJECT_DIR` environment variable
+* Justfile tool Window: load Justfiles into the task-tree and support Markdown files(README.md, AGENTS.md, CLAUDE.md).
+* Submodules/import resolver
+* Interesting miscellaneous: DuckDB, Bun, Nushell, etc.
+* Justfile as a scratch file: `PROJECT_DIR` environment variable
 
 How to use?
 
 * Download and install `just` command line from https://github.com/casey/just/releases
 * Install JetBrains Just plugin
-* Invoke 'Justfile' item from New file group, and a `justfile` file will be created with following code:
+* Invoke 'Justfile' item from `New` file group, and a `justfile` file will be created with the following code:
 
 ```
 #!/usr/bin/env just --justfile
@@ -42,7 +42,7 @@ hello:
   echo "hello world"
 ```
 
-* Click run button in Gutter and run a recipe/target!
+* Click the run button in the Gutter and run a recipe/target!
 
 Quick to understand `justfile`, please
 click [Justfile cheat sheet](https://cheatography.com/linux-china/cheat-sheets/justfile/)
@@ -63,7 +63,7 @@ If param as command name, such as `{{MVN}} --version`, please use `exec '{{MVN}}
 * Justfile cheat sheet: https://cheatography.com/linux-china/cheat-sheets/justfile/
 * Grammar-Kit: https://github.com/JetBrains/Grammar-Kit
 * just: https://github.com/casey/just
-* Developing an Intellij IDEA Plugin for a Custom Language— Tutorial 1-Setting up the
+* Developing an IntelliJ IDEA Plugin for a Custom Language— Tutorial 1-Setting up the
   environment: https://medium.com/@raveensr/developing-an-intellij-idea-plugin-for-a-custom-language-tutorial-1-setting-up-the-environment-aefe310bfcf9
 * Custom Language Support: https://plugins.jetbrains.com/docs/intellij/custom-language-support.html
 * simple_language_plugin: https://github.com/JetBrains/intellij-sdk-code-samples/tree/main/simple_language_plugin
