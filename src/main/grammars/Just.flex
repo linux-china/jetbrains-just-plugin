@@ -38,6 +38,7 @@ REEQ = ("=~")
 NORE = ("!~")
 NOT = ("!")
 PLUS = ("+")
+PLUS_PLUS = ("++")
 SLASH = ("/")
 OR = ("||")
 AND = ("&&")
@@ -230,11 +231,14 @@ KEYWORD_ELSE_IF=("else if")
   {BACKTICK}                   {  yybegin(VARIABLE); return BACKTICK; }
   {ID_LITERAL}                    {  yybegin(VARIABLE); return ID_LITERAL; }
   {PLUS}                      {  yybegin(VARIABLE); return PLUS; }
+  {PLUS_PLUS}                      {  yybegin(VARIABLE); return PLUS_PLUS; }
   {SLASH}                      {  yybegin(VARIABLE); return SLASH; }
   {OR}                      {  yybegin(VARIABLE); return OR; }
   {AND}                      {  yybegin(VARIABLE); return AND; }
   {OPEN_PAREN}               {  yybegin(VARIABLE); return OPEN_PAREN; }
   {CLOSE_PAREN}               {  yybegin(VARIABLE); return CLOSE_PAREN; }
+  {OPEN_BRACKET}               {  yybegin(VARIABLE); return OPEN_BRACKET; }
+  {CLOSE_BRACKET}               {  yybegin(VARIABLE); return CLOSE_BRACKET; }
   {COMMA}               {  yybegin(VARIABLE); return COMMA; }
   {COMMENT}                   {  yybegin(VARIABLE); return JustTypes.COMMENT; }
   {NEW_LINE}                   {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
