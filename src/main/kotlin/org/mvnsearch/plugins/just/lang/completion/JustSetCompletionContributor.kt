@@ -43,6 +43,9 @@ class JustSetCompletionContributor : CompletionContributor() {
                         result.addElement(
                             LookupElementBuilder.create("dotenv-path := \"\"").withInsertHandler(insertHandler)
                         )
+                        result.addElement(
+                            LookupElementBuilder.create("indentation := \"  \"").withInsertHandler(insertHandler)
+                        )
                         result.addElement(LookupElementBuilder.create("ignore-comments"))
                         result.addElement(LookupElementBuilder.create("default-list := true"))
                         result.addElement(LookupElementBuilder.create("export"))
