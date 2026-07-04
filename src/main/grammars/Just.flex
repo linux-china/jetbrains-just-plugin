@@ -35,6 +35,8 @@ EQUAL = [=]
 EQEQ = ("==")
 NOEQ = ("!=")
 REEQ = ("=~")
+NORE = ("!~")
+NOT = ("!")
 PLUS = ("+")
 SLASH = ("/")
 OR = ("||")
@@ -285,6 +287,8 @@ KEYWORD_ELSE_IF=("else if")
   {EQEQ}                     {  yybegin(CONDITIONAL); return EQEQ; }
   {NOEQ}                     {  yybegin(CONDITIONAL); return NOEQ; }
   {REEQ}                     {  yybegin(CONDITIONAL); return REEQ; }
+  {NORE}                     {  yybegin(CONDITIONAL); return NORE; }
+  {NOT}                     {  yybegin(CONDITIONAL); return NOT; }
   {OR}                       {  yybegin(CONDITIONAL); return OR; }
   {AND}                      {  yybegin(CONDITIONAL); return AND; }
   {KEYWORD_IF}               {  yybegin(CONDITIONAL); return KEYWORD_IF; }
