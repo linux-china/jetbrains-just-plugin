@@ -451,6 +451,7 @@ KEYWORD_ELSE_IF=("else if")
  {STRING}                                {  yybegin(ATTRIBUTE); return STRING; }
  {RAW_STRING}                            {  yybegin(ATTRIBUTE); return RAW_STRING; }
  {BACKTICK}                             {  yybegin(ATTRIBUTE); return BACKTICK; }
+ {NUMBER_LITERAL}                       {  yybegin(ATTRIBUTE); return NUMBER_LITERAL; }
  {EXPRESSION_FENCE}                      {  yybegin(ATTRIBUTE); return EXPRESSION_FENCE; }
  {OPEN_BRACKET}                           {  yybegin(ATTRIBUTE_LIST_VALUE); return OPEN_BRACKET; }
  {CLOSE_PAREN}                           {  yybegin(ATTRIBUTE); return CLOSE_PAREN; }
@@ -465,6 +466,7 @@ KEYWORD_ELSE_IF=("else if")
  {F_INDICATOR}/ {STRING_STARTER}        {  yybegin(ATTRIBUTE_LIST_VALUE); return F_INDICATOR; }
  {STRING}                                {  yybegin(ATTRIBUTE_LIST_VALUE); return STRING; }
  {RAW_STRING}                            {  yybegin(ATTRIBUTE_LIST_VALUE); return RAW_STRING; }
+ {NUMBER_LITERAL}                        {  yybegin(ATTRIBUTE_LIST_VALUE); return NUMBER_LITERAL; }
  {EXPRESSION_FENCE}                      {  yybegin(ATTRIBUTE_LIST_VALUE); return EXPRESSION_FENCE; }
  {CLOSE_BRACKET}                         {  yybegin(ATTRIBUTE); return CLOSE_BRACKET; }
 }
