@@ -4,11 +4,17 @@
 
 ## Unreleased
 
+## 0.6.53 - 2026-07-10
+
+### Fixed
+
+- Fix `[arg("package", min=2, max=5)]` syntax error
+
 ## 0.6.52 - 2026-07-04
 
 ### Added
 
-- Add `indentation` setting: `set indentation :="  "` 
+- Add `indentation` setting: `set indentation :="  "`
 - Parameter default value as an empty list: `hello: name=[]`
 - List literal support enhancement
 - Fix some bugs for conditional check
