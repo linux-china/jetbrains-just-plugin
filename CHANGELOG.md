@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.6.54 - 2026-07-29
+
+### Added
+
+- Add `[timestamp]` attribute
+
 ## 0.6.53 - 2026-07-10
 
 ### Fixed
