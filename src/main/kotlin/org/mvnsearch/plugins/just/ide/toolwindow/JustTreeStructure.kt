@@ -19,8 +19,10 @@ class JustTreeStructure(
             is RootNode -> {
                 val baseDir = project.guessProjectDir()
 
-                justService.findJustfiles().map {
-                    JustfileNode(project = project, file = it, relativePath = baseDir?.let { base ->
+                justService.findJustfiles()
+                    .filter { justService.loadRecipes(it).isNotEmpty() }
+                    .map {
+                        JustfileNode(project = project, file = it, relativePath = baseDir?.let { base ->
                         VfsUtilCore.getRelativePath(it.parent, base)?.takeIf { relativePath ->
                             relativePath.isNotEmpty()
                         }

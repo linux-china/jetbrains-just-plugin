@@ -11,6 +11,8 @@ import io.ktor.util.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.jsonPrimitive
 import org.mvnsearch.plugins.just.Just
 import java.util.concurrent.ConcurrentHashMap
 
@@ -95,7 +97,9 @@ class JustfileService(
 
         val recipes = root["recipes"]?.jsonObject ?: return emptyList()
 
-        return recipes.map { (name, recipeJson) ->
+        return recipes.filter { (_, recipeJson) ->
+            recipeJson.jsonObject["private"]?.jsonPrimitive?.booleanOrNull != true
+        }.map { (name, recipeJson) ->
             val description = recipeJson.jsonObject["doc"]?.toString()?.removeSurrounding("\"")?.takeIf { it != "null" }
             val params =
                 recipeJson.jsonObject["parameters"]?.jsonArray?.filter { it.jsonObject["name"] != null }
