@@ -148,3 +148,4 @@ gradle-app.setting
 .qodana
 src/main/gen
 temp/
+.envrc
