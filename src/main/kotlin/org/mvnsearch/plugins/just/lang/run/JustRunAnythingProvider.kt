@@ -59,12 +59,14 @@ class JustRunAnythingProvider : RunAnythingCommandLineProvider() {
     override fun run(dataContext: DataContext, commandLine: CommandLine): Boolean {
         val project = dataContext.getData(CommonDataKeys.PROJECT) ?: return false
         val workDirectory = project.guessProjectDir() ?: return false
-        val commandString = Just.getJustCmdAbsolutionPath(project) + " " + commandLine.command
+        val command = listOf(Just.getJustCmdAbsolutionPath(project)) +
+                ParametersListUtil.parse(commandLine.command, false, true)
         val commandDataContext = RunAnythingCommandCustomizer.customizeContext(dataContext)
         val justColor = "auto"
-        val initialCommandLine = GeneralCommandLine(ParametersListUtil.parse(commandString, false, true))
+        val initialCommandLine = GeneralCommandLine(command)
             .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
             .withEnvironment("JUST_COLOR", justColor)
+            .withEnvironment("JUST_UNSTABLE", "1")
             .withWorkDirectory(workDirectory.toNioPath().toFile())
         adjustCommandLinePath(project, initialCommandLine)
         val newCommandLine =
@@ -88,17 +90,12 @@ class JustRunAnythingProvider : RunAnythingCommandLineProvider() {
 
     override fun suggestCompletionVariants(dataContext: DataContext, commandLine: CommandLine): Sequence<String> {
         val project = dataContext.getData(CommonDataKeys.PROJECT) ?: return emptySequence()
-        val projectDir = project.guessProjectDir()
-        var justfile = projectDir?.findChild("justfile")
-        if (justfile == null) {
-            justfile = projectDir?.findChild("Justfile")
+        val projectDir = project.guessProjectDir() ?: return emptySequence()
+        val justfile = listOf("justfile", "Justfile", ".justfile", ".Justfile")
+            .firstNotNullOfOrNull { projectDir.findChild(it) } ?: return emptySequence()
+        return ReadAction.compute<Sequence<String>, Throwable> {
+            val psiFile = PsiManager.getInstance(project).findFile(justfile) as? JustFile
+            psiFile?.findAllRecipes()?.asSequence() ?: emptySequence()
         }
-        if (justfile != null) {
-            return ReadAction.compute<Sequence<String>, Throwable> {
-                val psiFile = PsiManager.getInstance(project).findFile(justfile) as JustFile
-                psiFile.findAllRecipes().asSequence()
-            }
-        }
-        return emptySequence()
     }
 }
