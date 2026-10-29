@@ -78,7 +78,8 @@ class JustfileService(
 
         val result = try {
             runReadAction {
-                if (DumbService.isDumb(project)) throw IndexNotReadyException.create()
+                // getService instead of DumbService.getInstance/isDumb: on newer platforms those compile to DumbService.Companion, missing on older IDEs
+                if (project.getService(DumbService::class.java).isDumb) throw IndexNotReadyException.create()
                 // project scope only: excluded dirs (build, target, node_modules ...), library roots and ignored files are skipped
                 val scope = GlobalSearchScope.projectScope(project)
                 val files = FileTypeIndex.getFiles(JustFileType, scope).filter { Just.isJustfile(it.name) }

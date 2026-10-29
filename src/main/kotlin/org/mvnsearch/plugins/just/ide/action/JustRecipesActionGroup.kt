@@ -26,7 +26,7 @@ open class JustRecipesActionGroup(private val justfile: VirtualFile) : ActionGro
     override fun getChildren(e: AnActionEvent?): Array<AnAction> {
         val project = e?.project ?: return arrayOf()
         // called during action update (under read action): never run `just` here, load it in background instead
-        val justfileService = project.service<JustfileService>()
+        val justfileService = project.getService(JustfileService::class.java)
         val recipes = justfileService.getCachedRecipes(justfile)
         if (recipes == null) {
             justfileService.loadRecipesAsync(justfile) {}
@@ -39,7 +39,7 @@ open class JustRecipesActionGroup(private val justfile: VirtualFile) : ActionGro
      * get recipe actions, called on EDT: load recipes under a modal progress when the cache is empty
      */
     open fun getActions(dataContext: DataContext?, project: Project): Array<AnAction> {
-        val justfileService = project.service<JustfileService>()
+        val justfileService = project.getService(JustfileService::class.java)
         val recipes = justfileService.getCachedRecipes(justfile)
             ?: ProgressManager.getInstance().runProcessWithProgressSynchronously<List<RecipeNode>, RuntimeException>(
                 { justfileService.loadRecipes(justfile) }, "Loading Just Recipes", false, project
