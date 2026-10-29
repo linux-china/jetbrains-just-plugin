@@ -6,6 +6,7 @@ import com.intellij.lang.folding.FoldingDescriptor
 import com.intellij.lang.folding.FoldingDescriptor.EMPTY_ARRAY
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.project.DumbAware
+import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import org.mvnsearch.plugins.just.lang.psi.JustFile
@@ -27,26 +28,27 @@ class JustfileFoldingBuilder : FoldingBuilderEx(), DumbAware {
             JustVariableStatement::class.java
         )
             .mapNotNull { statement ->
-                if (statement is JustRecipeStatement) {
-                    FoldingDescriptor(
-                        statement, statement.textRange.startOffset, statement.textRange.endOffset - 1,
-                        null,
-                        statement.recipeName.text + ":"
-                    )
-                } else if (statement is JustVariableStatement) {
-                    if (statement.text.trim().contains('\n')) {
-                        FoldingDescriptor(
-                            statement, statement.textRange.startOffset, statement.textRange.endOffset - 1,
-                            null,
-                            statement.variable.text + " := ..."
-                        )
-                    } else {
-                        null
-                    }
-                } else {
-                    null
+                val placeholder = when (statement) {
+                    is JustRecipeStatement -> statement.recipeName.text + ":"
+                    is JustVariableStatement -> statement.variable.text + " := ..."
+                    else -> return@mapNotNull null
                 }
+                val range = foldingRange(statement) ?: return@mapNotNull null
+                FoldingDescriptor(statement.node, range, null, placeholder)
             }.toTypedArray()
+    }
+
+    /**
+     * Range of the statement without trailing whitespace, only when it spans multiple lines
+     */
+    private fun foldingRange(statement: PsiElement): TextRange? {
+        val text = statement.text
+        val trimmed = text.trimEnd()
+        if (!trimmed.contains('\n')) {
+            return null
+        }
+        val start = statement.textRange.startOffset
+        return TextRange(start, start + trimmed.length)
     }
 
     override fun getPlaceholderText(node: ASTNode): String {
