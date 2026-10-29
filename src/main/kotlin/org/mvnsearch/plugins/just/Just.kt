@@ -48,6 +48,7 @@ object Just {
         return justfileName == "justfile"
                 || justfileName == "Justfile"
                 || justfileName == ".justfile"
+                || justfileName == ".Justfile"
     }
 
     fun isJustfile(justfileName: String): Boolean {
