@@ -25,14 +25,18 @@ class JustfileRegionFoldingBuilder : FoldingBuilderEx(), DumbAware {
             .filter { it.text.startsWith("# region") || it.text.startsWith("# endregion") }
             .toList()
         val descriptors = mutableListOf<FoldingDescriptor>()
-        // for loop with index
-        for (i in regionElements.indices step 2) {
-            val startElement = regionElements[i]
-            val endElement = regionElements[i + 1]
-            val start = startElement.textRange.startOffset
-            val end = endElement.textRange.endOffset
-            val foldingDescriptor = FoldingDescriptor(startElement, start, end, null, startElement.text.substring(2))
-            descriptors.add(foldingDescriptor)
+        // pair region/endregion with a stack, unmatched markers are ignored
+        val startElements = ArrayDeque<PsiElement>()
+        for (element in regionElements) {
+            if (element.text.startsWith("# endregion")) {
+                val startElement = startElements.removeLastOrNull() ?: continue
+                val start = startElement.textRange.startOffset
+                val end = element.textRange.endOffset
+                val foldingDescriptor = FoldingDescriptor(startElement, start, end, null, startElement.text.substring(2))
+                descriptors.add(foldingDescriptor)
+            } else {
+                startElements.addLast(element)
+            }
         }
         return descriptors.toTypedArray()
     }
