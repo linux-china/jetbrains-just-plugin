@@ -166,6 +166,53 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
         return includedFiles
     }
 
+    /**
+     * Find the `mod` statement with the given name, in this file or its imported files.
+     */
+    fun findModStatement(modName: String, visited: MutableSet<VirtualFile> = mutableSetOf()): JustModStatement? {
+        originalFile.virtualFile?.let {
+            if (!visited.add(it)) return null
+        }
+        PsiTreeUtil.getChildrenOfType(this, JustModStatement::class.java)
+            ?.firstOrNull { it.modName?.text == modName }
+            ?.let { return it }
+        parseIncludedFiles().forEach { file ->
+            file.findModStatement(modName, visited)?.let { return it }
+        }
+        return null
+    }
+
+    /**
+     * Resolve the module file of a `mod` statement declared in this file.
+     * `mod foo` searches foo.just, foo/mod.just, foo/justfile and foo/.justfile;
+     * `mod foo 'path'` uses the path, or the same candidates inside it if the path is a directory.
+     */
+    fun resolveModFile(modStatement: JustModStatement): JustFile? {
+        val modName = modStatement.modName?.text ?: return null
+        val parentDir = originalFile.virtualFile?.parent ?: return null
+        val modPath = modStatement.modPath?.text?.let { StringUtil.unquoteString(it) }
+        if (modPath.isNullOrBlank()) {
+            val candidates = listOf("$modName.just") + MOD_FILE_NAMES.map { "$modName/$it" }
+            return candidates.firstNotNullOfOrNull { path ->
+                parentDir.findFileByRelativePath(path)?.let { toJustFile(it) }
+            }
+        }
+        val target = if (modPath.startsWith("/")) {
+            LocalFileSystem.getInstance().findFileByPath(modPath)
+        } else {
+            parentDir.findFileByRelativePath(modPath)
+        } ?: return null
+        if (target.isDirectory) {
+            return MOD_FILE_NAMES.firstNotNullOfOrNull { name -> target.findChild(name)?.let { toJustFile(it) } }
+        }
+        return toJustFile(target)
+    }
+
+    private fun toJustFile(file: VirtualFile): JustFile? {
+        if (file.isDirectory) return null
+        return PsiManager.getInstance(project).findFile(file) as? JustFile
+    }
+
     private fun resolveImportPathToFile(importPath: String): PsiFile? {
         if (importPath.isBlank()) {
             return null
@@ -184,6 +231,7 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
 
     companion object {
         private val BASH_ALIKE_SHELLS = setOf("sh", "bash", "zsh", "dash", "fish")
+        private val MOD_FILE_NAMES = listOf("mod.just", "justfile", "Justfile", ".justfile", ".Justfile")
     }
 }
 

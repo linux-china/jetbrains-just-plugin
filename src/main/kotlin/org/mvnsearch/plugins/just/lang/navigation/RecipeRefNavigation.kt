@@ -13,7 +13,15 @@ class RecipeRefNavigation : DirectNavigationProvider {
     override fun getNavigationElement(element: PsiElement): PsiElement? {
         if (element.elementType == JustTypes.DEPENDENCY_NAME) {
             val dependencyName = element.text
-            val justFile = element.containingFile as JustFile
+            val justFile = element.containingFile as? JustFile ?: return null
+            // module recipe: `mod::recipe`
+            if (dependencyName.contains("::")) {
+                val modName = dependencyName.substringBefore("::")
+                val recipeName = dependencyName.substringAfter("::")
+                val modStatement = justFile.findModStatement(modName) ?: return null
+                val modFile = (modStatement.containingFile as? JustFile)?.resolveModFile(modStatement) ?: return null
+                return modFile.findRecipeElement(recipeName) ?: modFile
+            }
             val target = justFile.findRecipeElement(dependencyName)
             if (target != null) {
                 return target
