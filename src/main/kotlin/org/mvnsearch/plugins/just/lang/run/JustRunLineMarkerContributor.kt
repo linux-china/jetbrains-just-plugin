@@ -182,7 +182,7 @@ fun runJustCommand(
     try {
         val generalCommandLine =
             if (Registry.`is`("run.anything.use.pty", true)) PtyCommandLine(commandLine) else commandLine
-        val runAnythingRunProfile = RunJustProfile(generalCommandLine, ParametersListUtil.join(command))
+        val runAnythingRunProfile = RunJustProfile(generalCommandLine, ParametersListUtil.join(listOf("just") + command.drop(1)))
         ExecutionEnvironmentBuilder.create(project, DefaultRunExecutor.getRunExecutorInstance(), runAnythingRunProfile)
             .dataContext(commandDataContext)
             .buildAndExecute()
@@ -191,7 +191,7 @@ fun runJustCommand(
     }
 }
 
-class RunJustProfile(private val commandLine: GeneralCommandLine, private val originalCommand: String) :
+class RunJustProfile(private val commandLine: GeneralCommandLine, private val displayName: String) :
     RunProfile {
 
     override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState {
@@ -209,10 +209,6 @@ class RunJustProfile(private val commandLine: GeneralCommandLine, private val or
     }
 
     override fun getName(): String {
-        return if (originalCommand.contains("/bin/just")) {
-            originalCommand.substring(originalCommand.indexOf("/bin") + 5)
-        } else {
-            originalCommand
-        }
+        return displayName
     }
 }
