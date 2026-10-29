@@ -43,7 +43,7 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
         return this.children
             .filterIsInstance<JustRecipeStatement>()
             .map {
-                it.recipeName.text
+                it.recipeName.text.replace("@","")
             }.toList()
     }
 

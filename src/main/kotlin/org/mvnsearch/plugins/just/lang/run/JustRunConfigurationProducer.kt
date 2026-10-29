@@ -53,7 +53,7 @@ class JustRunConfigurationProducer : LazyRunConfigurationProducer<JustRunConfigu
             } else {
                 configuration.setFileName(filePath)
             }
-            val recipeName = originalElement.text
+            val recipeName = originalElement.text.replace("@","")
             configuration.setRecipeName(recipeName)
             configuration.name = getDefaultConfigurationName(virtualFile.name, recipeName)
             return true
