@@ -9,6 +9,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.DoubleClickListener
@@ -25,7 +26,7 @@ import javax.swing.tree.DefaultMutableTreeNode
 
 class JustToolWindowPanel(private val project: Project) : JPanel(BorderLayout()), Disposable {
     private val treeStructure = JustTreeStructure(project) {
-        ApplicationManager.getApplication().invokeLater {
+        invokeLaterIfAlive {
             structureTreeModel.invalidateAsync()
         }
     }
@@ -101,10 +102,20 @@ class JustToolWindowPanel(private val project: Project) : JPanel(BorderLayout())
     fun refresh(justVirtualFile: VirtualFile? = null) {
         project.getService(JustfileService::class.java).invalidate(justVirtualFile)
 
-        ApplicationManager.getApplication().invokeLater {
+        invokeLaterIfAlive {
             structureTreeModel.invalidateAsync()
             tree.repaint()
         }
+    }
+
+    /**
+     * run on EDT, skipped if the project or this panel has been disposed in the meantime
+     */
+    private fun invokeLaterIfAlive(action: () -> Unit) {
+        ApplicationManager.getApplication().invokeLater(
+            { action() },
+            Condition<Any?> { project.isDisposed || Disposer.isDisposed(this) }
+        )
     }
 
     override fun dispose() = Unit
