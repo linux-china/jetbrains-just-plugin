@@ -54,14 +54,15 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
 
     fun isBashAlike(): Boolean {
         val shellItem = this.children
-            .filterIsInstance<JustSetStatement>().firstOrNull() {
-                it.setting.text == "shell" || it.setting.text == "windows-shell" || it.setting.text == "script-interpreter"
-            }
-        return if (shellItem == null) {
-            true
-        } else {
-            shellItem.text.contains("sh\"")
-        }
+            .filterIsInstance<JustSetStatement>().firstOrNull {
+                it.setting.text == "shell"
+            } ?: return true
+        // shell := ["bash", "-c"], take the first element and compare its basename
+        val command = shellItem.setStatementValue?.stringList?.textItemList?.firstOrNull()?.text ?: return true
+        val program = command.trimStart('x', 'f').trim('"', '\'').trim()
+            .substringAfterLast('/').substringAfterLast('\\')
+            .removeSuffix(".exe")
+        return program in BASH_ALIKE_SHELLS
     }
 
     fun hasShellConfig(): Boolean {
@@ -179,6 +180,10 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
         }
 
         return resolvedFileVirtualFile?.let { PsiManager.getInstance(project).findFile(it) }
+    }
+
+    companion object {
+        private val BASH_ALIKE_SHELLS = setOf("sh", "bash", "zsh", "dash", "fish")
     }
 }
 
