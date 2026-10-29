@@ -1,11 +1,13 @@
 package org.mvnsearch.plugins.just
 
+import com.intellij.execution.configurations.PathEnvironmentVariableUtil
 import com.intellij.openapi.application.PathMacros
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.EnvironmentUtil
+import com.intellij.util.text.VersionComparatorUtil
 import java.io.File
 import java.io.IOException
 import kotlin.io.path.Path
@@ -26,23 +28,43 @@ object Just {
         project.guessProjectDir()?.let { projectDir ->
             projectDir.findFileByRelativePath(".devenv/profile/bin/just")?.let { return it.path }
         }
-        // mise
         val userHome = Path(System.getProperty("user.home"))
         val justExecName = if (SystemInfo.isWindows) "just.exe" else "just"
-        userHome.resolve(".local/share/mise/installs/just/latest/$justExecName").toFile().let { justExec ->
-            if (justExec.exists()) return justExec.absolutePath
-        }
-        return if (SystemInfo.isWindows) {
-            return "just"
+        // mise
+        findMiseJust(userHome, justExecName)?.let { return it }
+        // PATH, loaded from the login shell by EnvironmentUtil
+        if (SystemInfo.isWindows) {
+            PathEnvironmentVariableUtil.findExecutableInWindowsPath("just", null)?.let { return it }
         } else {
-            if (File("/usr/local/bin/just").exists()) {
-                "/usr/local/bin/just"
-            } else if (File("/opt/homebrew/bin/just").exists()) {
-                "/opt/homebrew/bin/just"
-            } else {
-                "just"
+            PathEnvironmentVariableUtil.findInPath("just")?.let { return it.absolutePath }
+        }
+        // common install locations
+        val candidates = mutableListOf(
+            userHome.resolve(".cargo/bin/$justExecName").toFile(),
+            userHome.resolve(".local/bin/$justExecName").toFile()
+        )
+        if (!SystemInfo.isWindows) {
+            candidates.add(File("/usr/local/bin/just"))
+            candidates.add(File("/opt/homebrew/bin/just"))
+        }
+        return candidates.firstOrNull { it.isFile && it.canExecute() }?.absolutePath ?: "just"
+    }
+
+    private fun findMiseJust(userHome: java.nio.file.Path, justExecName: String): String? {
+        val miseDataDir = EnvironmentUtil.getValue("MISE_DATA_DIR")?.takeIf { it.isNotBlank() }?.let { Path(it) }
+            ?: userHome.resolve(".local/share/mise")
+        val installsDir = miseDataDir.resolve("installs/just").toFile()
+        if (!installsDir.isDirectory) return null
+        // "latest" symlink first, then the highest installed version
+        val versionDirs = listOf(File(installsDir, "latest")) +
+                (installsDir.listFiles { file -> file.isDirectory && file.name != "latest" } ?: emptyArray())
+                    .sortedWith { a, b -> VersionComparatorUtil.compare(b.name, a.name) }
+        for (versionDir in versionDirs) {
+            for (justExec in listOf(File(versionDir, justExecName), File(versionDir, "bin/$justExecName"))) {
+                if (justExec.isFile) return justExec.absolutePath
             }
         }
+        return null
     }
 
     fun isDefaultJustfile(justfileName: String): Boolean {
