@@ -8,9 +8,13 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.search.FileTypeIndex
+import com.intellij.psi.search.FilenameIndex
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.xml.util.XmlStringUtil
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNull
@@ -18,7 +22,9 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
+import org.mvnsearch.plugins.just.JUSTFILES_MARKDOWN
 import org.mvnsearch.plugins.just.Just
+import org.mvnsearch.plugins.just.lang.psi.JustFileType
 import org.mvnsearch.plugins.just.lang.run.RecipeParam
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.ConcurrentHashMap
@@ -59,22 +65,34 @@ class JustfileService(
         }
     }
 
+    /**
+     * true when the last lookup ran while indexes were not ready, so its (empty) result was not cached and should be retried after indexing
+     */
+    @Volatile
+    var incompleteJustfiles = false
+        private set
+
     fun findJustfiles(): List<VirtualFile> {
         // drop files invalidated by a VFS change the refresh listener has not caught
         justfiles?.let { cached -> if (cached.all { it.isValid }) return cached }
 
-        val result = mutableListOf<VirtualFile>()
-
-        // iterate project content only: excluded dirs (build, target, node_modules ...), library roots and ignored files are skipped
-        runReadAction {
-            ProjectFileIndex.getInstance(project).iterateContent {
-                if (!it.isDirectory && (Just.isJustfile(it.name) || Just.isJustfileMarkdown(it))) {
-                    result += it
-                }
-                true
+        val result = try {
+            runReadAction {
+                if (DumbService.isDumb(project)) throw IndexNotReadyException.create()
+                // project scope only: excluded dirs (build, target, node_modules ...), library roots and ignored files are skipped
+                val scope = GlobalSearchScope.projectScope(project)
+                val files = FileTypeIndex.getFiles(JustFileType, scope).filter { Just.isJustfile(it.name) }
+                // only files named README.md, AGENTS.md or CLAUDE.md are read to look for a just code block
+                val markdownFiles = JUSTFILES_MARKDOWN.flatMap { FilenameIndex.getVirtualFilesByName(it, scope) }
+                    .filter { Just.isJustfileMarkdown(it) }
+                (files + markdownFiles).filter { !it.isDirectory }.distinctBy { it.path }
             }
+        } catch (_: IndexNotReadyException) {
+            incompleteJustfiles = true
+            return emptyList()
         }
 
+        incompleteJustfiles = false
         justfiles = result
 
         return result

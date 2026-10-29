@@ -8,6 +8,7 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Disposer
@@ -94,6 +95,15 @@ class JustToolWindowPanel(private val project: Project) : JPanel(BorderLayout())
 
         // subscribe VFS changes and watch Justfile changes
         Disposer.register(this, JustToolWindowRefreshListener(project, ::refresh))
+
+        // justfiles are looked up through indexes, retry the lookup skipped during indexing; cached recipes stay valid
+        project.messageBus.connect(this).subscribe(DumbService.DUMB_MODE, object : DumbService.DumbModeListener {
+            override fun exitDumbMode() {
+                if (project.getService(JustfileService::class.java).incompleteJustfiles) {
+                    invokeLaterIfAlive { structureTreeModel.invalidateAsync() }
+                }
+            }
+        })
     }
 
     /**
