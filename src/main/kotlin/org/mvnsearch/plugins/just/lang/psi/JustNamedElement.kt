@@ -7,7 +7,8 @@ import com.intellij.navigation.ItemPresentation
 import com.intellij.navigation.NavigationItem
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNameIdentifierOwner
-import org.mvnsearch.plugins.just.lang.psi.JustfileElementFactory.createRecipe
+import com.intellij.psi.impl.source.tree.LeafElement
+import com.intellij.util.IncorrectOperationException
 import javax.swing.Icon
 
 interface JustNamedElement : PsiNameIdentifierOwner, NavigationItem {
@@ -25,15 +26,13 @@ interface JustNamedElement : PsiNameIdentifierOwner, NavigationItem {
 }
 
 abstract class JustNamedElementImpl(node: ASTNode) : ASTWrapperPsiElement(node), JustNamedElement {
-    private var _name: String? = null
 
     override fun getName(): String? {
-        return this._name
+        return null
     }
 
     override fun setName(name: String): PsiElement? {
-        this._name = name
-        return this
+        throw IncorrectOperationException("Rename is not supported for ${this.node.elementType}")
     }
 
     override fun getNameIdentifier(): PsiElement? {
@@ -65,10 +64,10 @@ abstract class JustRecipeElementImpl(node: ASTNode) : JustNamedElementImpl(node)
 
     override fun setName(name: String): PsiElement? {
         val keyNode: ASTNode? = this.node.findChildByType(JustTypes.RECIPE_NAME)
-        if (keyNode != null) {
-            val createdRecipe = createRecipe(this.project, name)
-            val newKeyNode = createdRecipe.recipeName.node
-            this.node.replaceChild(keyNode, newKeyNode)
+        if (keyNode is LeafElement) {
+            // keep `@` prefix for quiet recipe
+            val newName = if (keyNode.text.startsWith("@")) "@$name" else name
+            keyNode.replaceWithText(newName)
         }
         return this
     }

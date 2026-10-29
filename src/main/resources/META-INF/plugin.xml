@@ -71,6 +71,8 @@
         <!-- run configuration -->
         <configurationType implementation="org.mvnsearch.plugins.just.lang.run.JustConfigurationType"/>
         <runConfigurationProducer implementation="org.mvnsearch.plugins.just.lang.run.JustRunConfigurationProducer"/>
+        <lang.findUsagesProvider language="Just"
+                                 implementationClass="org.mvnsearch.plugins.just.lang.resolve.JustFindUsagesProvider"/>
         <renameInputValidator implementation="org.mvnsearch.plugins.just.lang.resolve.JustRecipeRenameInputValidator"
                               order="first"/>
         <spellchecker.bundledDictionaryProvider

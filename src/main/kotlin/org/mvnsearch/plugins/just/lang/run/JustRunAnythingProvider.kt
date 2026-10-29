@@ -57,8 +57,8 @@ class JustRunAnythingProvider : RunAnythingCommandLineProvider() {
     }
 
     override fun run(dataContext: DataContext, commandLine: CommandLine): Boolean {
-        val project = dataContext.getData(CommonDataKeys.PROJECT)!!
-        val workDirectory = project.guessProjectDir()!!
+        val project = dataContext.getData(CommonDataKeys.PROJECT) ?: return false
+        val workDirectory = project.guessProjectDir() ?: return false
         val commandString = Just.getJustCmdAbsolutionPath(project) + " " + commandLine.command
         val commandDataContext = RunAnythingCommandCustomizer.customizeContext(dataContext)
         val justColor = "auto"
@@ -87,15 +87,15 @@ class JustRunAnythingProvider : RunAnythingCommandLineProvider() {
     }
 
     override fun suggestCompletionVariants(dataContext: DataContext, commandLine: CommandLine): Sequence<String> {
-        val project = dataContext.getData(CommonDataKeys.PROJECT)
-        val projectDir = project?.guessProjectDir()
+        val project = dataContext.getData(CommonDataKeys.PROJECT) ?: return emptySequence()
+        val projectDir = project.guessProjectDir()
         var justfile = projectDir?.findChild("justfile")
         if (justfile == null) {
             justfile = projectDir?.findChild("Justfile")
         }
         if (justfile != null) {
             return ReadAction.compute<Sequence<String>, Throwable> {
-                val psiFile = PsiManager.getInstance(project!!).findFile(justfile) as JustFile
+                val psiFile = PsiManager.getInstance(project).findFile(justfile) as JustFile
                 psiFile.findAllRecipes().asSequence()
             }
         }
