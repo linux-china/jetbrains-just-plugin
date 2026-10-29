@@ -32,7 +32,6 @@ import org.mvnsearch.plugins.just.lang.psi.JustFile
 import org.mvnsearch.plugins.just.lang.psi.JustRecipeStatement
 import org.mvnsearch.plugins.just.lang.psi.JustTypes
 import org.mvnsearch.plugins.just.lang.run.JustRunConfiguration.Companion.adjustCommandLinePath
-import org.mvnsearch.plugins.just.parseRecipeName
 import javax.swing.Icon
 
 @Suppress("DialogTitleCapitalization")
@@ -46,40 +45,37 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
     }
 
     override fun getLineMarkerInfo(psiElement: PsiElement): LineMarkerInfo<*>? {
-        val elementType = psiElement.elementType
-        if (elementType == JustTypes.RECIPE_STATEMENT) {
-            val text = psiElement.text
-            val recipeName = parseRecipeName(text)
-            var runIcon = JustIcons.RUN_ICON
-            if (recipeName == "default") {
-                runIcon = JustIcons.DEFAULT_RUN_ICON
-            } else {
-                val recipeStatement = psiElement as JustRecipeStatement
-                recipeStatement.prevSibling?.prevSibling?.let {
-                    if (it.elementType == JustTypes.ATTRIBUTE) {
-                        if (it.text == "[default]") {
-                            runIcon = JustIcons.DEFAULT_RUN_ICON
-                        }
+        // register on the RECIPE_NAME leaf only, line markers must be attached to leaf elements
+        if (psiElement.elementType != JustTypes.RECIPE_NAME) return null
+        val recipeStatement = psiElement.parent as? JustRecipeStatement ?: return null
+        val recipeName = psiElement.text
+        var runIcon = JustIcons.RUN_ICON
+        if (recipeName == "default") {
+            runIcon = JustIcons.DEFAULT_RUN_ICON
+        } else {
+            recipeStatement.prevSibling?.prevSibling?.let {
+                if (it.elementType == JustTypes.ATTRIBUTE) {
+                    if (it.text == "[default]") {
+                        runIcon = JustIcons.DEFAULT_RUN_ICON
                     }
                 }
             }
-            return LineMarkerInfo(
-                psiElement,
-                psiElement.textRange,
-                runIcon,
-                {
-                    "Run just recipe: $recipeName"
-                },
-                { _, _ ->
-                    runJustRecipeByRunAnything(psiElement.project, psiElement, recipeName)
-                },
-                GutterIconRenderer.Alignment.CENTER,
-                {
-                    recipeName
-                }
-            )
         }
-        return null
+        return LineMarkerInfo(
+            psiElement,
+            psiElement.textRange,
+            runIcon,
+            {
+                "Run just recipe: $recipeName"
+            },
+            { _, _ ->
+                runJustRecipeByRunAnything(psiElement.project, psiElement, recipeName)
+            },
+            GutterIconRenderer.Alignment.CENTER,
+            {
+                recipeName
+            }
+        )
     }
 
 

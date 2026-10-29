@@ -18,7 +18,8 @@ class ShebangMarkerProvider : LineMarkerProviderDescriptor() {
     }
 
     override fun getLineMarkerInfo(psiElement: PsiElement): LineMarkerInfo<*>? {
-        if (psiElement.elementType == JustTypes.CODE_BLOCK) {
+        // line markers must be attached to leaf elements: CODE leaf of CODE_BLOCK, SETTING leaf of SET_STATEMENT
+        if (psiElement.elementType == JustTypes.CODE && psiElement.parent?.elementType == JustTypes.CODE_BLOCK) {
             val elementText = psiElement.text
             val firstLine = elementText.trim().substringBefore('\n')
             if (firstLine.startsWith("#!")) {
@@ -57,9 +58,9 @@ class ShebangMarkerProvider : LineMarkerProviderDescriptor() {
                     }
                 )
             }
-        } else if (psiElement.elementType == JustTypes.SET_STATEMENT) {
-            val setStatement = psiElement as JustSetStatement
-            if (setStatement.setting.text == "shell" || setStatement.setting.text == "windows-shell") {
+        } else if (psiElement.elementType == JustTypes.SETTING) {
+            val setStatement = psiElement.parent as? JustSetStatement ?: return null
+            if (psiElement.text == "shell" || psiElement.text == "windows-shell") {
                 setStatement.setStatementValue?.let { shellValueElement ->
                     var icon = JustIcons.Bash
                     var hint = "Shell"
@@ -82,7 +83,7 @@ class ShebangMarkerProvider : LineMarkerProviderDescriptor() {
                     }
                     return LineMarkerInfo(
                         psiElement,
-                        setStatement.textRange,
+                        psiElement.textRange,
                         icon,
                         { _: PsiElement? ->
                             hint
