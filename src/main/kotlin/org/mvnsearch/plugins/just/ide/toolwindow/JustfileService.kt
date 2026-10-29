@@ -1,5 +1,8 @@
 package org.mvnsearch.plugins.just.ide.toolwindow
 
+import com.intellij.execution.ExecutionException
+import com.intellij.execution.configurations.GeneralCommandLine
+import com.intellij.execution.util.ExecUtil
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.runReadAction
@@ -16,6 +19,7 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import org.mvnsearch.plugins.just.Just
 import org.mvnsearch.plugins.just.lang.run.RecipeParam
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.ConcurrentHashMap
 
 @Service(Service.Level.PROJECT)
@@ -63,26 +67,39 @@ class JustfileService(
     }
 
     fun loadRecipes(justVirtualFile: VirtualFile): List<RecipeNode> {
-        return recipeCache.computeIfAbsent(justVirtualFile.path) {
-            loadRecipesInternal(justVirtualFile)
-        }
+        recipeCache[justVirtualFile.path]?.let { return it }
+        // run just outside computeIfAbsent: a long running process must not block other writes to the map
+        val recipes = loadRecipesInternal(justVirtualFile)
+        return recipeCache.putIfAbsent(justVirtualFile.path, recipes) ?: recipes
     }
 
     private fun loadRecipesInternal(justVirtualFile: VirtualFile): List<RecipeNode> {
-        val process = ProcessBuilder(
+        val commandLine = GeneralCommandLine(
             Just.getJustCmdAbsolutionPath(project),
             "--dump",
             "--dump-format",
             "json",
             "--justfile",
             justVirtualFile.path,
-        ).directory(justVirtualFile.parent.toNioPath().toFile()).start()
+        ).withWorkDirectory(justVirtualFile.parent.path)
+            .withCharset(StandardCharsets.UTF_8)
 
-        val output = process.inputStream.bufferedReader().readText()
-        val errorOutput = process.errorStream.bufferedReader().readText()
+        // stdout and stderr are drained concurrently, and the process is killed on timeout
+        val processOutput = try {
+            ExecUtil.execAndGetOutput(commandLine, DUMP_TIMEOUT_MS)
+        } catch (e: ExecutionException) {
+            notifyJustDumpFailed(justVirtualFile, e.message ?: "Failed to execute just")
+            return emptyList()
+        }
 
-        if (process.waitFor() != 0 || output.isBlank()) {
-            notifyJustDumpFailed(justVirtualFile, errorOutput.ifBlank { output })
+        if (processOutput.isTimeout) {
+            notifyJustDumpFailed(justVirtualFile, "just --dump timed out after ${DUMP_TIMEOUT_MS / 1000}s")
+            return emptyList()
+        }
+
+        val output = processOutput.stdout
+        if (processOutput.exitCode != 0 || output.isBlank()) {
+            notifyJustDumpFailed(justVirtualFile, processOutput.stderr.ifBlank { output })
             return emptyList()
         }
 
@@ -137,5 +154,9 @@ class JustfileService(
             "Failed to parse ${file.name}:<br/><pre>${message.escapeHTML()}</pre>",
             NotificationType.WARNING
         ).notify(project)
+    }
+
+    companion object {
+        private const val DUMP_TIMEOUT_MS = 10_000
     }
 }
