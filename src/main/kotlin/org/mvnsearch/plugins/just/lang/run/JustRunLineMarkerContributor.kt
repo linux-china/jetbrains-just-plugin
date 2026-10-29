@@ -87,14 +87,14 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
         val justPsiFile = psiElement.containingFile as JustFile
         val justfile = justPsiFile.virtualFile
         val justCmdPath = Just.getJustCmdAbsolutionPath(project)
-        var commandString = if (Just.isDefaultJustfile(justfile.name)) {
+        val baseCommandString = if (Just.isDefaultJustfile(justfile.name)) {
             "$justCmdPath $taskName"
         } else {
             "$justCmdPath -f ${justfile.name} $taskName"
         }
         val recipeStatement = justPsiFile.findRecipeElement(taskName) ?: return
-        // pop dialog to ask input param value, and append it to commandString
-        commandString = adjustCommandLine(project, recipeStatement, commandString)
+        // pop dialog to ask input param value, and append it to commandString; abort if user cancelled
+        val commandString = adjustCommandLine(project, recipeStatement, baseCommandString) ?: return
         val workDirectory = if (justfile is VirtualFileWindow) {
             justfile.delegate.parent
         } else {
@@ -112,8 +112,8 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
 
 }
 
-fun adjustCommandLine(project: Project, recipeStatement: JustRecipeStatement, commandLine: String) : String {
-    var newCommandLine = commandLine;
+fun adjustCommandLine(project: Project, recipeStatement: JustRecipeStatement, commandLine: String): String? {
+    var newCommandLine = commandLine
     val recipeParamNames = recipeStatement.params?.recipeParamList?.map { it.recipeParamName.text }?.toList()
     // pop dialog to ask input param value, and append it to commandString
     if (!recipeParamNames.isNullOrEmpty()) {
@@ -123,7 +123,7 @@ fun adjustCommandLine(project: Project, recipeStatement: JustRecipeStatement, co
                 "Please enter value for '$paramName':",
                 "Recipe Parameter: $paramName",
                 null
-            ) ?: return commandLine // user cancelled
+            ) ?: return null // user cancelled
             if (paramName.startsWith('*') || paramName.startsWith('+')) {
                 newCommandLine += " $value"
             } else {
