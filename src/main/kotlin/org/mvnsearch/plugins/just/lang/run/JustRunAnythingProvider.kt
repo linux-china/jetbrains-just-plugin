@@ -71,7 +71,7 @@ class JustRunAnythingProvider : RunAnythingCommandLineProvider() {
             RunAnythingCommandCustomizer.customizeCommandLine(commandDataContext, workDirectory, initialCommandLine)
         try {
             val generalCommandLine =
-                if (Registry.`is`("run.anything.use.pty", false)) PtyCommandLine(newCommandLine) else newCommandLine
+                if (Registry.`is`("run.anything.use.pty", true)) PtyCommandLine(newCommandLine) else newCommandLine
             val runAnythingRunProfile = RunJustProfile(generalCommandLine, commandString)
             ExecutionEnvironmentBuilder.create(
                 project,
