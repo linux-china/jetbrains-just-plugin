@@ -27,8 +27,8 @@ class JustChooseByRecipeNameContributor : ChooseByNameContributor {
         fun findRecipeStatements(project: Project, recipeName: String): List<JustRecipeStatement> {
             val result = mutableListOf<JustRecipeStatement>()
             FileTypeIndex.getFiles(JustFileType, GlobalSearchScope.allScope(project)).forEach {
-                val witFile = PsiManager.getInstance(project).findFile(it) as JustFile
-                witFile.children.filterIsInstance<JustRecipeStatement>().forEach { item ->
+                val justFile = PsiManager.getInstance(project).findFile(it) as JustFile?
+                justFile?.children?.filterIsInstance<JustRecipeStatement>()?.forEach { item ->
                     if (item.name == recipeName) {
                         result.add(item)
                     }
