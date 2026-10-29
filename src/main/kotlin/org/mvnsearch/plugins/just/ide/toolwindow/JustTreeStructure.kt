@@ -5,9 +5,11 @@ import com.intellij.ide.util.treeView.NodeDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.VfsUtilCore
+import com.intellij.openapi.vfs.VirtualFile
 
 class JustTreeStructure(
     private val project: Project,
+    private val onRecipesLoaded: () -> Unit,
 ) : AbstractTreeStructure() {
     private val justService = project.getService(JustfileService::class.java)
     private val root = RootNode(project)
@@ -19,7 +21,7 @@ class JustTreeStructure(
             is RootNode -> {
                 val baseDir = project.guessProjectDir()
 
-                justService.findJustfiles().map {
+                justService.findJustfiles().onEach { recipesOrLoadAsync(it) }.map {
                     JustfileNode(project = project, file = it, relativePath = baseDir?.let { base ->
                         VfsUtilCore.getRelativePath(it.parent, base)?.takeIf { relativePath ->
                             relativePath.isNotEmpty()
@@ -29,7 +31,7 @@ class JustTreeStructure(
             }
 
             is JustfileNode -> {
-                val recipes = justService.loadRecipes(element.file)
+                val recipes = recipesOrLoadAsync(element.file)
                 val groups = recipes.mapNotNull { it.getGroup() }.distinct().sorted().map {
                     GroupNode(project = project, file = element.file, group = it)
                 }
@@ -37,11 +39,21 @@ class JustTreeStructure(
                 (groups + recipes.filter { it.getGroup() == null }).toTypedArray()
             }
 
-            is GroupNode -> justService.loadRecipes(element.file).filter {
+            is GroupNode -> recipesOrLoadAsync(element.file).filter {
                 it.getGroup() == element.group
             }.toTypedArray()
 
             else -> emptyArray()
+        }
+    }
+
+    /**
+     * children are computed under a read action, so never run `just` here: return cached recipes, or load them asynchronously and refresh the tree later
+     */
+    private fun recipesOrLoadAsync(file: VirtualFile): List<RecipeNode> {
+        return justService.getCachedRecipes(file) ?: run {
+            justService.loadRecipesAsync(file, onRecipesLoaded)
+            emptyList()
         }
     }
 

@@ -5,6 +5,7 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.util.ExecUtil
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
@@ -21,6 +22,7 @@ import org.mvnsearch.plugins.just.Just
 import org.mvnsearch.plugins.just.lang.run.RecipeParam
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicLong
 
 @Service(Service.Level.PROJECT)
 class JustfileService(
@@ -33,10 +35,16 @@ class JustfileService(
 
     private val recipeCache = ConcurrentHashMap<String, List<RecipeNode>>()
 
+    private val loadingFiles = ConcurrentHashMap.newKeySet<String>()
+
+    // bumped on every invalidate, so a load started before the invalidation never caches stale recipes
+    private val generation = AtomicLong()
+
     @Volatile
     private var justfiles: List<VirtualFile>? = null
 
     fun invalidate(file: VirtualFile?) {
+        generation.incrementAndGet()
         if (file == null) {
             justfiles = null
             recipeCache.clear()
@@ -66,10 +74,29 @@ class JustfileService(
         return result
     }
 
+    fun getCachedRecipes(justVirtualFile: VirtualFile): List<RecipeNode>? = recipeCache[justVirtualFile.path]
+
+    /**
+     * load recipes on a pooled thread, outside any read action: running `just` synchronously under a read action is forbidden
+     */
+    fun loadRecipesAsync(justVirtualFile: VirtualFile, onLoaded: () -> Unit) {
+        if (!loadingFiles.add(justVirtualFile.path)) return
+        ApplicationManager.getApplication().executeOnPooledThread {
+            try {
+                loadRecipes(justVirtualFile)
+            } finally {
+                loadingFiles.remove(justVirtualFile.path)
+            }
+            if (!project.isDisposed) onLoaded()
+        }
+    }
+
     fun loadRecipes(justVirtualFile: VirtualFile): List<RecipeNode> {
         recipeCache[justVirtualFile.path]?.let { return it }
+        val startGeneration = generation.get()
         // run just outside computeIfAbsent: a long running process must not block other writes to the map
         val recipes = loadRecipesInternal(justVirtualFile)
+        if (startGeneration != generation.get()) return recipes
         return recipeCache.putIfAbsent(justVirtualFile.path, recipes) ?: recipes
     }
 

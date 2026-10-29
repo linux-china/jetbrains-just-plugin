@@ -23,8 +23,12 @@ import javax.swing.JPanel
 import javax.swing.tree.DefaultMutableTreeNode
 
 class JustToolWindowPanel(private val project: Project) : JPanel(BorderLayout()), Disposable {
-    private val treeStructure = JustTreeStructure(project)
-    private val structureTreeModel = StructureTreeModel(treeStructure, this)
+    private val treeStructure = JustTreeStructure(project) {
+        ApplicationManager.getApplication().invokeLater {
+            structureTreeModel.invalidateAsync()
+        }
+    }
+    private val structureTreeModel: StructureTreeModel<JustTreeStructure> = StructureTreeModel(treeStructure, this)
     private val asyncTreeModel = AsyncTreeModel(structureTreeModel, this)
     private val tree = Tree(asyncTreeModel)
 
