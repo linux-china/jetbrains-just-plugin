@@ -168,7 +168,7 @@ fun runJustCommand(
     dataContext: DataContext
 ) {
     var commandDataContext = dataContext
-    val projectDir = project.guessProjectDir()!!.path
+    val projectDir = project.guessProjectDir()?.path ?: return
     commandDataContext = RunAnythingCommandCustomizer.customizeContext(commandDataContext)
     val initialCommandLine = GeneralCommandLine(command)
         .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
