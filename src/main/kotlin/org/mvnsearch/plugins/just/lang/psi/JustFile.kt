@@ -2,6 +2,7 @@ package org.mvnsearch.plugins.just.lang.psi
 
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.project.guessProjectDir
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
@@ -9,6 +10,7 @@ import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.SystemProperties
 import org.mvnsearch.plugins.just.lang.JustLanguage
 import org.mvnsearch.plugins.just.parseRecipeName
 
@@ -197,11 +199,7 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
                 parentDir.findFileByRelativePath(path)?.let { toJustFile(it) }
             }
         }
-        val target = if (modPath.startsWith("/")) {
-            LocalFileSystem.getInstance().findFileByPath(modPath)
-        } else {
-            parentDir.findFileByRelativePath(modPath)
-        } ?: return null
+        val target = resolvePath(parentDir, modPath) ?: return null
         if (target.isDirectory) {
             return MOD_FILE_NAMES.firstNotNullOfOrNull { name -> target.findChild(name)?.let { toJustFile(it) } }
         }
@@ -218,15 +216,22 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
             return null
         }
 
-        val resolvedFileVirtualFile = if (importPath.startsWith("/")) {
-            LocalFileSystem.getInstance().findFileByPath(importPath)
-        } else {
-            val currentFile = originalFile.virtualFile
-            val parentDir = currentFile.parent
-            parentDir?.findFileByRelativePath(importPath)
-        }
+        val parentDir = originalFile.virtualFile?.parent ?: return null
+        return resolvePath(parentDir, importPath)?.let { PsiManager.getInstance(project).findFile(it) }
+    }
 
-        return resolvedFileVirtualFile?.let { PsiManager.getInstance(project).findFile(it) }
+    /**
+     * Resolve an import/mod path: `~/...` is relative to the user home, absolute paths (`/...`, `C:\...`)
+     * are looked up directly, others are relative to the directory of this file.
+     */
+    private fun resolvePath(parentDir: VirtualFile, path: String): VirtualFile? {
+        val normalized = FileUtil.toSystemIndependentName(path)
+        val absolutePath = when {
+            normalized == "~" || normalized.startsWith("~/") -> FileUtil.toSystemIndependentName(SystemProperties.getUserHome()) + normalized.substring(1)
+            FileUtil.isAbsolute(normalized) -> normalized
+            else -> return parentDir.findFileByRelativePath(normalized)
+        }
+        return LocalFileSystem.getInstance().findFileByPath(absolutePath)
     }
 
     companion object {
