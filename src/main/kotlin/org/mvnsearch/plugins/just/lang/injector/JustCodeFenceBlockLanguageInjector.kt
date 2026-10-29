@@ -44,9 +44,8 @@ class JustCodeFenceBlockLanguageInjector : MultiHostInjector {
                 offsetEnd
             )
             registrar.startInjecting(language)
-            // add prefix to declare variables
             registrar.addPlace(
-                languageId,
+                null,
                 null,
                 context as PsiLanguageInjectionHost,
                 injectionTextRange
