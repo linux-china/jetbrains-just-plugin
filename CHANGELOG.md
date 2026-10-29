@@ -4,11 +4,21 @@
 
 ## Unreleased
 
+## 0.6.56 - 2026-10-29
+
+### Added 
+
+- Add `eager` keyword: `eager name := "xxxx"`
+
+### Fixed
+
+- Fix some bugs reported by LLM
+
 ## 0.6.55 - 2026-08-09
 
 ### Added
 
-- Add group node for recipes in Just toolwindow
+- Add a group node for recipes in Just toolwindow
 
 ## 0.6.54 - 2026-07-29
 
