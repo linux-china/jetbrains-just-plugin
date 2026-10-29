@@ -16,11 +16,11 @@ private const val MAX_MARKDOWN_SIZE = 1024 * 1024
 object Just {
     fun getJustCmdAbsolutionPath(project: Project): String {
         // environment variable
-        EnvironmentUtil.getValue("JUST_EXECUTABLE")?.let {
+        EnvironmentUtil.getValue("JUST_EXECUTABLE")?.takeIf { it.isNotBlank() }?.let {
             return it
         }
         // path macro
-        PathMacros.getInstance().getValue("JUST_EXECUTABLE")?.let {
+        PathMacros.getInstance().getValue("JUST_EXECUTABLE")?.takeIf { it.isNotBlank() }?.let {
             return it
         }
         project.guessProjectDir()?.let { projectDir ->
@@ -28,7 +28,8 @@ object Just {
         }
         // mise
         val userHome = Path(System.getProperty("user.home"))
-        userHome.resolve(".local/share/mise/installs/just/latest/just").toFile().let { justExec ->
+        val justExecName = if (SystemInfo.isWindows) "just.exe" else "just"
+        userHome.resolve(".local/share/mise/installs/just/latest/$justExecName").toFile().let { justExec ->
             if (justExec.exists()) return justExec.absolutePath
         }
         return if (SystemInfo.isWindows) {
