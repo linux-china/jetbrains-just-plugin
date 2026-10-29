@@ -1,8 +1,10 @@
 package org.mvnsearch.plugins.just.ide.action
 
 import com.intellij.openapi.actionSystem.*
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.SystemInfo
@@ -139,8 +141,50 @@ class NewJustfileAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.getData(CommonDataKeys.PROJECT) ?: return
         val projectDir = project.guessProjectDir() ?: return
+        var psiElement = e.getData(CommonDataKeys.PSI_ELEMENT)
+        if (psiElement == null) {
+            psiElement = e.getData(CommonDataKeys.PSI_FILE)
+        }
+        if (psiElement != null && (psiElement is PsiDirectory || psiElement is PsiFile)) {
+            val psiDirectory = if (psiElement is PsiFile) {
+                psiElement.parent ?: return
+            } else {
+                psiElement as PsiDirectory
+            }
+            // just matches `justfile`/`.justfile` case-insensitively, so any existing variant counts
+            val justFile = psiDirectory.virtualFile.children.firstOrNull {
+                !it.isDirectory && (it.name.equals("justfile", true) || it.name.equals(".justfile", true))
+            }
+            if (justFile == null) {
+                // reading pom.xml is file IO, keep it off the EDT
+                val content = ProgressManager.getInstance().runProcessWithProgressSynchronously<String, RuntimeException>(
+                    { ReadAction.compute<String, RuntimeException> { detectJustfileContent(projectDir) } },
+                    "Detecting Project Type", false, project
+                )
+                val destDir = psiDirectory.virtualFile
+                val newJustfile = try {
+                    WriteAction.compute<VirtualFile, IOException> {
+                        val file = destDir.createChildData(this, "Justfile")
+                        VfsUtil.saveText(file, content)
+                        file
+                    }
+                } catch (ex: IOException) {
+                    Messages.showErrorDialog(project, "Failed to create Justfile: ${ex.message}", "New Justfile")
+                    return
+                }
+                if (SystemInfo.isUnix) {
+                    File(newJustfile.path).setExecutable(true)
+                }
+                FileEditorManager.getInstance(project).openFile(newJustfile, true)
+            } else {
+                FileEditorManager.getInstance(project).openFile(justFile, true)
+            }
+        }
+    }
+
+    private fun detectJustfileContent(projectDir: VirtualFile): String {
         val pomXml = projectDir.findChild("pom.xml")
-        val content = if (pomXml != null) {
+        return if (pomXml != null) {
             if (pomXml.readText().contains("spring-boot-starter")) {
                 JUSTFILE_MAVEN_SB
             } else {
@@ -162,40 +206,6 @@ class NewJustfileAction : AnAction() {
             JUSTFILE_ZIG
         } else {
             JUSTFILE
-        }
-        var psiElement = e.getData(CommonDataKeys.PSI_ELEMENT)
-        if (psiElement == null) {
-            psiElement = e.getData(CommonDataKeys.PSI_FILE)
-        }
-        if (psiElement != null && (psiElement is PsiDirectory || psiElement is PsiFile)) {
-            val psiDirectory = if (psiElement is PsiFile) {
-                psiElement.parent ?: return
-            } else {
-                psiElement as PsiDirectory
-            }
-            // just matches `justfile`/`.justfile` case-insensitively, so any existing variant counts
-            val justFile = psiDirectory.virtualFile.children.firstOrNull {
-                !it.isDirectory && (it.name.equals("justfile", true) || it.name.equals(".justfile", true))
-            }
-            if (justFile == null) {
-                val destDir = psiDirectory.virtualFile
-                val newJustfile = try {
-                    WriteAction.compute<VirtualFile, IOException> {
-                        val file = destDir.createChildData(this, "Justfile")
-                        VfsUtil.saveText(file, content)
-                        file
-                    }
-                } catch (ex: IOException) {
-                    Messages.showErrorDialog(project, "Failed to create Justfile: ${ex.message}", "New Justfile")
-                    return
-                }
-                if (SystemInfo.isUnix) {
-                    File(newJustfile.path).setExecutable(true)
-                }
-                FileEditorManager.getInstance(project).openFile(newJustfile, true)
-            } else {
-                FileEditorManager.getInstance(project).openFile(justFile, true)
-            }
         }
     }
 
