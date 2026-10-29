@@ -65,7 +65,9 @@ class JustVariableFunctionCompletionContributor : CompletionContributor() {
                     val lineOffset = caret.visualLineStart
                     val lineEndOffset = caret.visualLineEnd
                     val prefixText = parameters.editor.document.getText(TextRange(lineOffset, caret.offset))
-                    val prefix = prefixText.substring(prefixText.lastIndexOf("{{"))
+                    val braceIndex = prefixText.lastIndexOf("{{")
+                    if (braceIndex < 0) return
+                    val prefix = prefixText.substring(braceIndex)
                     val prefixMatcher = result.withPrefixMatcher(prefix)
                     var suffix = if (prefix.endsWith(" ")) {
                         " }}"
@@ -81,8 +83,8 @@ class JustVariableFunctionCompletionContributor : CompletionContributor() {
                         }
                     }
                     val manager = InjectedLanguageManager.getInstance(element.project)
-                    val host = manager.getInjectionHost(element)!!
-                    val justfile = host.containingFile as JustFile
+                    val host = manager.getInjectionHost(element) ?: return
+                    val justfile = host.containingFile as? JustFile ?: return
                     val justfileMetadata = justfile.parseMetadata(true)
                     justfileMetadata.variables.forEach {
                         prefixMatcher.addElement(
