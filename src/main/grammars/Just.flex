@@ -86,6 +86,7 @@ CODE=((\n[ \t]+[^\n]*)|(\n[ \t]*))+
 CODE_FENCE=\n```([a-zA-Z0-9_+-]*)\n([\s\S]*?)\n```
 EXPRESSION_FENCE=\{\{([^\n]*)\}\}
 
+KEYWORD_EAGER=(eager)
 KEYWORD_ALIAS=(alias)
 KEYWORD_EXPORT=(export)
 KEYWORD_UNEXPORT=(unexport)
@@ -96,7 +97,7 @@ KEYWORD_IF=(if)
 KEYWORD_ELSE=(else)
 KEYWORD_ELSE_IF=("else if")
 
-%state MOD IMPORT ALIAS VARIABLE_PAREN VARIABLE_PAREN_FUNCTION_CALL VARIABLE FUNCTION_DECL FUNCTION_BODY CONDITIONAL CONDITIONAL_BLOCK_BODY CONDITIONAL_END UNEXPORT EXPORT EXPORT_VALUE SET SET_VALUE ATTRIBUTE ATTRIBUTE_LIST_VALUE RECIPE PARAMS PARAM_WITH_VALUE PARAM_WITH_VALUE_FUNCTION_CALL DEPENDENCIES DEPENDENCY_WITH_PARAMS DEPENDENCY_CALL_PARAMS
+%state MOD IMPORT ALIAS VARIABLE_PAREN VARIABLE_PAREN_FUNCTION_CALL EAGER_VARIABLE VARIABLE FUNCTION_DECL FUNCTION_BODY CONDITIONAL CONDITIONAL_BLOCK_BODY CONDITIONAL_END UNEXPORT EXPORT EXPORT_VALUE SET SET_VALUE ATTRIBUTE ATTRIBUTE_LIST_VALUE RECIPE PARAMS PARAM_WITH_VALUE PARAM_WITH_VALUE_FUNCTION_CALL DEPENDENCIES DEPENDENCY_WITH_PARAMS DEPENDENCY_CALL_PARAMS
 
 %%
 
@@ -215,6 +216,12 @@ KEYWORD_ELSE_IF=("else if")
    {COMMA}                     {  yybegin(FUNCTION_BODY); return COMMA; }
    {COMMENT}                   {  yybegin(FUNCTION_BODY); return JustTypes.COMMENT; }
    {NEW_LINE}                   {  yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
+}
+
+<EAGER_VARIABLE> {
+  {WHITE_SPACE}+                             {  yybegin(EAGER_VARIABLE); return TokenType.WHITE_SPACE; }
+  {VARIABLE} / (\s*)(":=")(\s*){OPEN_PAREN}  { yybegin(VARIABLE_PAREN); return JustTypes.VARIABLE; }
+  {VARIABLE} / (\s*)(":=")                   { yybegin(VARIABLE); return JustTypes.VARIABLE; }
 }
 
 <VARIABLE> {
@@ -490,10 +497,11 @@ KEYWORD_ELSE_IF=("else if")
   {OPEN_BRACKET}                       { yybegin(ATTRIBUTE); return JustTypes.OPEN_BRACKET; }
 
   // Flex: Lookahead predicate
-  {VARIABLE} / (\s*)(":=")(\s*){OPEN_PAREN}  { yybegin(VARIABLE_PAREN); return JustTypes.VARIABLE; }
-  {VARIABLE} / (\s*)(":=")             { yybegin(VARIABLE); return JustTypes.VARIABLE; }
+  {KEYWORD_EAGER} / (\s*){VARIABLE}(\s*)(":=")   { yybegin(EAGER_VARIABLE); return JustTypes.KEYWORD_EAGER; }
+  {VARIABLE} / (\s*)(":=")(\s*){OPEN_PAREN}      { yybegin(VARIABLE_PAREN); return JustTypes.VARIABLE; }
+  {VARIABLE} / (\s*)(":=")                       { yybegin(VARIABLE); return JustTypes.VARIABLE; }
   {FUNCTION_DECL_NAME} / ((\s*)\((\s*)([a-zA-Z_][a-zA-Z0-9,_\-\s]*)*\))(\s*)(":=")             { yybegin(FUNCTION_DECL); return JustTypes.FUNCTION_DECL_NAME; }
-  @?{RECIPE_NAME}                      { yybegin(RECIPE); return JustTypes.RECIPE_NAME; }
+  @?{RECIPE_NAME}                                { yybegin(RECIPE); return JustTypes.RECIPE_NAME; }
 }
 
 {NEW_LINE}                             { yybegin(YYINITIAL); return JustTypes.NEW_LINE; }
