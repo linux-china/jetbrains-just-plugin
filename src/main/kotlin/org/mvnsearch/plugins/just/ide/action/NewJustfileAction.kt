@@ -1,15 +1,18 @@
 package org.mvnsearch.plugins.just.ide.action
 
 import com.intellij.openapi.actionSystem.*
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.guessProjectDir
+import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.SystemInfo
+import com.intellij.openapi.vfs.VfsUtil
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.readText
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiFile
 import java.io.File
-import java.nio.file.Files
+import java.io.IOException
 
 /**
  * create justfile by project type: maven, gradle or normal
@@ -99,14 +102,14 @@ class NewJustfileAction : AnAction() {
         """.trimIndent()
         val JUSTFILE_NODEJS = """
         #!/usr/bin/env just --justfile
-        export PATH := join(justfile_directory(), "node_modules", "bin") + ":" + env_var('PATH')
+        export PATH := join(justfile_directory(), "node_modules", ".bin") + PATH_SEP + env_var('PATH')
         
         build:
           npm run build
         """.trimIndent()
         val JUSTFILE_UV = """
          #!/usr/bin/env just --justfile
-         export PATH := join(justfile_directory(), ".env", "bin") + ":" + env_var('PATH')
+         export PATH := join(justfile_directory(), ".venv", if os_family() == "windows" { "Scripts" } else { "bin" }) + PATH_SEP + env_var('PATH')
          
          upgrade:
            uv lock --upgrade
@@ -115,10 +118,10 @@ class NewJustfileAction : AnAction() {
          #!/usr/bin/env just --justfile
          
          build:
-           zig build--summary all
+           zig build --summary all
          
          run:
-           zig buildrun --summary all
+           zig build run --summary all
          """.trimIndent()
         val JUSTFILE = """
         #!/usr/bin/env just --justfile
@@ -134,11 +137,11 @@ class NewJustfileAction : AnAction() {
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-        val project = e.getData(CommonDataKeys.PROJECT)!!
-        val projectDir = project.guessProjectDir()!!
-        val content = if (projectDir.findChild("pom.xml") != null) {
-            val pomXmlCode = projectDir.findChild("pom.xml")!!.readText()
-            if (pomXmlCode.contains("spring-boot-starter")) {
+        val project = e.getData(CommonDataKeys.PROJECT) ?: return
+        val projectDir = project.guessProjectDir() ?: return
+        val pomXml = projectDir.findChild("pom.xml")
+        val content = if (pomXml != null) {
+            if (pomXml.readText().contains("spring-boot-starter")) {
                 JUSTFILE_MAVEN_SB
             } else {
                 JUSTFILE_MAVEN
@@ -166,25 +169,27 @@ class NewJustfileAction : AnAction() {
         }
         if (psiElement != null && (psiElement is PsiDirectory || psiElement is PsiFile)) {
             val psiDirectory = if (psiElement is PsiFile) {
-                psiElement.parent!!
+                psiElement.parent ?: return
             } else {
                 psiElement as PsiDirectory
             }
             val justFile = psiDirectory.findFile("Justfile")
             if (justFile == null) {
                 val destDir = psiDirectory.virtualFile
-                ApplicationManager.getApplication().runWriteAction {
-                    val newJustfile = destDir.createChildData(psiElement, "Justfile")
-                    newJustfile.getOutputStream(psiElement).use {
-                        it.write(content.toByteArray())
-                        it.flush()
+                val newJustfile = try {
+                    WriteAction.compute<VirtualFile, IOException> {
+                        val file = destDir.createChildData(this, "Justfile")
+                        VfsUtil.saveText(file, content)
+                        file
                     }
-                    File(newJustfile.path).setExecutable(true)
-                    if ((SystemInfo.isLinux || SystemInfo.isMac)) {
-                        File(newJustfile.path).setExecutable(true)
-                    }
-                    FileEditorManager.getInstance(project).openFile(newJustfile, true)
+                } catch (ex: IOException) {
+                    Messages.showErrorDialog(project, "Failed to create Justfile: ${ex.message}", "New Justfile")
+                    return
                 }
+                if (SystemInfo.isUnix) {
+                    File(newJustfile.path).setExecutable(true)
+                }
+                FileEditorManager.getInstance(project).openFile(newJustfile, true)
             } else {
                 FileEditorManager.getInstance(project).openFile(justFile.virtualFile, true)
             }
