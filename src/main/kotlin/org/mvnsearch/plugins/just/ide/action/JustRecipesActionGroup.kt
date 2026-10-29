@@ -54,12 +54,12 @@ class RunJustRecipeAction(
         val dataContext = e.dataContext
         val justCmdPath = Just.getJustCmdAbsolutionPath(project)
         val workingDirectory = justVirtualFile.parent
-        val baseCommandString = "$justCmdPath --justfile \"${justVirtualFile.name}\" $recipeName"
-        // pop dialog to ask input param value, and append it to commandString; abort if user cancelled
-        val commandString = appendRecipeArguments(project, params, baseCommandString) ?: return
+        val baseCommand = listOf(justCmdPath, "--justfile", justVirtualFile.name, recipeName)
+        // pop dialog to ask input param value, and append it to command; abort if user cancelled
+        val command = appendRecipeArguments(project, params, baseCommand) ?: return
         ApplicationManager.getApplication().invokeLater {
             if (!project.isDisposed) {
-                runJustCommand(project, workingDirectory, justVirtualFile, commandString, dataContext)
+                runJustCommand(project, workingDirectory, justVirtualFile, command, dataContext)
             }
         }
     }

@@ -83,14 +83,14 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
         val justPsiFile = psiElement.containingFile as JustFile
         val justfile = justPsiFile.virtualFile
         val justCmdPath = Just.getJustCmdAbsolutionPath(project)
-        val baseCommandString = if (Just.isDefaultJustfile(justfile.name)) {
-            "$justCmdPath $taskName"
+        val baseCommand = if (Just.isDefaultJustfile(justfile.name)) {
+            listOf(justCmdPath, taskName)
         } else {
-            "$justCmdPath -f ${justfile.name} $taskName"
+            listOf(justCmdPath, "-f", justfile.name, taskName)
         }
         val recipeStatement = justPsiFile.findRecipeElement(taskName) ?: return
-        // pop dialog to ask input param value, and append it to commandString; abort if user cancelled
-        val commandString = adjustCommandLine(project, recipeStatement, baseCommandString) ?: return
+        // pop dialog to ask input param value, and append it to command; abort if user cancelled
+        val command = adjustCommandLine(project, recipeStatement, baseCommand) ?: return
         val workDirectory = if (justfile is VirtualFileWindow) {
             justfile.delegate.parent
         } else {
@@ -100,7 +100,7 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
             project,
             workDirectory,
             justfile,
-            commandString,
+            command,
             SimpleDataContext.getProjectContext(project)
         )
     }
@@ -118,19 +118,20 @@ data class RecipeParam(val name: String, val defaultValue: String? = null) {
     val isOptional: Boolean get() = defaultValue != null || name.startsWith('*')
 }
 
-fun adjustCommandLine(project: Project, recipeStatement: JustRecipeStatement, commandLine: String): String? {
+fun adjustCommandLine(project: Project, recipeStatement: JustRecipeStatement, command: List<String>): List<String>? {
     val recipeParams = recipeStatement.params?.recipeParamList?.map {
         RecipeParam(it.recipeParamName.text, it.recipeParamValue?.text)
     } ?: emptyList()
-    return appendRecipeArguments(project, recipeParams, commandLine)
+    return appendRecipeArguments(project, recipeParams, command)
 }
 
 /**
- * pop dialog to ask input param value, and append it to command line; return null if user cancelled.
+ * pop dialog to ask input param value, and append it to command arguments; return null if user cancelled.
  * If an optional param is left empty, it and all following params are omitted, so just uses their default values.
+ * Each value is passed as one argument as is, except variadic params, whose value is split like a shell command line.
  */
-fun appendRecipeArguments(project: Project, params: List<RecipeParam>, commandLine: String): String? {
-    var newCommandLine = commandLine
+fun appendRecipeArguments(project: Project, params: List<RecipeParam>, command: List<String>): List<String>? {
+    val newCommand = command.toMutableList()
     for (param in params) {
         val message = if (param.defaultValue != null) {
             "Please enter value for '${param.name}' (leave empty to use default: ${param.defaultValue}):"
@@ -149,22 +150,26 @@ fun appendRecipeArguments(project: Project, params: List<RecipeParam>, commandLi
             // just only allows optional params after an optional one, so skip the rest
             break
         }
-        newCommandLine += if (param.isVariadic) " $value" else " \"$value\""
+        if (param.isVariadic) {
+            newCommand += ParametersListUtil.parse(value)
+        } else {
+            newCommand += value
+        }
     }
-    return newCommandLine
+    return newCommand
 }
 
 fun runJustCommand(
     project: Project,
     workDirectory: VirtualFile,
     justfile: VirtualFile,
-    commandString: String,
+    command: List<String>,
     dataContext: DataContext
 ) {
     var commandDataContext = dataContext
     val projectDir = project.guessProjectDir()!!.path
     commandDataContext = RunAnythingCommandCustomizer.customizeContext(commandDataContext)
-    val initialCommandLine = GeneralCommandLine(ParametersListUtil.parse(commandString, false, true))
+    val initialCommandLine = GeneralCommandLine(command)
         .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
         .withEnvironment("JUST_UNSTABLE", "1")
         .withEnvironment("PROJECT_DIR", projectDir)
@@ -176,7 +181,7 @@ fun runJustCommand(
     try {
         val generalCommandLine =
             if (Registry.`is`("run.anything.use.pty", true)) PtyCommandLine(commandLine) else commandLine
-        val runAnythingRunProfile = RunJustProfile(generalCommandLine, commandString)
+        val runAnythingRunProfile = RunJustProfile(generalCommandLine, ParametersListUtil.join(command))
         ExecutionEnvironmentBuilder.create(project, DefaultRunExecutor.getRunExecutorInstance(), runAnythingRunProfile)
             .dataContext(commandDataContext)
             .buildAndExecute()
