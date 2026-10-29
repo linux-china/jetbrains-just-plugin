@@ -4,7 +4,10 @@ import com.intellij.execution.actions.ConfigurationContext
 import com.intellij.execution.actions.LazyRunConfigurationProducer
 import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.execution.configurations.runConfigurationType
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.util.Ref
+import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.elementType
@@ -27,8 +30,8 @@ class JustRunConfigurationProducer : LazyRunConfigurationProducer<JustRunConfigu
         context.psiLocation?.let {
             val psiElement = it.originalElement
             if (psiElement.elementType == JustTypes.RECIPE_NAME) {
-                val configurationName = getDefaultConfigurationName(file.name, psiElement.text)
-                return configuration.name == configurationName
+                return configuration.getFileName() == getJustfilePath(it.project, file)
+                        && configuration.getRecipeName() == psiElement.text.replace("@", "")
             }
         }
         return false
@@ -45,14 +48,7 @@ class JustRunConfigurationProducer : LazyRunConfigurationProducer<JustRunConfigu
         val psiLocation = context.psiLocation!!
         val originalElement = psiLocation.originalElement
         if (originalElement != null && originalElement.elementType == JustTypes.RECIPE_NAME) {
-            val project = psiFile.project
-            val filePath = virtualFile.path
-            val projectBasePath = project.basePath!!
-            if (filePath.startsWith(projectBasePath)) {
-                configuration.setFileName(filePath.substring(projectBasePath.length + 1))
-            } else {
-                configuration.setFileName(filePath)
-            }
+            configuration.setFileName(getJustfilePath(psiFile.project, virtualFile))
             val recipeName = originalElement.text.replace("@","")
             configuration.setRecipeName(recipeName)
             configuration.name = getDefaultConfigurationName(virtualFile.name, recipeName)
@@ -63,6 +59,14 @@ class JustRunConfigurationProducer : LazyRunConfigurationProducer<JustRunConfigu
 
     private fun isAcceptableFileType(virtualFile: VirtualFile): Boolean {
         return Just.isJustfile(virtualFile.name)
+    }
+
+    /**
+     * justfile path relative to project dir(working directory of just command), or absolute path if outside project
+     */
+    private fun getJustfilePath(project: Project, virtualFile: VirtualFile): String {
+        val projectDir = project.guessProjectDir() ?: return virtualFile.path
+        return VfsUtilCore.getRelativePath(virtualFile, projectDir) ?: virtualFile.path
     }
 
     private fun getDefaultConfigurationName(fileName: String, recipeName: String): String {
