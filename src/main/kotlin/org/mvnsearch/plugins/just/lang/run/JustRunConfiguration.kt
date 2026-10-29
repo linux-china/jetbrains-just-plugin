@@ -1,15 +1,18 @@
 package org.mvnsearch.plugins.just.lang.run
 
+import com.intellij.execution.ExecutionException
 import com.intellij.execution.Executor
 import com.intellij.execution.configurations.*
-import com.intellij.execution.process.ColoredProcessHandler
+import com.intellij.execution.process.KillableColoredProcessHandler
 import com.intellij.execution.process.ProcessHandler
-import com.intellij.execution.process.ProcessHandlerFactory
 import com.intellij.execution.process.ProcessTerminatedListener
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.util.EnvVariablesTable
 import com.intellij.execution.util.ProgramParametersConfigurator
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.PathMacros
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.util.ThrowableComputable
 import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
@@ -173,8 +176,7 @@ class JustRunConfiguration(
                 }
                 // add project SDK bin directory to PATH
                 injectProjectSdkIntoPath(project, commandLine)
-                val processHandler = ProcessHandlerFactory.getInstance()
-                    .createColoredProcessHandler(commandLine) as ColoredProcessHandler
+                val processHandler = createJustProcessHandler(project, commandLine)
                 processHandler.setShouldKillProcessSoftly(true)
                 ProcessTerminatedListener.attach(processHandler)
                 return processHandler
@@ -183,6 +185,24 @@ class JustRunConfiguration(
     }
 
     companion object {
+        /**
+         * Create process handler for just command. Process creation is a slow operation and not allowed on EDT,
+         * so the process is started in background with a modal progress when called from EDT.
+         */
+        fun createJustProcessHandler(project: Project, commandLine: GeneralCommandLine): KillableColoredProcessHandler {
+            val process = if (ApplicationManager.getApplication().isDispatchThread) {
+                ProgressManager.getInstance().runProcessWithProgressSynchronously(
+                    ThrowableComputable<Process, ExecutionException> { commandLine.createProcess() },
+                    "Starting just",
+                    false,
+                    project
+                )
+            } else {
+                commandLine.createProcess()
+            }
+            return object : KillableColoredProcessHandler(process, commandLine) {}
+        }
+
         fun adjustCommandLinePath(project: Project, commandLine: GeneralCommandLine) {
             val justShPath = PathMacros.getInstance().getValue("JUST_SH_PATH")
             if (justShPath != null) {

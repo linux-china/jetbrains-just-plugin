@@ -6,7 +6,6 @@ import com.intellij.execution.Executor
 import com.intellij.execution.configurations.*
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.lineMarker.RunLineMarkerProvider
-import com.intellij.execution.process.ColoredProcessHandler
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.process.ProcessTerminatedListener
 import com.intellij.execution.runners.ExecutionEnvironment
@@ -172,7 +171,7 @@ class RunJustProfile(private val commandLine: GeneralCommandLine, private val or
     override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState {
         return object : CommandLineState(environment) {
             override fun startProcess(): ProcessHandler {
-                val handler = ColoredProcessHandler(commandLine)
+                val handler = JustRunConfiguration.createJustProcessHandler(environment.project, commandLine)
                 ProcessTerminatedListener.attach(handler)
                 return handler
             }
