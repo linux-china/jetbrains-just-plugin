@@ -24,11 +24,14 @@ class JustRecipeDependencyCompletionContributor : CompletionContributor() {
                 ) {
                     val element = parameters.position
                     val caret = parameters.editor.caretModel.currentCaret
-                    val lineOffset = caret.visualLineStart
+                    val document = parameters.editor.document
+                    // use logical line, visual line differs from it when soft wraps are on
+                    val lineNumber = document.getLineNumber(caret.offset)
+                    val lineOffset = document.getLineStartOffset(lineNumber)
                     val prefixText = parameters.editor.document.getText(TextRange(lineOffset, caret.offset))
                     if (prefixText.contains(':')) {  //recipe names completion
                         val excludedNames = mutableListOf(parseRecipeName(prefixText))
-                        val line = parameters.editor.document.getText(TextRange(lineOffset, caret.visualLineEnd))
+                        val line = parameters.editor.document.getText(TextRange(lineOffset, document.getLineEndOffset(lineNumber)))
                         val dependencies = line.substring(line.indexOf(':') + 1).trim()
                         if (dependencies.isNotEmpty()) {
                             excludedNames.addAll(dependencies.split("\\s+".toRegex()))

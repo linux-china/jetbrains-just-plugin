@@ -62,8 +62,11 @@ class JustVariableFunctionCompletionContributor : CompletionContributor() {
                 ) {
                     val element = parameters.position
                     val caret = parameters.editor.caretModel.currentCaret
-                    val lineOffset = caret.visualLineStart
-                    val lineEndOffset = caret.visualLineEnd
+                    val document = parameters.editor.document
+                    // use logical line, visual line differs from it when soft wraps are on
+                    val lineNumber = document.getLineNumber(caret.offset)
+                    val lineOffset = document.getLineStartOffset(lineNumber)
+                    val lineEndOffset = document.getLineEndOffset(lineNumber)
                     val prefixText = parameters.editor.document.getText(TextRange(lineOffset, caret.offset))
                     val braceIndex = prefixText.lastIndexOf("{{")
                     if (braceIndex < 0) return
