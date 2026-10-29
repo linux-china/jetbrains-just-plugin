@@ -3,12 +3,14 @@ package org.mvnsearch.plugins.just.ide.action
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import org.mvnsearch.plugins.just.Just
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
 import org.mvnsearch.plugins.just.ide.toolwindow.JustfileService
+import org.mvnsearch.plugins.just.ide.toolwindow.RecipeNode
 import org.mvnsearch.plugins.just.lang.run.RecipeParam
 import org.mvnsearch.plugins.just.lang.run.appendRecipeArguments
 import org.mvnsearch.plugins.just.lang.run.runJustCommand
@@ -22,15 +24,31 @@ open class JustRecipesActionGroup(private val justfile: VirtualFile) : ActionGro
     }
 
     override fun getChildren(e: AnActionEvent?): Array<AnAction> {
-        return if (e != null) {
-            getActions(e.dataContext, e.project!!)
-        } else {
-            arrayOf()
+        val project = e?.project ?: return arrayOf()
+        // called during action update (under read action): never run `just` here, load it in background instead
+        val justfileService = project.service<JustfileService>()
+        val recipes = justfileService.getCachedRecipes(justfile)
+        if (recipes == null) {
+            justfileService.loadRecipesAsync(justfile) {}
+            return arrayOf()
         }
+        return toActions(project, recipes)
     }
 
+    /**
+     * get recipe actions, called on EDT: load recipes under a modal progress when the cache is empty
+     */
     open fun getActions(dataContext: DataContext?, project: Project): Array<AnAction> {
-        return project.service<JustfileService>().loadRecipes(justfile)
+        val justfileService = project.service<JustfileService>()
+        val recipes = justfileService.getCachedRecipes(justfile)
+            ?: ProgressManager.getInstance().runProcessWithProgressSynchronously<List<RecipeNode>, RuntimeException>(
+                { justfileService.loadRecipes(justfile) }, "Loading Just Recipes", false, project
+            )
+        return toActions(project, recipes)
+    }
+
+    private fun toActions(project: Project, recipes: List<RecipeNode>): Array<AnAction> {
+        return recipes
             .filter { !it.isPrivate }
             .map {
                 val text = if (it.description.isNullOrBlank()) it.recipe else "${it.recipe} # ${it.description}"

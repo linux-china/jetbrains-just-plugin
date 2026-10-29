@@ -48,7 +48,8 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
         // register on the RECIPE_NAME leaf only, line markers must be attached to leaf elements
         if (psiElement.elementType != JustTypes.RECIPE_NAME) return null
         val recipeStatement = psiElement.parent as? JustRecipeStatement ?: return null
-        val recipeName = psiElement.text
+        // RECIPE_NAME token includes the `@` quiet prefix, which is not part of the recipe name
+        val recipeName = psiElement.text.removePrefix("@")
         var runIcon = JustIcons.RUN_ICON
         if (recipeName == "default") {
             runIcon = JustIcons.DEFAULT_RUN_ICON
