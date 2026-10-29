@@ -20,12 +20,17 @@ import java.nio.charset.StandardCharsets
 class JustExternalFormatter : AsyncDocumentFormattingService() {
     val ignoreDirective= "# @formatter:off"
 
+    /**
+     * `just --fmt` can only format a whole justfile, so no features (e.g. FORMAT_FRAGMENTS) are declared:
+     * "Reformat selected fragment" will reformat the entire file.
+     */
     override fun getFeatures(): MutableSet<FormattingService.Feature> {
         return mutableSetOf()
     }
 
     override fun canFormat(psiFile: PsiFile): Boolean {
-        return psiFile is JustFile && !psiFile.text.contains(ignoreDirective)
+        // use viewProvider.contents to avoid copying the whole file text into a new String
+        return psiFile is JustFile && !psiFile.viewProvider.contents.contains(ignoreDirective)
     }
 
     override fun createFormattingTask(request: AsyncFormattingRequest): FormattingTask? {
@@ -38,38 +43,54 @@ class JustExternalFormatter : AsyncDocumentFormattingService() {
             params.add("--justfile")
             params.add(justFile.path)
 
-            try {
-                val commandLine: GeneralCommandLine = GeneralCommandLine()
-                    .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
-                    .withExePath(justCmd)
-                    .withParameters(params)
-                    .withEnvironment("JUST_UNSTABLE", "1")
+            val commandLine: GeneralCommandLine = GeneralCommandLine()
+                .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
+                .withExePath(justCmd)
+                .withParameters(params)
+                .withEnvironment("JUST_UNSTABLE", "1")
+                .withCharset(StandardCharsets.UTF_8)
 
-                val handler = OSProcessHandler(commandLine.withCharset(StandardCharsets.UTF_8))
-                return object : FormattingTask {
-                    override fun run() {
-                        handler.addProcessListener(object : CapturingProcessAdapter() {
-                            override fun processTerminated(event: ProcessEvent) {
-                                val exitCode: Int = event.exitCode
-                                if (exitCode == 0) {
-                                    val formattedText = justFile.readText(StandardCharsets.UTF_8)
-                                    request.onTextReady(formattedText)
-                                } else {
-                                    request.onError("Justfile format", output.stderr)
-                                }
+            return object : FormattingTask {
+                @Volatile
+                private var handler: OSProcessHandler? = null
+
+                @Volatile
+                private var cancelled = false
+
+                override fun run() {
+                    if (cancelled) return
+                    // OSProcessHandler starts the process in its constructor, so create it only when the task runs
+                    val processHandler = try {
+                        OSProcessHandler(commandLine)
+                    } catch (e: ExecutionException) {
+                        request.onError("Just file", e.message ?: e.toString())
+                        return
+                    }
+                    handler = processHandler
+                    if (cancelled) {
+                        processHandler.destroyProcess()
+                        return
+                    }
+                    processHandler.addProcessListener(object : CapturingProcessAdapter() {
+                        override fun processTerminated(event: ProcessEvent) {
+                            if (cancelled) return
+                            val exitCode: Int = event.exitCode
+                            if (exitCode == 0) {
+                                val formattedText = justFile.readText(StandardCharsets.UTF_8)
+                                request.onTextReady(formattedText)
+                            } else {
+                                request.onError("Justfile format", output.stderr)
                             }
-                        })
-                        handler.startNotify()
-                    }
-
-                    override fun cancel(): Boolean {
-                        handler.destroyProcess()
-                        return true
-                    }
+                        }
+                    })
+                    processHandler.startNotify()
                 }
-            } catch (e: ExecutionException) {
-                request.onError("Just file", e.message!!)
-                return null
+
+                override fun cancel(): Boolean {
+                    cancelled = true
+                    handler?.destroyProcess()
+                    return true
+                }
             }
         }
         return null
