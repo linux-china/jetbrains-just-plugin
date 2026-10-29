@@ -9,6 +9,7 @@ class JustToolWindowFactory : ToolWindowFactory {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         val panel = JustToolWindowPanel(project)
         val content = ContentFactory.getInstance().createContent(panel, null, false)
+        content.setDisposer(panel)
 
         toolWindow.contentManager.addContent(content)
     }

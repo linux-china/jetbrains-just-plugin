@@ -9,6 +9,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.DoubleClickListener
 import com.intellij.ui.ScrollPaneFactory
@@ -91,7 +92,7 @@ class JustToolWindowPanel(private val project: Project) : JPanel(BorderLayout())
         add(toolbar.component, BorderLayout.NORTH)
 
         // subscribe VFS changes and watch Justfile changes
-        JustToolWindowRefreshListener(project, ::refresh)
+        Disposer.register(this, JustToolWindowRefreshListener(project, ::refresh))
     }
 
     /**
