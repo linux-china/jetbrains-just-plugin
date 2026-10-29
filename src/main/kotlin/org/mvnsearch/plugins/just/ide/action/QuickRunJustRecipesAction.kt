@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.ui.popup.JBPopupFactory.ActionSelectionAid
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.newvfs.NewVirtualFile
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
 
 
@@ -16,16 +17,23 @@ class QuickRunJustRecipesAction : QuickSwitchSchemeAction(), DumbAware {
         super.update(e)
         val p: Presentation = e.presentation
         val project = e.project ?: return
-        val justfileAvailable = findJustfile(project) != null
+        // update() may run on EDT, so only look up VFS cache to avoid slow operations
+        val justfileAvailable = findJustfile(project, cachedOnly = true) != null
         p.isEnabled = justfileAvailable
         p.isVisible = justfileAvailable
         p.icon = JustIcons.JUST_FILE
     }
 
-    private fun findJustfile(currentProject: Project): VirtualFile? {
+    private fun findJustfile(currentProject: Project, cachedOnly: Boolean = false): VirtualFile? {
         val projectDir = currentProject.guessProjectDir() ?: return null
 
-        return listOf("justfile", "Justfile", ".justfile", ".Justfile").firstNotNullOfOrNull { projectDir.findChild(it) }
+        return listOf("justfile", "Justfile", ".justfile", ".Justfile").firstNotNullOfOrNull {
+            if (cachedOnly) {
+                (projectDir as? NewVirtualFile)?.findChildIfCached(it)
+            } else {
+                projectDir.findChild(it)
+            }
+        }
     }
 
 
