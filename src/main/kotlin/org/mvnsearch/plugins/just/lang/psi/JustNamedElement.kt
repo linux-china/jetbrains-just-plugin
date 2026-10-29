@@ -49,7 +49,9 @@ abstract class JustNamedElementImpl(node: ASTNode) : ASTWrapperPsiElement(node),
 abstract class JustRecipeElementImpl(node: ASTNode) : JustNamedElementImpl(node) {
     override fun getKey(): String? {
         val keyNode: ASTNode? = this.node.findChildByType(JustTypes.RECIPE_NAME)
-        return keyNode?.text?.replace("\\\\ ".toRegex(), " ")
+        return keyNode?.text
+            ?.replace("\\\\ ".toRegex(), " ")
+            ?.replace("@","")
     }
 
     override fun getValue(): String? {
