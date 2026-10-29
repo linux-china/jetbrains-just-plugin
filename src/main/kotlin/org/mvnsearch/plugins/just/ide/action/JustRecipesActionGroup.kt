@@ -2,19 +2,15 @@ package org.mvnsearch.plugins.just.ide.action
 
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.PsiManager
 import org.mvnsearch.plugins.just.Just
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
-import org.mvnsearch.plugins.just.lang.psi.JustFile
-import org.mvnsearch.plugins.just.lang.run.adjustCommandLine
+import org.mvnsearch.plugins.just.ide.toolwindow.JustfileService
 import org.mvnsearch.plugins.just.lang.run.runJustCommand
-import java.io.BufferedReader
-import java.io.InputStreamReader
 
 
 @SuppressWarnings("ComponentNotRegistered")
@@ -33,27 +29,13 @@ open class JustRecipesActionGroup(private val justfile: VirtualFile) : ActionGro
     }
 
     open fun getActions(dataContext: DataContext?, project: Project): Array<AnAction> {
-        val result = mutableListOf<AnAction>()
-        val projectDir = project.guessProjectDir()!!
-        val builder = ProcessBuilder()
-        builder.command(Just.getJustCmdAbsolutionPath(project), "--color=never", "-l", "--unsorted")
-        builder.directory(projectDir.toNioPath().toFile())
-        val process = builder.start()
-        val reader = BufferedReader(InputStreamReader(process.inputStream))
-        reader.lines().forEach {
-            val recipeInfo = it.trim()
-            if (recipeInfo.isNotEmpty() && !recipeInfo.startsWith("Available recipes:")) {
-                val parts = recipeInfo.split('#', limit = 2)
-                val recipeName = parts[0].trim()
-                if (parts.size >= 2) {
-                    val text = "$recipeName # ${parts[1].trim()}"
-                    result.add(RunJustRecipeAction(project, recipeName, text, justfile))
-                } else {
-                    result.add(RunJustRecipeAction(project, recipeName, recipeName, justfile))
-                }
+        return project.service<JustfileService>().loadRecipes(justfile)
+            .filter { !it.isPrivate }
+            .map {
+                val text = if (it.description.isNullOrBlank()) it.recipe else "${it.recipe} # ${it.description}"
+                RunJustRecipeAction(project, it.recipe, text, justfile, it.params)
             }
-        }
-        return result.toTypedArray()
+            .toTypedArray()
     }
 }
 

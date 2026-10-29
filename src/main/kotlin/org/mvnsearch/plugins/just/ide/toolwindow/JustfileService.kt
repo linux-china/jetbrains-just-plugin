@@ -118,7 +118,8 @@ class JustfileService(
                 recipe = name,
                 description = description,
                 params = params,
-                attributes = attributes
+                attributes = attributes,
+                isPrivate = recipeJson.jsonObject["private"]?.toString() == "true",
             )
         }.sortedBy { it.recipe }
     }
