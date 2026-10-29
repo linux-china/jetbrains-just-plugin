@@ -17,6 +17,15 @@ sealed class JustTreeNode(
 ) {
     abstract val name: String
     abstract val icon: Icon
+
+    /**
+     * nodes are identified by `id` only, so the nodes rebuilt in `JustTreeStructure.getParentElement` equal the real ones.
+     * final, so the data classes below don't generate their own `equals`/`hashCode`
+     */
+    final override fun equals(other: Any?): Boolean =
+        this === other || (other is JustTreeNode && other.javaClass == javaClass && other.id == id)
+
+    final override fun hashCode(): Int = id.hashCode()
 }
 
 data class RootNode(
