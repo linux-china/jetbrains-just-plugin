@@ -11,7 +11,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.vfs.VirtualFile
-import io.ktor.util.*
+import com.intellij.xml.util.XmlStringUtil
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonPrimitive
@@ -178,7 +178,7 @@ class JustfileService(
     private fun notifyJustDumpFailed(file: VirtualFile, message: String) {
         NotificationGroupManager.getInstance().getNotificationGroup("just toolwindow").createNotification(
             "Cannot load Just recipes",
-            "Failed to parse ${file.name}:<br/><pre>${message.escapeHTML()}</pre>",
+            "Failed to parse ${file.name}:<br/><pre>${XmlStringUtil.escapeString(message)}</pre>",
             NotificationType.WARNING
         ).notify(project)
     }
