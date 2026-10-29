@@ -11,6 +11,7 @@ import io.ktor.util.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import org.mvnsearch.plugins.just.Just
@@ -99,12 +100,12 @@ class JustfileService(
         val recipes = root["recipes"]?.jsonObject ?: return emptyList()
 
         return recipes.map { (name, recipeJson) ->
-            val description = recipeJson.jsonObject["doc"]?.toString()?.removeSurrounding("\"")?.takeIf { it != "null" }
+            val description = (recipeJson.jsonObject["doc"] as? JsonPrimitive)?.contentOrNull
             val params =
                 recipeJson.jsonObject["parameters"]?.jsonArray?.filter { it.jsonObject["name"] != null }
                     ?.mapNotNull {
-                        val name = it.jsonObject["name"]?.toString()?.trim('"')
-                        val kind = it.jsonObject["kind"]?.toString()?.trim('"')
+                        val name = (it.jsonObject["name"] as? JsonPrimitive)?.contentOrNull
+                        val kind = (it.jsonObject["kind"] as? JsonPrimitive)?.contentOrNull
                         // default is a string for literal, or an expression array such as ["call", "arch"]
                         val defaultValue = when (val default = it.jsonObject["default"]) {
                             null, is JsonNull -> null
