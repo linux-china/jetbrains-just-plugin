@@ -55,7 +55,8 @@ class JustfileService(
     }
 
     fun findJustfiles(): List<VirtualFile> {
-        justfiles?.let { return it }
+        // drop files invalidated by a VFS change the refresh listener has not caught
+        justfiles?.let { cached -> if (cached.all { it.isValid }) return cached }
 
         val result = mutableListOf<VirtualFile>()
 
