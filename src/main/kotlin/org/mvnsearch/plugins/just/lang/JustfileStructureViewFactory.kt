@@ -44,6 +44,9 @@ class JustfileStructureViewModel(editor: Editor?, psiFile: JustFile) :
 
 class JustfileStructureViewElement(private val myElement: PsiElement) : StructureViewTreeElement, SortableTreeElement {
     override fun getPresentation(): ItemPresentation {
+        if (!myElement.isValid) {
+            return PresentationData("", null, null, null)
+        }
         if (myElement is JustFile) {
             return PresentationData(myElement.name, "justfile", JustIcons.JUST_FILE, null)
         } else if (myElement is JustRecipeStatement) {
@@ -64,6 +67,7 @@ class JustfileStructureViewElement(private val myElement: PsiElement) : Structur
     }
 
     override fun getChildren(): Array<TreeElement> {
+        if (!myElement.isValid) return emptyArray()
         if (myElement is JustFile) {
             val recipeStatements: List<PsiElement> = myElement.children.filter {
                 it is JustRecipeStatement || it is JustVariableStatement || it is JustExportStatement
@@ -78,17 +82,18 @@ class JustfileStructureViewElement(private val myElement: PsiElement) : Structur
     }
 
     override fun navigate(requestFocus: Boolean) {
+        if (!myElement.isValid) return
         OpenFileDescriptor(myElement.project, myElement.containingFile.virtualFile, myElement.textOffset).navigate(
             requestFocus
         )
     }
 
     override fun canNavigate(): Boolean {
-        return true
+        return myElement.isValid
     }
 
     override fun canNavigateToSource(): Boolean {
-        return true
+        return myElement.isValid
     }
 
     override fun getValue(): Any {
@@ -96,6 +101,7 @@ class JustfileStructureViewElement(private val myElement: PsiElement) : Structur
     }
 
     override fun getAlphaSortKey(): String {
+        if (!myElement.isValid) return ""
         return when (myElement) {
             is JustRecipeStatement -> myElement.recipeName.text
             is JustVariableStatement -> myElement.variable.text
