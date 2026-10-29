@@ -96,10 +96,15 @@ class JustfileStructureViewElement(private val myElement: PsiElement) : Structur
     }
 
     override fun getAlphaSortKey(): String {
-        if (myElement is JustRecipeStatement) {
-            myElement.recipeName.text
+        return when (myElement) {
+            is JustRecipeStatement -> myElement.recipeName.text
+            is JustVariableStatement -> myElement.variable.text
+            is JustExportStatement -> myElement.exportName.text
+            is JustImportStatement -> myElement.justfilePath.text
+            is JustSetStatement -> myElement.setting.text
+            is JustModStatement -> myElement.modName.text
+            else -> ""
         }
-        return ""
     }
 
 }
