@@ -24,11 +24,7 @@ class QuickRunJustRecipesAction : QuickSwitchSchemeAction(), DumbAware {
     private fun findJustfile(currentProject: Project): VirtualFile? {
         val projectDir = currentProject.guessProjectDir() ?: return null
 
-        setOf("justfile", "Justfile", ".justfile").forEach { child ->
-            return projectDir.findChild(child)
-        }
-
-        return null
+        return listOf("justfile", "Justfile", ".justfile").firstNotNullOfOrNull { projectDir.findChild(it) }
     }
 
 
