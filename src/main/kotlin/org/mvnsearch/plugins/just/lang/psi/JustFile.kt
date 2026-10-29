@@ -4,6 +4,7 @@ import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
@@ -16,7 +17,11 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
     override fun toString() = "Justfile"
 
 
-    fun findRecipeElement(recipe: String): JustRecipeStatement? {
+    fun findRecipeElement(recipe: String, visited: MutableSet<VirtualFile> = mutableSetOf()): JustRecipeStatement? {
+        // guard against circular imports
+        originalFile.virtualFile?.let {
+            if (!visited.add(it)) return null
+        }
         val currentRecipes = this.children
             .filterIsInstance<JustRecipeStatement>()
             .firstOrNull {
@@ -29,7 +34,7 @@ class JustFile(viewProvider: FileViewProvider?) : PsiFileBase(viewProvider!!, Ju
         }
 
         parseIncludedFiles().forEach { file ->
-            val recipeElement = file.findRecipeElement(recipe)
+            val recipeElement = file.findRecipeElement(recipe, visited)
             if (recipeElement != null) {
                 return recipeElement
             }
