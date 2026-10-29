@@ -35,6 +35,9 @@ class JustfileService(
 
     private val recipeCache = ConcurrentHashMap<String, List<RecipeNode>>()
 
+    // failed loads are remembered briefly, so callers that reload on a cache miss (tree refresh, action update) don't rerun just in a loop
+    private val failedLoads = ConcurrentHashMap<String, DumpFailure>()
+
     private val loadingFiles = ConcurrentHashMap.newKeySet<String>()
 
     // bumped on every invalidate, so a load started before the invalidation never caches stale recipes
@@ -48,9 +51,11 @@ class JustfileService(
         if (file == null) {
             justfiles = null
             recipeCache.clear()
+            failedLoads.clear()
         } else {
             justfiles = null
             recipeCache.remove(file.path)
+            failedLoads.remove(file.path)
         }
     }
 
@@ -75,7 +80,10 @@ class JustfileService(
         return result
     }
 
-    fun getCachedRecipes(justVirtualFile: VirtualFile): List<RecipeNode>? = recipeCache[justVirtualFile.path]
+    fun getCachedRecipes(justVirtualFile: VirtualFile): List<RecipeNode>? {
+        recipeCache[justVirtualFile.path]?.let { return it }
+        return if (failedLoads[justVirtualFile.path]?.isRecent() == true) emptyList() else null
+    }
 
     /**
      * load recipes on a pooled thread, outside any read action: running `just` synchronously under a read action is forbidden
@@ -93,14 +101,30 @@ class JustfileService(
     }
 
     fun loadRecipes(justVirtualFile: VirtualFile): List<RecipeNode> {
-        recipeCache[justVirtualFile.path]?.let { return it }
+        getCachedRecipes(justVirtualFile)?.let { return it }
         val startGeneration = generation.get()
         // run just outside computeIfAbsent: a long running process must not block other writes to the map
-        val recipes = loadRecipesInternal(justVirtualFile)
+        val recipes = try {
+            loadRecipesInternal(justVirtualFile)
+        } catch (e: DumpException) {
+            if (startGeneration == generation.get()) {
+                // failures are never written to recipeCache, so the next load after the retry delay runs just again
+                val previous = failedLoads.put(justVirtualFile.path, DumpFailure(e.title, e.message))
+                // notify once per distinct error, the periodic retries of the same failure stay silent
+                if (previous == null || previous.title != e.title || previous.message != e.message) {
+                    notifyJustDumpFailed(e.title, e.message)
+                }
+            }
+            return emptyList()
+        }
         if (startGeneration != generation.get()) return recipes
+        failedLoads.remove(justVirtualFile.path)
         return recipeCache.putIfAbsent(justVirtualFile.path, recipes) ?: recipes
     }
 
+    /**
+     * @throws DumpException when just cannot be executed, times out, exits with an error or prints invalid JSON
+     */
     private fun loadRecipesInternal(justVirtualFile: VirtualFile): List<RecipeNode> {
         val commandLine = GeneralCommandLine(
             Just.getJustCmdAbsolutionPath(project),
@@ -116,26 +140,34 @@ class JustfileService(
         val processOutput = try {
             ExecUtil.execAndGetOutput(commandLine, DUMP_TIMEOUT_MS)
         } catch (e: ExecutionException) {
-            notifyJustDumpFailed(justVirtualFile, e.message ?: "Failed to execute just")
-            return emptyList()
+            throw DumpException(
+                "Failed to execute just for ${justVirtualFile.name}",
+                (e.message ?: "Failed to execute just") + "\nCheck that just is installed and its path is configured.",
+            )
         }
 
         if (processOutput.isTimeout) {
-            notifyJustDumpFailed(justVirtualFile, "just --dump timed out after ${DUMP_TIMEOUT_MS / 1000}s")
-            return emptyList()
+            throw DumpException(
+                "just --dump timed out for ${justVirtualFile.name}",
+                "just --dump did not finish within ${DUMP_TIMEOUT_MS / 1000}s",
+            )
         }
 
         val output = processOutput.stdout
         if (processOutput.exitCode != 0 || output.isBlank()) {
-            notifyJustDumpFailed(justVirtualFile, processOutput.stderr.ifBlank { output })
-            return emptyList()
+            throw DumpException(
+                "just --dump failed for ${justVirtualFile.name} (exit code ${processOutput.exitCode})",
+                processOutput.stderr.ifBlank { output }.ifBlank { "no output" },
+            )
         }
 
         val root = try {
             json.parseToJsonElement(output).jsonObject
         } catch (e: Exception) {
-            notifyJustDumpFailed(justVirtualFile, e.message ?: "Failed to parse just dump JSON")
-            return emptyList()
+            throw DumpException(
+                "Failed to parse just --dump output for ${justVirtualFile.name}",
+                e.message ?: "Invalid JSON",
+            )
         }
 
         val recipes = root["recipes"]?.jsonObject ?: return emptyList()
@@ -176,15 +208,24 @@ class JustfileService(
         }.sortedBy { it.recipe }
     }
 
-    private fun notifyJustDumpFailed(file: VirtualFile, message: String) {
+    private fun notifyJustDumpFailed(title: String, message: String) {
         NotificationGroupManager.getInstance().getNotificationGroup("just toolwindow").createNotification(
             "Cannot load Just recipes",
-            "Failed to parse ${file.name}:<br/><pre>${XmlStringUtil.escapeString(message)}</pre>",
+            "${XmlStringUtil.escapeString(title)}:<br/><pre>${XmlStringUtil.escapeString(message)}</pre>",
             NotificationType.WARNING
         ).notify(project)
     }
 
+    private class DumpException(val title: String, override val message: String) : Exception(message)
+
+    private class DumpFailure(val title: String, val message: String) {
+        private val failedAt = System.currentTimeMillis()
+
+        fun isRecent() = System.currentTimeMillis() - failedAt < FAILURE_RETRY_DELAY_MS
+    }
+
     companion object {
         private const val DUMP_TIMEOUT_MS = 10_000
+        private const val FAILURE_RETRY_DELAY_MS = 30_000
     }
 }
