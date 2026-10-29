@@ -127,7 +127,10 @@ class JustfileService(
         } catch (e: DumpException) {
             if (startGeneration == generation.get()) {
                 // failures are never written to recipeCache, so the next load after the retry delay runs just again
-                val previous = failedLoads.put(justVirtualFile.path, DumpFailure(e.title, e.message))
+                val failure = DumpFailure(e.title, e.message)
+                val previous = failedLoads.put(justVirtualFile.path, failure)
+                // an invalidate between the check and the put would leave a stale failure behind
+                if (startGeneration != generation.get()) failedLoads.remove(justVirtualFile.path, failure)
                 // notify once per distinct error, the periodic retries of the same failure stay silent
                 if (previous == null || previous.title != e.title || previous.message != e.message) {
                     notifyJustDumpFailed(e.title, e.message)
@@ -137,7 +140,12 @@ class JustfileService(
         }
         if (startGeneration != generation.get()) return recipes
         failedLoads.remove(justVirtualFile.path)
-        return recipeCache.putIfAbsent(justVirtualFile.path, recipes) ?: recipes
+        val cached = recipeCache.putIfAbsent(justVirtualFile.path, recipes)
+        // an invalidate between the check and the put would leave stale recipes cached, drop them again (only if they are ours)
+        if (cached == null && startGeneration != generation.get()) {
+            recipeCache.remove(justVirtualFile.path, recipes)
+        }
+        return cached ?: recipes
     }
 
     /**
