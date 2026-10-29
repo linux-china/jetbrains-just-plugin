@@ -5,12 +5,13 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.readText
 import com.intellij.util.EnvironmentUtil
 import java.io.File
+import java.io.IOException
 import kotlin.io.path.Path
 
 val JUSTFILES_MARKDOWN = listOf("README.md", "AGENTS.md", "CLAUDE.md")
+private const val MAX_MARKDOWN_SIZE = 1024 * 1024
 
 object Just {
     fun getJustCmdAbsolutionPath(project: Project): String {
@@ -55,6 +56,16 @@ object Just {
 
     fun isJustfileMarkdown(justVirtualFile: VirtualFile): Boolean {
         val fileName = justVirtualFile.name
-        return (JUSTFILES_MARKDOWN.contains(fileName)) && justVirtualFile.readText().contains("```just\n")
+        if (!JUSTFILES_MARKDOWN.contains(fileName) || !justVirtualFile.isValid || justVirtualFile.length > MAX_MARKDOWN_SIZE) {
+            return false
+        }
+        // scan line by line and stop at the first just code block instead of reading the whole file
+        return try {
+            justVirtualFile.inputStream.bufferedReader().useLines { lines ->
+                lines.any { it.trimEnd().endsWith("```just") }
+            }
+        } catch (_: IOException) {
+            false
+        }
     }
 }

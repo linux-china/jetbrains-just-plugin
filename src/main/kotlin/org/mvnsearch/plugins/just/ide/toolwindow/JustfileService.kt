@@ -2,10 +2,10 @@ package org.mvnsearch.plugins.just.ide.toolwindow
 
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
+import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.guessProjectDir
-import com.intellij.openapi.vfs.VfsUtilCore
+import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.vfs.VirtualFile
 import io.ktor.util.*
 import kotlinx.serialization.json.Json
@@ -45,20 +45,16 @@ class JustfileService(
     fun findJustfiles(): List<VirtualFile> {
         justfiles?.let { return it }
 
-        val root = project.guessProjectDir() ?: return emptyList()
-
         val result = mutableListOf<VirtualFile>()
 
-        VfsUtilCore.iterateChildrenRecursively(root, null) {
-            if (!it.isDirectory) {
-                if (Just.isJustfile(it.name)) {
-                    result += it
-                } else if (Just.isJustfileMarkdown(it)) {
+        // iterate project content only: excluded dirs (build, target, node_modules ...), library roots and ignored files are skipped
+        runReadAction {
+            ProjectFileIndex.getInstance(project).iterateContent {
+                if (!it.isDirectory && (Just.isJustfile(it.name) || Just.isJustfileMarkdown(it))) {
                     result += it
                 }
+                true
             }
-
-            true
         }
 
         justfiles = result
