@@ -15,7 +15,8 @@ class QuickRunJustRecipesAction : QuickSwitchSchemeAction(), DumbAware {
     override fun update(e: AnActionEvent) {
         super.update(e)
         val p: Presentation = e.presentation
-        val justfileAvailable = findJustfile(e.project!!) != null
+        val project = e.project ?: return
+        val justfileAvailable = findJustfile(project) != null
         p.isEnabled = justfileAvailable
         p.isVisible = justfileAvailable
         p.icon = JustIcons.JUST_FILE
@@ -45,5 +46,7 @@ class QuickRunJustRecipesAction : QuickSwitchSchemeAction(), DumbAware {
         return ActionSelectionAid.SPEEDSEARCH
     }
 
-
+    override fun getActionUpdateThread(): ActionUpdateThread {
+        return ActionUpdateThread.BGT
+    }
 }
