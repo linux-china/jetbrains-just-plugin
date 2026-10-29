@@ -112,24 +112,48 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
 
 }
 
+/**
+ * Recipe parameter, name with `*`/`+` prefix for variadic parameters, defaultValue is the default expression text
+ */
+data class RecipeParam(val name: String, val defaultValue: String? = null) {
+    val isVariadic: Boolean get() = name.startsWith('*') || name.startsWith('+')
+
+    /** parameter can be omitted: has default value or `*` variadic */
+    val isOptional: Boolean get() = defaultValue != null || name.startsWith('*')
+}
+
 fun adjustCommandLine(project: Project, recipeStatement: JustRecipeStatement, commandLine: String): String? {
+    val recipeParams = recipeStatement.params?.recipeParamList?.map {
+        RecipeParam(it.recipeParamName.text, it.recipeParamValue?.text)
+    } ?: emptyList()
+    return appendRecipeArguments(project, recipeParams, commandLine)
+}
+
+/**
+ * pop dialog to ask input param value, and append it to command line; return null if user cancelled.
+ * If an optional param is left empty, it and all following params are omitted, so just uses their default values.
+ */
+fun appendRecipeArguments(project: Project, params: List<RecipeParam>, commandLine: String): String? {
     var newCommandLine = commandLine
-    val recipeParamNames = recipeStatement.params?.recipeParamList?.map { it.recipeParamName.text }?.toList()
-    // pop dialog to ask input param value, and append it to commandString
-    if (!recipeParamNames.isNullOrEmpty()) {
-        for (paramName in recipeParamNames) {
-            val value = Messages.showInputDialog(
-                project,
-                "Please enter value for '$paramName':",
-                "Recipe Parameter: $paramName",
-                null
-            ) ?: return null // user cancelled
-            if (paramName.startsWith('*') || paramName.startsWith('+')) {
-                newCommandLine += " $value"
-            } else {
-                newCommandLine += " \"$value\""
-            }
+    for (param in params) {
+        val message = if (param.defaultValue != null) {
+            "Please enter value for '${param.name}' (leave empty to use default: ${param.defaultValue}):"
+        } else if (param.isOptional) {
+            "Please enter value for '${param.name}' (optional):"
+        } else {
+            "Please enter value for '${param.name}':"
         }
+        val value = Messages.showInputDialog(
+            project,
+            message,
+            "Recipe Parameter: ${param.name}",
+            null
+        ) ?: return null // user cancelled
+        if (value.isEmpty() && param.isOptional) {
+            // just only allows optional params after an optional one, so skip the rest
+            break
+        }
+        newCommandLine += if (param.isVariadic) " $value" else " \"$value\""
     }
     return newCommandLine
 }

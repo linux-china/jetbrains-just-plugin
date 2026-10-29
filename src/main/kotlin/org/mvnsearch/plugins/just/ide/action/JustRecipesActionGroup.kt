@@ -5,11 +5,12 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.vfs.VirtualFile
 import org.mvnsearch.plugins.just.Just
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
 import org.mvnsearch.plugins.just.ide.toolwindow.JustfileService
+import org.mvnsearch.plugins.just.lang.run.RecipeParam
+import org.mvnsearch.plugins.just.lang.run.appendRecipeArguments
 import org.mvnsearch.plugins.just.lang.run.runJustCommand
 
 
@@ -44,7 +45,7 @@ class RunJustRecipeAction(
     private val recipeName: String,
     private val text: String,
     private val virtualJustFile: VirtualFile? = null,
-    private val params: List<String> = emptyList(),
+    private val params: List<RecipeParam> = emptyList(),
 ) : AnAction(text) {
     override fun actionPerformed(e: AnActionEvent) {
         val justVirtualFile = virtualJustFile ?: e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
@@ -53,23 +54,9 @@ class RunJustRecipeAction(
         val dataContext = e.dataContext
         val justCmdPath = Just.getJustCmdAbsolutionPath(project)
         val workingDirectory = justVirtualFile.parent
-        var commandString = "$justCmdPath --justfile \"${justVirtualFile.name}\" $recipeName"
-        // pop dialog to ask input param value, and append it to commandString
-        if (params.isNotEmpty()) {
-            for (paramName in params) {
-                val value = Messages.showInputDialog(
-                    project,
-                    "Please enter value for '$paramName':",
-                    "Recipe Parameter: $paramName",
-                    null
-                ) ?: return // user cancelled
-                if (paramName.startsWith('*') || paramName.startsWith('+')) {
-                    commandString += " $value"
-                } else {
-                    commandString += " \"$value\""
-                }
-            }
-        }
+        val baseCommandString = "$justCmdPath --justfile \"${justVirtualFile.name}\" $recipeName"
+        // pop dialog to ask input param value, and append it to commandString; abort if user cancelled
+        val commandString = appendRecipeArguments(project, params, baseCommandString) ?: return
         ApplicationManager.getApplication().invokeLater {
             if (!project.isDisposed) {
                 runJustCommand(project, workingDirectory, justVirtualFile, commandString, dataContext)

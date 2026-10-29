@@ -9,9 +9,12 @@ import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import io.ktor.util.*
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import org.mvnsearch.plugins.just.Just
+import org.mvnsearch.plugins.just.lang.run.RecipeParam
 import java.util.concurrent.ConcurrentHashMap
 
 @Service(Service.Level.PROJECT)
@@ -102,11 +105,18 @@ class JustfileService(
                     ?.mapNotNull {
                         val name = it.jsonObject["name"]?.toString()?.trim('"')
                         val kind = it.jsonObject["kind"]?.toString()?.trim('"')
-                        when (kind) {
+                        // default is a string for literal, or an expression array such as ["call", "arch"]
+                        val defaultValue = when (val default = it.jsonObject["default"]) {
+                            null, is JsonNull -> null
+                            is JsonPrimitive -> default.content
+                            else -> default.toString()
+                        }
+                        val paramName = when (kind) {
                             "plus" -> "+${name}"
                             "star" -> "*${name}"
                             else -> name
                         }
+                        paramName?.let { RecipeParam(it, defaultValue) }
                     }
                     ?: emptyList()
             val attributes = recipeJson.jsonObject["attributes"]?.jsonArray?.mapNotNull {

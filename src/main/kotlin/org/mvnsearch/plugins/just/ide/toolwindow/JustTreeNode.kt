@@ -8,6 +8,7 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
+import org.mvnsearch.plugins.just.lang.run.RecipeParam
 import javax.swing.Icon
 
 sealed class JustTreeNode(
@@ -51,7 +52,7 @@ data class RecipeNode(
     val recipe: String,
     val description: String?,
     override val id: String = "${file.url}::$recipe",
-    val params: List<String> = emptyList(),
+    val params: List<RecipeParam> = emptyList(),
     val attributes: List<JsonElement> = emptyList(),
     val isPrivate: Boolean = false,
 ) : JustTreeNode(project, id) {
