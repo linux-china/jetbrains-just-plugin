@@ -173,7 +173,10 @@ class NewJustfileAction : AnAction() {
             } else {
                 psiElement as PsiDirectory
             }
-            val justFile = psiDirectory.findFile("Justfile")
+            // just matches `justfile`/`.justfile` case-insensitively, so any existing variant counts
+            val justFile = psiDirectory.virtualFile.children.firstOrNull {
+                !it.isDirectory && (it.name.equals("justfile", true) || it.name.equals(".justfile", true))
+            }
             if (justFile == null) {
                 val destDir = psiDirectory.virtualFile
                 val newJustfile = try {
@@ -191,7 +194,7 @@ class NewJustfileAction : AnAction() {
                 }
                 FileEditorManager.getInstance(project).openFile(newJustfile, true)
             } else {
-                FileEditorManager.getInstance(project).openFile(justFile.virtualFile, true)
+                FileEditorManager.getInstance(project).openFile(justFile, true)
             }
         }
     }
