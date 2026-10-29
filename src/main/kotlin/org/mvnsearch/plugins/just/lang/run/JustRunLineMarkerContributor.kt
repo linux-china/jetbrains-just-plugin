@@ -22,12 +22,14 @@ import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.util.elementType
 import com.intellij.util.execution.ParametersListUtil
 import org.mvnsearch.plugins.just.Just
 import org.mvnsearch.plugins.just.JustBundle
 import org.mvnsearch.plugins.just.ide.icons.JustIcons
 import org.mvnsearch.plugins.just.ide.icons.JustIcons.JUST_FILE
+import org.mvnsearch.plugins.just.lang.psi.JustAttribute
 import org.mvnsearch.plugins.just.lang.psi.JustFile
 import org.mvnsearch.plugins.just.lang.psi.JustRecipeStatement
 import org.mvnsearch.plugins.just.lang.psi.JustTypes
@@ -50,17 +52,10 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
         val recipeStatement = psiElement.parent as? JustRecipeStatement ?: return null
         // RECIPE_NAME token includes the `@` quiet prefix, which is not part of the recipe name
         val recipeName = psiElement.text.removePrefix("@")
-        var runIcon = JustIcons.RUN_ICON
-        if (recipeName == "default") {
-            runIcon = JustIcons.DEFAULT_RUN_ICON
+        val runIcon = if (recipeName == "default" || hasDefaultAttribute(recipeStatement)) {
+            JustIcons.DEFAULT_RUN_ICON
         } else {
-            recipeStatement.prevSibling?.prevSibling?.let {
-                if (it.elementType == JustTypes.ATTRIBUTE) {
-                    if (it.text == "[default]") {
-                        runIcon = JustIcons.DEFAULT_RUN_ICON
-                    }
-                }
-            }
+            JustIcons.RUN_ICON
         }
         return LineMarkerInfo(
             psiElement,
@@ -79,6 +74,24 @@ class JustRunLineMarkerContributor : RunLineMarkerProvider() {
         )
     }
 
+    /**
+     * check all attributes before the recipe, such as `[private]\n[default]` or `[default, group('x')]`,
+     * whitespaces, new lines and comments between attributes and the recipe are skipped.
+     */
+    private fun hasDefaultAttribute(recipeStatement: JustRecipeStatement): Boolean {
+        var sibling = recipeStatement.prevSibling
+        while (sibling != null) {
+            when {
+                sibling is JustAttribute -> {
+                    if (sibling.attributeItemList.any { it.attributeName.text == "default" }) return true
+                }
+                sibling !is PsiWhiteSpace && sibling.elementType != JustTypes.NEW_LINE
+                        && sibling.elementType != JustTypes.COMMENT -> return false
+            }
+            sibling = sibling.prevSibling
+        }
+        return false
+    }
 
     private fun runJustRecipeByRunAnything(project: Project, psiElement: PsiElement, taskName: String) {
         val justPsiFile = psiElement.containingFile as JustFile
