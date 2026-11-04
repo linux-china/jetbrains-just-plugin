@@ -29,6 +29,9 @@ import org.mvnsearch.plugins.just.lang.run.RecipeParam
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.jsonPrimitive
+
 
 @Service(Service.Level.PROJECT)
 class JustfileService(
@@ -199,7 +202,11 @@ class JustfileService(
 
         val recipes = root["recipes"]?.jsonObject ?: return emptyList()
 
-        return recipes.map { (name, recipeJson) ->
+        return recipes
+            .filter { (_, recipeJson) ->
+                recipeJson.jsonObject["private"]?.jsonPrimitive?.booleanOrNull != true
+            }
+            .map { (name, recipeJson) ->
             val description = (recipeJson.jsonObject["doc"] as? JsonPrimitive)?.contentOrNull
             val params =
                 recipeJson.jsonObject["parameters"]?.jsonArray?.filter { it.jsonObject["name"] != null }
