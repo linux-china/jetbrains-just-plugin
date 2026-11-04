@@ -9,6 +9,7 @@
 ### Fixed
 
 - Hide private recipes and empty Justfiles from tree view tool window
+- Triple-quoted (indented) strings rejected as attribute arguments
 
 ## 0.6.56 - 2026-10-29
 
