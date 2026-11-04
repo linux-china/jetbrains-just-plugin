@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.6.57 - 2026-11-04
+
+### Fixed
+
+- Hide private recipes and empty Justfiles from tree view tool window
+
 ## 0.6.56 - 2026-10-29
 
 ### Added 
