@@ -21,9 +21,10 @@ class JustTreeStructure(
             is RootNode -> {
                 val baseDir = project.guessProjectDir()
 
+                // hide empty justfiles, a file not loaded yet is hidden until its async load refreshes the tree
                 justService.findJustfiles()
-                    .filter { justService.loadRecipes(it).isNotEmpty() }
-                    .onEach { recipesOrLoadAsync(it) }.map {
+                    .filter { recipesOrLoadAsync(it).isNotEmpty() }
+                    .map {
                     JustfileNode(project = project, file = it, relativePath = baseDir?.let { base ->
                         VfsUtilCore.getRelativePath(it.parent, base)?.takeIf { relativePath ->
                             relativePath.isNotEmpty()
