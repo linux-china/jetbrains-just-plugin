@@ -57,6 +57,7 @@ class JustSetCompletionContributor : CompletionContributor() {
                         result.addElement(LookupElementBuilder.create("script-interpreter"))
                         result.addElement(LookupElementBuilder.create("default-script := true"))
                         result.addElement(LookupElementBuilder.create("no-cd"))
+                        result.addElement(LookupElementBuilder.create("dry-run"))
                         result.addElement(
                             LookupElementBuilder.create("tempdir := \"\"").withInsertHandler(insertHandler)
                         )
