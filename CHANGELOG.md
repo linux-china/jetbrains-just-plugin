@@ -4,6 +4,13 @@
 
 ## Unreleased
 
+
+## 0.6.58 - 2026-11-05
+
+### Fixed
+
+- Add icons for dark theme
+
 ## 0.6.57 - 2026-11-04
 
 ### Fixed
