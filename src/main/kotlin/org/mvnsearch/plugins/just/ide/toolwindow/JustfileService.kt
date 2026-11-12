@@ -11,6 +11,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.search.FileTypeIndex
 import com.intellij.psi.search.FilenameIndex
@@ -89,7 +90,10 @@ class JustfileService(
                 // only files named README.md, AGENTS.md or CLAUDE.md are read to look for a just code block
                 val markdownFiles = JUSTFILES_MARKDOWN.flatMap { FilenameIndex.getVirtualFilesByName(it, scope) }
                     .filter { Just.isJustfileMarkdown(it) }
-                (files + markdownFiles).filter { !it.isDirectory }.distinctBy { it.path }
+                val discovered = (files + markdownFiles).filter { !it.isDirectory }.distinctBy { it.path }
+                // The ignored file only affects tool-window discovery.
+                val ignoreMatcher = project.guessProjectDir()?.let { JustIgnoreMatcher.fromProjectRoot(it) }
+                if (ignoreMatcher == null) discovered else discovered.filterNot(ignoreMatcher::ignores)
             }
         } catch (_: IndexNotReadyException) {
             incompleteJustfiles = true
