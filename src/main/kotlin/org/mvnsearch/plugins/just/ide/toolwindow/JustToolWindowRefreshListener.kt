@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
+import com.intellij.openapi.vfs.newvfs.events.VFileContentChangeEvent
 import com.intellij.openapi.vfs.newvfs.events.VFileDeleteEvent
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.openapi.vfs.newvfs.events.VFileMoveEvent
@@ -24,8 +25,15 @@ class JustToolWindowRefreshListener(project: Project, private val refresh: (Virt
                             || justService.isModuleSource(event.path)
                 }
                 if (relevantEvents.isEmpty()) return
-                // A changed module can affect any root Justfile which imports it. Invalidate the full compiled tree.
-                refresh(null)
+                // Re-read ignore rules when the configuration file changes including content-only edits.
+                if (relevantEvents.any { JustIgnoreMatcher.FILE_NAME in eventFileNames(it) }) {
+                    refresh(null)
+                } else if (relevantEvents.all { it is VFileContentChangeEvent }) {
+                    relevantEvents.mapNotNull { it.file }.distinctBy { it.path }.forEach { refresh(it) }
+                } else {
+                    // create/delete/move/rename change the justfile list and cached paths, invalidate all
+                    refresh(null)
+                }
             }
         })
     }
@@ -46,7 +54,7 @@ class JustToolWindowRefreshListener(project: Project, private val refresh: (Virt
     }
 
     private fun isCandidateName(fileName: String): Boolean {
-        return Just.isJustfile(fileName) || JUSTFILES_MARKDOWN.contains(fileName)
+        return Just.isJustfile(fileName) || JUSTFILES_MARKDOWN.contains(fileName) || fileName == JustIgnoreMatcher.FILE_NAME
     }
 
     override fun dispose() = Unit

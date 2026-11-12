@@ -10,6 +10,8 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <errorHandler implementation="com.intellij.diagnostic.JetBrainsMarketplaceErrorReportSubmitter"/>
+        <fileType name="GitIgnore file"
+                  fileNames=".just-plugin-ignore"/>
         <fileType name="justfile"
                   implementationClass="org.mvnsearch.plugins.just.lang.psi.JustFileType"
                   fieldName="INSTANCE"

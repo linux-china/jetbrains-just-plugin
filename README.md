@@ -25,6 +25,7 @@ Plugin features:
 * Language injection for a legal Shell script
 * Justfile structure view
 * Justfile tool Window: load Justfiles into the task-tree and support Markdown files(README.md, AGENTS.md, CLAUDE.md).
+* Ignore Justfiles in the tool window using a project-level `.just-plugin-ignore` file.
 * Submodules/import resolver
 * Interesting miscellaneous: DuckDB, Bun, Nushell, etc.
 * Justfile as a scratch file: `PROJECT_DIR` environment variable
@@ -43,6 +44,17 @@ hello:
 ```
 
 * Click the run button in the Gutter and run a recipe/target!
+
+To hide intermediary Justfiles from the tool window, create `.just-plugin-ignore` in the project root:
+
+```gitignore
+# Java NIO glob patterns, one per line
+.just/**
+*-common.just
+```
+
+Patterns support glob wildcards and `#` comments, but not `.gitignore` negation (`!`). This affects only
+the plugin tool window, not Just execution or imports.
 
 Quick to understand `justfile`, please
 click [Justfile cheat sheet](https://cheatography.com/linux-china/cheat-sheets/justfile/)
