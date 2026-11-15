@@ -21,6 +21,13 @@ class JustNodeDescriptor(
                 node.relativePath?.let { presentation.addText(" $it", SimpleTextAttributes.GRAYED_ATTRIBUTES) }
             }
 
+            is ModuleNode -> {
+                presentation.addText(node.name, SimpleTextAttributes.REGULAR_ATTRIBUTES)
+                node.description?.takeIf { it.isNotBlank() }?.let {
+                    presentation.addText(" $it", SimpleTextAttributes.GRAYED_ATTRIBUTES)
+                }
+            }
+
             is RecipeNode -> {
                 presentation.addText(node.name, SimpleTextAttributes.REGULAR_ATTRIBUTES)
                 node.description?.let { presentation.addText(" $it", SimpleTextAttributes.GRAYED_ATTRIBUTES) }

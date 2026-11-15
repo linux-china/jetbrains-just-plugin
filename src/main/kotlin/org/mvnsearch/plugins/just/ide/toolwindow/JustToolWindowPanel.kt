@@ -22,6 +22,8 @@ import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.tree.TreeUtil
 import org.mvnsearch.plugins.just.ide.action.RunJustRecipeAction
 import java.awt.BorderLayout
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import javax.swing.JPanel
 import javax.swing.tree.DefaultMutableTreeNode
 
@@ -42,23 +44,13 @@ class JustToolWindowPanel(private val project: Project) : JPanel(BorderLayout())
         TreeUtil.installActions(tree)
 
         object : DoubleClickListener() {
-            override fun onDoubleClick(event: java.awt.event.MouseEvent): Boolean {
-                val path = tree.selectionPath ?: return false
-                val last = path.lastPathComponent ?: return false
-
-                val descriptor = when (last) {
-                    is DefaultMutableTreeNode -> last.userObject
-                    is NodeDescriptor<*> -> last
-                    else -> return false
-                }
-
-                val node = when (descriptor) {
-                    is JustNodeDescriptor -> descriptor.element
-                    is RecipeNode -> descriptor
-                    else -> null
-                } as? RecipeNode ?: return false
-
-                val runJustRecipeAction = RunJustRecipeAction(project, node.recipe, node.recipe, node.file, node.params)
+            override fun onDoubleClick(event: MouseEvent): Boolean {
+                // Only recipes execute on double-click; all other nodes use the normal tree expand/collapse behavior.
+                val path = tree.getPathForLocation(event.x, event.y) ?: return false
+                val recipeNode = treeNode(path.lastPathComponent) as? RecipeNode ?: return false
+                val runJustRecipeAction = RunJustRecipeAction(
+                    project, recipeNode.qualifiedRecipe, recipeNode.qualifiedRecipe, recipeNode.file, recipeNode.params
+                )
                 val actionEvent = JustToolWindowActionEventFactory.create(project)
                 // use reflection because of `Override-only method usage violation` rule
                 val actionPerformedMethod =
@@ -67,6 +59,12 @@ class JustToolWindowPanel(private val project: Project) : JPanel(BorderLayout())
                 return true
             }
         }.installOn(tree)
+
+        // The context action targets the node under the pointer, even if a different row was selected previously.
+        tree.addMouseListener(object : MouseAdapter() {
+            override fun mousePressed(event: MouseEvent) = showNavigatePopup(event)
+            override fun mouseReleased(event: MouseEvent) = showNavigatePopup(event)
+        })
 
         val expander = object : TreeExpander {
             override fun expandAll() {
@@ -104,6 +102,33 @@ class JustToolWindowPanel(private val project: Project) : JPanel(BorderLayout())
                 }
             }
         })
+    }
+
+    private fun treeNode(value: Any?): JustTreeNode? {
+        val descriptor = when (value) {
+            is DefaultMutableTreeNode -> value.userObject
+            is NodeDescriptor<*> -> value
+            else -> return null
+        }
+        return when (descriptor) {
+            is JustNodeDescriptor -> descriptor.element
+            is JustTreeNode -> descriptor
+            else -> null
+        }
+    }
+
+    private fun showNavigatePopup(event: MouseEvent) {
+        // macOS and other platforms may trigger popup menus on either press or release.
+        if (!event.isPopupTrigger) return
+        val path = tree.getPathForLocation(event.x, event.y) ?: return
+        val node = treeNode(path.lastPathComponent) ?: return
+        if (node is RootNode) return
+
+        tree.selectionPath = path
+        val actions = DefaultActionGroup().apply { add(JustNavigateToAction(project, node)) }
+        ActionManager.getInstance().createActionPopupMenu("JustToolWindowPopup", actions)
+            .component.show(tree, event.x, event.y)
+        event.consume()
     }
 
     /**

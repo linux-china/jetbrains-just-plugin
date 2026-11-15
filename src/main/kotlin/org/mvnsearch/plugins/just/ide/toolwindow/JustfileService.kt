@@ -17,20 +17,13 @@ import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.xml.util.XmlStringUtil
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import org.mvnsearch.plugins.just.JUSTFILES_MARKDOWN
 import org.mvnsearch.plugins.just.Just
 import org.mvnsearch.plugins.just.lang.psi.JustFileType
-import org.mvnsearch.plugins.just.lang.run.RecipeParam
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
-import kotlinx.serialization.json.booleanOrNull
-import kotlinx.serialization.json.jsonPrimitive
 
 
 @Service(Service.Level.PROJECT)
@@ -42,7 +35,7 @@ class JustfileService(
         ignoreUnknownKeys = true
     }
 
-    private val recipeCache = ConcurrentHashMap<String, List<RecipeNode>>()
+    private val recipeCache = ConcurrentHashMap<String, JustfileContents>()
 
     // failed loads are remembered briefly, so callers that reload on a cache miss (tree refresh, action update) don't rerun just in a loop
     private val failedLoads = ConcurrentHashMap<String, DumpFailure>()
@@ -102,9 +95,21 @@ class JustfileService(
         return result
     }
 
-    fun getCachedRecipes(justVirtualFile: VirtualFile): List<RecipeNode>? {
+    // Preserve the original root-level recipe API used by JustRecipesActionGroup.
+    fun getCachedRecipes(justVirtualFile: VirtualFile): List<RecipeNode>? = getCachedContents(justVirtualFile)?.recipes
+
+    fun getCachedContents(justVirtualFile: VirtualFile): JustfileContents? {
         recipeCache[justVirtualFile.path]?.let { return it }
-        return if (failedLoads[justVirtualFile.path]?.isRecent() == true) emptyList() else null
+        return if (failedLoads[justVirtualFile.path]?.isRecent() == true) JustfileContents() else null
+    }
+
+    /** A module may have an arbitrary source filename, not necessarily ending in `.just`. */
+    fun isModuleSource(path: String): Boolean {
+        val normalizedPath = path.replace('\\', '/')
+        fun containsSource(contents: JustfileContents): Boolean = contents.modules.any { module ->
+            module.sourcePath?.replace('\\', '/') == normalizedPath || containsSource(module.contents)
+        }
+        return recipeCache.values.any(::containsSource)
     }
 
     /**
@@ -122,8 +127,10 @@ class JustfileService(
         }
     }
 
-    fun loadRecipes(justVirtualFile: VirtualFile): List<RecipeNode> {
-        getCachedRecipes(justVirtualFile)?.let { return it }
+    fun loadRecipes(justVirtualFile: VirtualFile): List<RecipeNode> = loadContents(justVirtualFile).recipes
+
+    private fun loadContents(justVirtualFile: VirtualFile): JustfileContents {
+        getCachedContents(justVirtualFile)?.let { return it }
         val startGeneration = generation.get()
         // run just outside computeIfAbsent: a long running process must not block other writes to the map
         val recipes = try {
@@ -140,7 +147,7 @@ class JustfileService(
                     notifyJustDumpFailed(e.title, e.message)
                 }
             }
-            return emptyList()
+            return JustfileContents()
         }
         if (startGeneration != generation.get()) return recipes
         failedLoads.remove(justVirtualFile.path)
@@ -155,7 +162,7 @@ class JustfileService(
     /**
      * @throws DumpException when just cannot be executed, times out, exits with an error or prints invalid JSON
      */
-    private fun loadRecipesInternal(justVirtualFile: VirtualFile): List<RecipeNode> {
+    private fun loadRecipesInternal(justVirtualFile: VirtualFile): JustfileContents {
         val commandLine = GeneralCommandLine(
             Just.getJustCmdAbsolutionPath(project),
             "--dump",
@@ -200,46 +207,14 @@ class JustfileService(
             )
         }
 
-        val recipes = root["recipes"]?.jsonObject ?: return emptyList()
-
-        return recipes
-            .filter { (_, recipeJson) ->
-                recipeJson.jsonObject["private"]?.jsonPrimitive?.booleanOrNull != true
-            }
-            .map { (name, recipeJson) ->
-            val description = (recipeJson.jsonObject["doc"] as? JsonPrimitive)?.contentOrNull
-            val params =
-                recipeJson.jsonObject["parameters"]?.jsonArray?.filter { it.jsonObject["name"] != null }
-                    ?.mapNotNull {
-                        val name = (it.jsonObject["name"] as? JsonPrimitive)?.contentOrNull
-                        val kind = (it.jsonObject["kind"] as? JsonPrimitive)?.contentOrNull
-                        // default is a string for literal, or an expression array such as ["call", "arch"]
-                        val defaultValue = when (val default = it.jsonObject["default"]) {
-                            null, is JsonNull -> null
-                            is JsonPrimitive -> default.content
-                            else -> default.toString()
-                        }
-                        val paramName = when (kind) {
-                            "plus" -> "+${name}"
-                            "star" -> "*${name}"
-                            else -> name
-                        }
-                        paramName?.let { RecipeParam(it, defaultValue) }
-                    }
-                    ?: emptyList()
-            val attributes = recipeJson.jsonObject["attributes"]?.jsonArray?.mapNotNull {
-                it
-            }?: emptyList()
-            RecipeNode(
-                project = project,
-                file = justVirtualFile,
-                recipe = name,
-                description = description,
-                params = params,
-                attributes = attributes,
-                isPrivate = recipeJson.jsonObject["private"]?.toString() == "true",
+        return try {
+            JustDumpTreeParser(project, justVirtualFile).parse(root)
+        } catch (e: Exception) {
+            throw DumpException(
+                "Failed to read just --dump structure for ${justVirtualFile.name}",
+                e.message ?: "Unexpected JSON structure",
             )
-        }.sortedBy { it.recipe }
+        }
     }
 
     private fun notifyJustDumpFailed(title: String, message: String) {

@@ -5,7 +5,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
-import com.intellij.openapi.vfs.newvfs.events.VFileContentChangeEvent
 import com.intellij.openapi.vfs.newvfs.events.VFileDeleteEvent
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.openapi.vfs.newvfs.events.VFileMoveEvent
@@ -16,17 +15,17 @@ import org.mvnsearch.plugins.just.Just
 
 class JustToolWindowRefreshListener(project: Project, private val refresh: (VirtualFile?) -> Unit) : Disposable {
     init {
+        val justService = project.getService(JustfileService::class.java)
         project.messageBus.connect(this).subscribe(VirtualFileManager.VFS_CHANGES, object : BulkFileListener {
             override fun after(events: List<VFileEvent>) {
-                // match by file name only: never read file content here (EDT + write action), and the file may be deleted already
-                val relevantEvents = events.filter { event -> isDirectoryStructureChange(event) || eventFileNames(event).any { isCandidateName(it) } }
-                if (relevantEvents.isEmpty()) return
-                if (relevantEvents.all { it is VFileContentChangeEvent }) {
-                    relevantEvents.mapNotNull { it.file }.distinctBy { it.path }.forEach { refresh(it) }
-                } else {
-                    // create/delete/move/rename change the justfile list and cached paths, invalidate all
-                    refresh(null)
+                // Match known Justfile names and resolved module sources without reading file content (VFS write action).
+                val relevantEvents = events.filter { event ->
+                    isDirectoryStructureChange(event) || eventFileNames(event).any { isCandidateName(it) }
+                            || justService.isModuleSource(event.path)
                 }
+                if (relevantEvents.isEmpty()) return
+                // A changed module can affect any root Justfile which imports it. Invalidate the full compiled tree.
+                refresh(null)
             }
         })
     }
