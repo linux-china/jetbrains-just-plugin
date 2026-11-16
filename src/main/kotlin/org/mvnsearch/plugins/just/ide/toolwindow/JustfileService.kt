@@ -42,6 +42,13 @@ class JustfileService(
 
     private val loadingFiles = ConcurrentHashMap.newKeySet<String>()
 
+    /** True while a refresh still has undiscovered or uncached Justfiles, including loads not yet started. */
+    fun hasPendingLoads(): Boolean {
+        if (loadingFiles.isNotEmpty()) return true
+        val files = justfiles ?: return true
+        return files.any { getCachedContents(it) == null }
+    }
+
     // bumped on every invalidate, so a load started before the invalidation never caches stale recipes
     private val generation = AtomicLong()
 

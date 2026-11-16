@@ -30,18 +30,21 @@ import javax.swing.tree.DefaultMutableTreeNode
 class JustToolWindowPanel(private val project: Project) : JPanel(BorderLayout()), Disposable {
     private val treeStructure = JustTreeStructure(project) {
         invokeLaterIfAlive {
-            structureTreeModel.invalidateAsync()
+            invalidatePreservingTreeState()
         }
     }
     private val structureTreeModel: StructureTreeModel<JustTreeStructure> = StructureTreeModel(treeStructure, this)
     private val asyncTreeModel = AsyncTreeModel(structureTreeModel, this)
     private val tree = Tree(asyncTreeModel)
 
+    private val treeStateController = JustTreeStateController(tree, asyncTreeModel, ::treeNode, ::invokeLaterIfAlive)
+
     init {
         tree.isRootVisible = false
 
         TreeUIHelper.getInstance().installTreeSpeedSearch(tree)
         TreeUtil.installActions(tree)
+        Disposer.register(this, treeStateController)
 
         object : DoubleClickListener() {
             override fun onDoubleClick(event: MouseEvent): Boolean {
@@ -67,13 +70,9 @@ class JustToolWindowPanel(private val project: Project) : JPanel(BorderLayout())
         })
 
         val expander = object : TreeExpander {
-            override fun expandAll() {
-                TreeUtil.expandAll(tree)
-            }
+            override fun expandAll() = treeStateController.expandAll()
 
-            override fun collapseAll() {
-                TreeUtil.collapseAll(tree, 0)
-            }
+            override fun collapseAll() = treeStateController.collapseAll()
 
             override fun canExpand() = true
             override fun canCollapse() = true
@@ -98,7 +97,7 @@ class JustToolWindowPanel(private val project: Project) : JPanel(BorderLayout())
         project.messageBus.connect(this).subscribe(DumbService.DUMB_MODE, object : DumbService.DumbModeListener {
             override fun exitDumbMode() {
                 if (project.getService(JustfileService::class.java).incompleteJustfiles) {
-                    invokeLaterIfAlive { structureTreeModel.invalidateAsync() }
+                    invokeLaterIfAlive { invalidatePreservingTreeState() }
                 }
             }
         })
@@ -131,6 +130,12 @@ class JustToolWindowPanel(private val project: Project) : JPanel(BorderLayout())
         event.consume()
     }
 
+    /** Rebuild the model without capturing an intermediate asynchronous tree state. */
+    private fun invalidatePreservingTreeState() {
+        structureTreeModel.invalidateAsync()
+        treeStateController.onRefresh()
+    }
+
     /**
      * refresh tree if justfile changed
      */
@@ -138,7 +143,7 @@ class JustToolWindowPanel(private val project: Project) : JPanel(BorderLayout())
         project.getService(JustfileService::class.java).invalidate(justVirtualFile)
 
         invokeLaterIfAlive {
-            structureTreeModel.invalidateAsync()
+            invalidatePreservingTreeState()
             tree.repaint()
         }
     }
