@@ -148,19 +148,19 @@ class JustfileService(
         getCachedContents(justVirtualFile)?.let { return it }
         val startGeneration = generation.get()
         // PSI discovery requires a read action; never perform it inside the VFS write-action listener.
-        val dependencies = try {
+        val sourceMetadata = try {
             runReadAction { JustSourceDependencyCollector(project).collect(justVirtualFile) }
         } catch (_: Exception) {
             null // Keep the last known dependencies if indexing or an invalid file prevents discovery.
         }
         // Start watching newly discovered dependencies before executing just: edits made during
         // the dump must also invalidate the root. Keep old paths until a successful reload.
-        if (dependencies != null && startGeneration == generation.get()) {
-            sourceDependencies.merge(justVirtualFile.path, dependencies) { old, new -> old + new }
+        if (sourceMetadata != null && startGeneration == generation.get()) {
+            sourceDependencies.merge(justVirtualFile.path, sourceMetadata.dependencies) { old, new -> old + new }
         }
         // run just outside computeIfAbsent: a long running process must not block other writes to the map
         val recipes = try {
-            loadRecipesInternal(justVirtualFile)
+            loadRecipesInternal(justVirtualFile, sourceMetadata?.privateModules.orEmpty())
         } catch (e: DumpException) {
             if (startGeneration == generation.get()) {
                 // Dependencies remain watched even if the dump fails (e.g. a missing optional file).
@@ -177,7 +177,7 @@ class JustfileService(
             return JustfileContents()
         }
         if (startGeneration != generation.get()) return recipes
-        dependencies?.let { sourceDependencies[justVirtualFile.path] = it }
+        sourceMetadata?.let { sourceDependencies[justVirtualFile.path] = it.dependencies }
         failedLoads.remove(justVirtualFile.path)
         val cached = recipeCache.putIfAbsent(justVirtualFile.path, recipes)
         // an invalidate between the check and the put would leave stale recipes cached, drop them again (only if they are ours)
@@ -190,7 +190,7 @@ class JustfileService(
     /**
      * @throws DumpException when just cannot be executed, times out, exits with an error or prints invalid JSON
      */
-    private fun loadRecipesInternal(justVirtualFile: VirtualFile): JustfileContents {
+    private fun loadRecipesInternal(justVirtualFile: VirtualFile, privateModules: Set<String>): JustfileContents {
         val commandLine = GeneralCommandLine(
             Just.getJustCmdAbsolutionPath(project),
             "--dump",
@@ -236,7 +236,7 @@ class JustfileService(
         }
 
         return try {
-            JustDumpTreeParser(project, justVirtualFile).parse(root)
+            JustDumpTreeParser(project, justVirtualFile, privateModules).parse(root)
         } catch (e: Exception) {
             throw DumpException(
                 "Failed to read just --dump structure for ${justVirtualFile.name}",

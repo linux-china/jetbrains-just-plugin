@@ -19,6 +19,7 @@ import org.mvnsearch.plugins.just.lang.run.RecipeParam
 internal class JustDumpTreeParser(
     private val project: Project,
     private val rootJustfile: VirtualFile,
+    private val privateModules: Set<String> = emptySet(),
 ) {
     fun parse(root: JsonObject): JustfileContents = parseModule(root, "")
 
@@ -56,9 +57,11 @@ internal class JustDumpTreeParser(
             )
         }?.sortedBy { it.recipe } ?: emptyList()
 
-        val modules = json["modules"]?.jsonObject?.map { (name, element) ->
-            val moduleJson = element.jsonObject
+        val modules = json["modules"]?.jsonObject?.mapNotNull moduleMap@{ (name, element) ->
             val childPath = if (modulePath.isEmpty()) name else "$modulePath::$name"
+            // `just --dump` does not expose module privacy, so it is collected from declarations via PSI.
+            if (childPath in privateModules) return@moduleMap null
+            val moduleJson = element.jsonObject
             ModuleNode(
                 project = project,
                 file = rootJustfile,
