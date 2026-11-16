@@ -38,6 +38,9 @@ class JustfileService(
 
     private val recipeCache = ConcurrentHashMap<String, JustfileContents>()
 
+    // Keep source paths across invalidation so edits during a reload still trigger a refresh.
+    private val sourceDependencies = ConcurrentHashMap<String, Set<String>>()
+
     // failed loads are remembered briefly, so callers that reload on a cache miss (tree refresh, action update) don't rerun just in a loop
     private val failedLoads = ConcurrentHashMap<String, DumpFailure>()
 
@@ -103,6 +106,10 @@ class JustfileService(
         incompleteJustfiles = false
         justfiles = result
 
+        // Remove dependencies for roots no longer included in tool-window discovery.
+        val roots = result.mapTo(mutableSetOf()) { it.path }
+        sourceDependencies.keys.removeIf { it !in roots }
+
         return result
     }
 
@@ -114,13 +121,10 @@ class JustfileService(
         return if (failedLoads[justVirtualFile.path]?.isRecent() == true) JustfileContents() else null
     }
 
-    /** A module may have an arbitrary source filename, not necessarily ending in `.just`. */
-    fun isModuleSource(path: String): Boolean {
-        val normalizedPath = path.replace('\\', '/')
-        fun containsSource(contents: JustfileContents): Boolean = contents.modules.any { module ->
-            module.sourcePath?.replace('\\', '/') == normalizedPath || containsSource(module.contents)
-        }
-        return recipeCache.values.any(::containsSource)
+    /** Imported and module files can use arbitrary filenames, and may be outside the project. */
+    fun isDependencySource(path: String): Boolean {
+        val normalized = JustSourceDependencyCollector.normalize(path)
+        return sourceDependencies.values.any { normalized in it }
     }
 
     /**
@@ -143,11 +147,23 @@ class JustfileService(
     private fun loadContents(justVirtualFile: VirtualFile): JustfileContents {
         getCachedContents(justVirtualFile)?.let { return it }
         val startGeneration = generation.get()
+        // PSI discovery requires a read action; never perform it inside the VFS write-action listener.
+        val dependencies = try {
+            runReadAction { JustSourceDependencyCollector(project).collect(justVirtualFile) }
+        } catch (_: Exception) {
+            null // Keep the last known dependencies if indexing or an invalid file prevents discovery.
+        }
+        // Start watching newly discovered dependencies before executing just: edits made during
+        // the dump must also invalidate the root. Keep old paths until a successful reload.
+        if (dependencies != null && startGeneration == generation.get()) {
+            sourceDependencies.merge(justVirtualFile.path, dependencies) { old, new -> old + new }
+        }
         // run just outside computeIfAbsent: a long running process must not block other writes to the map
         val recipes = try {
             loadRecipesInternal(justVirtualFile)
         } catch (e: DumpException) {
             if (startGeneration == generation.get()) {
+                // Dependencies remain watched even if the dump fails (e.g. a missing optional file).
                 // failures are never written to recipeCache, so the next load after the retry delay runs just again
                 val failure = DumpFailure(e.title, e.message)
                 val previous = failedLoads.put(justVirtualFile.path, failure)
@@ -161,6 +177,7 @@ class JustfileService(
             return JustfileContents()
         }
         if (startGeneration != generation.get()) return recipes
+        dependencies?.let { sourceDependencies[justVirtualFile.path] = it }
         failedLoads.remove(justVirtualFile.path)
         val cached = recipeCache.putIfAbsent(justVirtualFile.path, recipes)
         // an invalidate between the check and the put would leave stale recipes cached, drop them again (only if they are ours)
