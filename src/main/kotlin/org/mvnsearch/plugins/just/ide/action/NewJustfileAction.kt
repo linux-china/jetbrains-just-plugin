@@ -23,6 +23,8 @@ import java.io.IOException
  */
 class NewJustfileAction : AnAction() {
     companion object {
+        // place used by the "New..." popup shown by the NewElement action (e.g. Shift+Insert/Alt+Insert)
+        private val NEW_ELEMENT_POPUP_PLACE = ActionPlaces.getActionGroupPopupPlace(IdeActions.GROUP_WEIGHING_NEW)
         val JUSTFILE_MAVEN = """
         #!/usr/bin/env just --justfile
         
@@ -135,7 +137,10 @@ class NewJustfileAction : AnAction() {
 
     override fun update(e: AnActionEvent) {
         super.update(e)
-        e.presentation.isEnabledAndVisible = e.place == ActionPlaces.PROJECT_VIEW_POPUP
+        // PROJECT_VIEW_POPUP: right-click "New" submenu in the project view
+        // NEW_ELEMENT_POPUP_PLACE: "New..." popup shown by the NewElement action (e.g. Shift+Insert/Alt+Insert)
+        e.presentation.isEnabledAndVisible =
+            e.place == ActionPlaces.PROJECT_VIEW_POPUP || e.place == NEW_ELEMENT_POPUP_PLACE
     }
 
     override fun actionPerformed(e: AnActionEvent) {
