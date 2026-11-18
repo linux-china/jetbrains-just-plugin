@@ -45,11 +45,45 @@ data class JustfileNode(
     override val icon = JustIcons.JUST_FILE
 }
 
+/** A compiled module contains its own recipes and zero or more nested modules. */
+data class JustfileContents(
+    val recipes: List<RecipeNode> = emptyList(),
+    val modules: List<ModuleNode> = emptyList(),
+) {
+    fun isEmpty() = recipes.isEmpty() && modules.isEmpty()
+
+    fun moduleAt(path: String): ModuleNode? {
+        if (path.isEmpty()) return null
+        var children = modules
+        var current: ModuleNode? = null
+        for (segment in path.split("::")) {
+            current = children.firstOrNull { it.name == segment } ?: return null
+            children = current.contents.modules
+        }
+        return current
+    }
+}
+
+data class ModuleNode(
+    override val project: Project,
+    // Always the *root* Justfile: module recipes must be executed relative to it.
+    val file: VirtualFile,
+    val modulePath: String,
+    val sourcePath: String?,
+    val description: String?,
+    val contents: JustfileContents,
+    override val id: String = "${file.url}::module::$modulePath",
+) : JustTreeNode(project, id) {
+    override val name = modulePath.substringAfterLast("::")
+    override val icon = JustIcons.MOD_ICON
+}
+
 data class GroupNode(
     override val project: Project,
     val file: VirtualFile,
     val group: String,
-    override val id: String = "${file.url}::group::$group",
+    val modulePath: String = "",
+    override val id: String = "${file.url}::module::$modulePath::group::$group",
 ) : JustTreeNode(project, id) {
     override val name = group
     override val icon = JustIcons.GROUP_ICON
@@ -60,7 +94,8 @@ data class RecipeNode(
     val file: VirtualFile,
     val recipe: String,
     val description: String?,
-    override val id: String = "${file.url}::$recipe",
+    val modulePath: String = "",
+    override val id: String = "${file.url}::recipe::${if (modulePath.isEmpty()) recipe else "$modulePath::$recipe"}",
     val params: List<RecipeParam> = emptyList(),
     val attributes: List<JsonElement> = emptyList(),
     val isPrivate: Boolean = false,
@@ -68,8 +103,11 @@ data class RecipeNode(
     override val name = recipe
     override val icon = JustIcons.RUN_ICON
 
+    val qualifiedRecipe: String
+        get() = if (modulePath.isEmpty()) recipe else "$modulePath::$recipe"
+
     fun getGroup(): String? {
-        val groupElement = this.attributes.find { it is JsonObject && it.jsonObject.containsKey("group") }
+        val groupElement = attributes.find { it is JsonObject && it.jsonObject.containsKey("group") }
         val group = groupElement?.jsonObject?.get("group") as? JsonPrimitive
         return group?.contentOrNull?.takeIf { it.isNotBlank() }
     }

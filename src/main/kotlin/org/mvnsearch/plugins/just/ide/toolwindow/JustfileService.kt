@@ -11,26 +11,20 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.search.FileTypeIndex
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.xml.util.XmlStringUtil
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import org.mvnsearch.plugins.just.JUSTFILES_MARKDOWN
 import org.mvnsearch.plugins.just.Just
 import org.mvnsearch.plugins.just.lang.psi.JustFileType
-import org.mvnsearch.plugins.just.lang.run.RecipeParam
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
-import kotlinx.serialization.json.booleanOrNull
-import kotlinx.serialization.json.jsonPrimitive
 
 
 @Service(Service.Level.PROJECT)
@@ -42,12 +36,22 @@ class JustfileService(
         ignoreUnknownKeys = true
     }
 
-    private val recipeCache = ConcurrentHashMap<String, List<RecipeNode>>()
+    private val recipeCache = ConcurrentHashMap<String, JustfileContents>()
+
+    // Keep source paths across invalidation so edits during a reload still trigger a refresh.
+    private val sourceDependencies = ConcurrentHashMap<String, Set<String>>()
 
     // failed loads are remembered briefly, so callers that reload on a cache miss (tree refresh, action update) don't rerun just in a loop
     private val failedLoads = ConcurrentHashMap<String, DumpFailure>()
 
     private val loadingFiles = ConcurrentHashMap.newKeySet<String>()
+
+    /** True while a refresh still has undiscovered or uncached Justfiles, including loads not yet started. */
+    fun hasPendingLoads(): Boolean {
+        if (loadingFiles.isNotEmpty()) return true
+        val files = justfiles ?: return true
+        return files.any { getCachedContents(it) == null }
+    }
 
     // bumped on every invalidate, so a load started before the invalidation never caches stale recipes
     private val generation = AtomicLong()
@@ -89,7 +93,10 @@ class JustfileService(
                 // only files named README.md, AGENTS.md or CLAUDE.md are read to look for a just code block
                 val markdownFiles = JUSTFILES_MARKDOWN.flatMap { FilenameIndex.getVirtualFilesByName(it, scope) }
                     .filter { Just.isJustfileMarkdown(it) }
-                (files + markdownFiles).filter { !it.isDirectory }.distinctBy { it.path }
+                val discovered = (files + markdownFiles).filter { !it.isDirectory }.distinctBy { it.path }
+                // The ignored file only affects tool-window discovery.
+                val ignoreMatcher = project.guessProjectDir()?.let { JustIgnoreMatcher.fromProjectRoot(it) }
+                if (ignoreMatcher == null) discovered else discovered.filterNot(ignoreMatcher::ignores)
             }
         } catch (_: IndexNotReadyException) {
             incompleteJustfiles = true
@@ -99,12 +106,25 @@ class JustfileService(
         incompleteJustfiles = false
         justfiles = result
 
+        // Remove dependencies for roots no longer included in tool-window discovery.
+        val roots = result.mapTo(mutableSetOf()) { it.path }
+        sourceDependencies.keys.removeIf { it !in roots }
+
         return result
     }
 
-    fun getCachedRecipes(justVirtualFile: VirtualFile): List<RecipeNode>? {
+    // Preserve the original root-level recipe API used by JustRecipesActionGroup.
+    fun getCachedRecipes(justVirtualFile: VirtualFile): List<RecipeNode>? = getCachedContents(justVirtualFile)?.recipes
+
+    fun getCachedContents(justVirtualFile: VirtualFile): JustfileContents? {
         recipeCache[justVirtualFile.path]?.let { return it }
-        return if (failedLoads[justVirtualFile.path]?.isRecent() == true) emptyList() else null
+        return if (failedLoads[justVirtualFile.path]?.isRecent() == true) JustfileContents() else null
+    }
+
+    /** Imported and module files can use arbitrary filenames, and may be outside the project. */
+    fun isDependencySource(path: String): Boolean {
+        val normalized = JustSourceDependencyCollector.normalize(path)
+        return sourceDependencies.values.any { normalized in it }
     }
 
     /**
@@ -122,14 +142,28 @@ class JustfileService(
         }
     }
 
-    fun loadRecipes(justVirtualFile: VirtualFile): List<RecipeNode> {
-        getCachedRecipes(justVirtualFile)?.let { return it }
+    fun loadRecipes(justVirtualFile: VirtualFile): List<RecipeNode> = loadContents(justVirtualFile).recipes
+
+    private fun loadContents(justVirtualFile: VirtualFile): JustfileContents {
+        getCachedContents(justVirtualFile)?.let { return it }
         val startGeneration = generation.get()
+        // PSI discovery requires a read action; never perform it inside the VFS write-action listener.
+        val sourceMetadata = try {
+            runReadAction { JustSourceDependencyCollector(project).collect(justVirtualFile) }
+        } catch (_: Exception) {
+            null // Keep the last known dependencies if indexing or an invalid file prevents discovery.
+        }
+        // Start watching newly discovered dependencies before executing just: edits made during
+        // the dump must also invalidate the root. Keep old paths until a successful reload.
+        if (sourceMetadata != null && startGeneration == generation.get()) {
+            sourceDependencies.merge(justVirtualFile.path, sourceMetadata.dependencies) { old, new -> old + new }
+        }
         // run just outside computeIfAbsent: a long running process must not block other writes to the map
         val recipes = try {
-            loadRecipesInternal(justVirtualFile)
+            loadRecipesInternal(justVirtualFile, sourceMetadata?.privateModules.orEmpty())
         } catch (e: DumpException) {
             if (startGeneration == generation.get()) {
+                // Dependencies remain watched even if the dump fails (e.g. a missing optional file).
                 // failures are never written to recipeCache, so the next load after the retry delay runs just again
                 val failure = DumpFailure(e.title, e.message)
                 val previous = failedLoads.put(justVirtualFile.path, failure)
@@ -140,9 +174,10 @@ class JustfileService(
                     notifyJustDumpFailed(e.title, e.message)
                 }
             }
-            return emptyList()
+            return JustfileContents()
         }
         if (startGeneration != generation.get()) return recipes
+        sourceMetadata?.let { sourceDependencies[justVirtualFile.path] = it.dependencies }
         failedLoads.remove(justVirtualFile.path)
         val cached = recipeCache.putIfAbsent(justVirtualFile.path, recipes)
         // an invalidate between the check and the put would leave stale recipes cached, drop them again (only if they are ours)
@@ -155,7 +190,7 @@ class JustfileService(
     /**
      * @throws DumpException when just cannot be executed, times out, exits with an error or prints invalid JSON
      */
-    private fun loadRecipesInternal(justVirtualFile: VirtualFile): List<RecipeNode> {
+    private fun loadRecipesInternal(justVirtualFile: VirtualFile, privateModules: Set<String>): JustfileContents {
         val commandLine = GeneralCommandLine(
             Just.getJustCmdAbsolutionPath(project),
             "--dump",
@@ -200,46 +235,14 @@ class JustfileService(
             )
         }
 
-        val recipes = root["recipes"]?.jsonObject ?: return emptyList()
-
-        return recipes
-            .filter { (_, recipeJson) ->
-                recipeJson.jsonObject["private"]?.jsonPrimitive?.booleanOrNull != true
-            }
-            .map { (name, recipeJson) ->
-            val description = (recipeJson.jsonObject["doc"] as? JsonPrimitive)?.contentOrNull
-            val params =
-                recipeJson.jsonObject["parameters"]?.jsonArray?.filter { it.jsonObject["name"] != null }
-                    ?.mapNotNull {
-                        val name = (it.jsonObject["name"] as? JsonPrimitive)?.contentOrNull
-                        val kind = (it.jsonObject["kind"] as? JsonPrimitive)?.contentOrNull
-                        // default is a string for literal, or an expression array such as ["call", "arch"]
-                        val defaultValue = when (val default = it.jsonObject["default"]) {
-                            null, is JsonNull -> null
-                            is JsonPrimitive -> default.content
-                            else -> default.toString()
-                        }
-                        val paramName = when (kind) {
-                            "plus" -> "+${name}"
-                            "star" -> "*${name}"
-                            else -> name
-                        }
-                        paramName?.let { RecipeParam(it, defaultValue) }
-                    }
-                    ?: emptyList()
-            val attributes = recipeJson.jsonObject["attributes"]?.jsonArray?.mapNotNull {
-                it
-            }?: emptyList()
-            RecipeNode(
-                project = project,
-                file = justVirtualFile,
-                recipe = name,
-                description = description,
-                params = params,
-                attributes = attributes,
-                isPrivate = recipeJson.jsonObject["private"]?.toString() == "true",
+        return try {
+            JustDumpTreeParser(project, justVirtualFile, privateModules).parse(root)
+        } catch (e: Exception) {
+            throw DumpException(
+                "Failed to read just --dump structure for ${justVirtualFile.name}",
+                e.message ?: "Unexpected JSON structure",
             )
-        }.sortedBy { it.recipe }
+        }
     }
 
     private fun notifyJustDumpFailed(title: String, message: String) {

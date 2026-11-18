@@ -5,7 +5,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
-import com.intellij.openapi.vfs.newvfs.events.VFileContentChangeEvent
 import com.intellij.openapi.vfs.newvfs.events.VFileDeleteEvent
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.openapi.vfs.newvfs.events.VFileMoveEvent
@@ -16,17 +15,22 @@ import org.mvnsearch.plugins.just.Just
 
 class JustToolWindowRefreshListener(project: Project, private val refresh: (VirtualFile?) -> Unit) : Disposable {
     init {
+        val justService = project.getService(JustfileService::class.java)
         project.messageBus.connect(this).subscribe(VirtualFileManager.VFS_CHANGES, object : BulkFileListener {
             override fun after(events: List<VFileEvent>) {
-                // match by file name only: never read file content here (EDT + write action), and the file may be deleted already
-                val relevantEvents = events.filter { event -> isDirectoryStructureChange(event) || eventFileNames(event).any { isCandidateName(it) } }
-                if (relevantEvents.isEmpty()) return
-                if (relevantEvents.all { it is VFileContentChangeEvent }) {
-                    relevantEvents.mapNotNull { it.file }.distinctBy { it.path }.forEach { refresh(it) }
-                } else {
-                    // create/delete/move/rename change the justfile list and cached paths, invalidate all
+                // Ignore-rule edits always re-run discovery, including content-only edits.
+                if (events.any { JustIgnoreMatcher.FILE_NAME in eventFileNames(it) }) {
                     refresh(null)
+                    return
                 }
+
+                // Imports and modules may use arbitrary names. Compare normalized paths only;
+                // never parse or read files from this VFS write-action callback.
+                val relevant = events.any { event ->
+                    isDirectoryStructureChange(event) || eventFileNames(event).any(::isCandidateName) ||
+                       eventPaths(event).any(justService::isDependencySource)
+                }
+                if (relevant) refresh(null) // A dependency can affect any compiled root Justfile.
             }
         })
     }
@@ -46,8 +50,29 @@ class JustToolWindowRefreshListener(project: Project, private val refresh: (Virt
         return listOf(PathUtil.getFileName(event.path))
     }
 
+    /** Check both old and new paths for moves and renames, including removed dependency sources. */
+    private fun eventPaths(event: VFileEvent): List<String> = when (event) {
+        is VFileMoveEvent -> {
+            val name = event.file?.name ?: PathUtil.getFileName(event.path)
+            listOf(
+                event.path,
+                "${event.oldParent.path}/$name",
+                "${event.newParent.path}/$name",
+            )
+        }
+        is VFilePropertyChangeEvent -> if (event.propertyName == VirtualFile.PROP_NAME) {
+            val parent = event.file?.parent?.path
+            if (parent == null) listOf(event.path) else listOfNotNull(
+                event.path,
+                (event.oldValue as? String)?.let { "$parent/$it" },
+                (event.newValue as? String)?.let { "$parent/$it" },
+            )
+        } else listOf(event.path)
+        else -> listOf(event.path)
+    }
+
     private fun isCandidateName(fileName: String): Boolean {
-        return Just.isJustfile(fileName) || JUSTFILES_MARKDOWN.contains(fileName)
+        return Just.isJustfile(fileName) || JUSTFILES_MARKDOWN.contains(fileName) || fileName == JustIgnoreMatcher.FILE_NAME
     }
 
     override fun dispose() = Unit

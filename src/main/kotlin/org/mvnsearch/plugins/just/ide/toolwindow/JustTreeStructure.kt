@@ -21,51 +21,64 @@ class JustTreeStructure(
             is RootNode -> {
                 val baseDir = project.guessProjectDir()
 
-                // hide empty justfiles, a file not loaded yet is hidden until its async load refreshes the tree
+                // Keep Justfiles with modules but no root-level recipes visible.
                 justService.findJustfiles()
-                    .filter { recipesOrLoadAsync(it).isNotEmpty() }
+                    .filter { !contentsOrLoadAsync(it).isEmpty() }
                     .map {
-                    JustfileNode(project = project, file = it, relativePath = baseDir?.let { base ->
-                        VfsUtilCore.getRelativePath(it.parent, base)?.takeIf { relativePath ->
-                            relativePath.isNotEmpty()
-                        }
-                    })
-                }.sortedBy { it.file.path }.toTypedArray()
+                        JustfileNode(project = project, file = it, relativePath = baseDir?.let { base ->
+                            VfsUtilCore.getRelativePath(it.parent, base)?.takeIf { relativePath ->
+                                relativePath.isNotEmpty()
+                            }
+                        })
+                    }.sortedBy { it.file.path }.toTypedArray()
             }
 
             is JustfileNode -> {
-                val recipes = recipesOrLoadAsync(element.file)
-                val groups = recipes.mapNotNull { it.getGroup() }.distinct().sorted().map {
-                    GroupNode(project = project, file = element.file, group = it)
-                }
-
-                (groups + recipes.filter { it.getGroup() == null }).toTypedArray()
+                val contents = contentsOrLoadAsync(element.file)
+                childrenOf(element.file, "", contents)
             }
 
-            is GroupNode -> recipesOrLoadAsync(element.file).filter {
-                it.getGroup() == element.group
-            }.toTypedArray()
+            is ModuleNode -> childrenOf(element.file, element.modulePath, element.contents)
+
+            is GroupNode -> {
+                val contents = contentsOrLoadAsync(element.file)
+                val recipes = if (element.modulePath.isEmpty()) contents.recipes
+                else contents.moduleAt(element.modulePath)?.contents?.recipes.orEmpty()
+                recipes.filter { it.getGroup() == element.group }.toTypedArray()
+            }
 
             else -> emptyArray()
         }
     }
 
-    /**
-     * children are computed under a read action, so never run `just` here: return cached recipes, or load them asynchronously and refresh the tree later
-     */
-    private fun recipesOrLoadAsync(file: VirtualFile): List<RecipeNode> {
-        return justService.getCachedRecipes(file) ?: run {
-            justService.loadRecipesAsync(file, onRecipesLoaded)
-            emptyList()
+    private fun childrenOf(file: VirtualFile, modulePath: String, contents: JustfileContents): Array<Any> {
+        val groups = contents.recipes.mapNotNull { it.getGroup() }.distinct().sorted().map {
+            GroupNode(project = project, file = file, group = it, modulePath = modulePath)
         }
+        return (groups + contents.recipes.filter { it.getGroup() == null } + contents.modules).toTypedArray()
+    }
+
+    /**
+     * children are computed under a read action, so never run `just` here: return cached contents or load asynchronously
+     */
+    private fun contentsOrLoadAsync(file: VirtualFile): JustfileContents {
+        return justService.getCachedContents(file) ?: run {
+            justService.loadRecipesAsync(file, onRecipesLoaded)
+            JustfileContents()
+        }
+    }
+
+    private fun parentOfModule(file: VirtualFile, modulePath: String): Any {
+        if (modulePath.isEmpty()) return JustfileNode(project, file, null)
+        return justService.getCachedContents(file)?.moduleAt(modulePath) ?: JustfileNode(project, file, null)
     }
 
     override fun getParentElement(element: Any): Any? = when (element) {
         is JustfileNode -> root
-        is GroupNode -> JustfileNode(project, element.file, null)
-        is RecipeNode -> element.getGroup()?.let { GroupNode(project, element.file, it) }
-            ?: JustfileNode(project, element.file, null)
-
+        is ModuleNode -> parentOfModule(element.file, element.modulePath.substringBeforeLast("::", ""))
+        is GroupNode -> parentOfModule(element.file, element.modulePath)
+        is RecipeNode -> element.getGroup()?.let { GroupNode(project, element.file, it, element.modulePath) }
+            ?: parentOfModule(element.file, element.modulePath)
         else -> null
     }
 
