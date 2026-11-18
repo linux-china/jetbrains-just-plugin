@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 0.6.59 - 2026-11-18
+
+### Fixed
+
+- Add new Justfile in `Shift+Insert`/`Command+N` popup menu
+- Enhanced tool window w/ module support
 
 ## 0.6.58 - 2026-11-05
 
